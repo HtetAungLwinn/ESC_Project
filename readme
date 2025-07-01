@@ -1,29 +1,35 @@
-
-
-FRONTEND STUFF features
+lwin (FRONTEND STUFF features
 pages
 Log in, sign up page
 Home page
 Destination, check in dates, check out dates, number of guests, number of rooms
 
+Payment page
+User details
+Name, contact, account
+Payment options
+Booking confirmation page)
 
-Hotel search results page 
+
+
+thoai (Hotel search results page 
 Shows results
 Add in filter
 Filter guest rating, star rating, price range
-Sort by price and star rating
-Hotel rooms details page
+Sort by price and star rating)
+
+
+
+zy (Hotel rooms details page
 Room options
 Map
 Photos
 Reviews
 Description
-Available dates
+Available dates)
 
 
-Payment page
-User details
-Name, contact, account
-Payment options
-Booking confirmation page
+
+
+
 
