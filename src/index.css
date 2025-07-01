@@ -1,0 +1,160 @@
+/* Header container (full width) */
+.header {
+  display: flex;
+  justify-content: space-between;  
+  align-items: center;
+  background: linear-gradient(90deg, #d66a6a, #f08e8e);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Left side: icon + title */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: white;
+}
+.header-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Right side: Login / Sign Up */
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.header-actions .login-btn,
+.header-actions .signup-btn {
+  text-decoration: none;
+  font-weight: 500;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+.header-actions .login-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.header-actions .signup-btn {
+  background: white;
+  color: #d66a6a;
+}
+
+.header-actions .signup-btn:hover {
+  background: #f08e8e;
+  color: white;
+}
+
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.flex-container {
+  display: flex;
+  justify-content: center;
+}
+
+/* Header banner */
+.flex-container.header {
+  background: linear-gradient(90deg, #d66a6a, #f08e8e);
+  color: white;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-title {
+  font-size: 3rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Utility centered */
+.centered {
+  text-align: center;
+}
+
+.img img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  object-position: 50% 89%;
+}
+
+/* Subtitle under main heading */
+.subheading {
+  margin: 0 auto 2rem;
+  max-width: 500px;
+  line-height: 1.6;
+  font-size: 1.125rem;
+  color: #555;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Search card container */
+.search-box {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin: 2rem auto;
+  max-width: 1200px;
+}
+
+/* Individual field styling */
+.search-field {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 180px;
+  min-width: 160px;
+}
+
+.search-field label {
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.search-field input,
+.search-field select,
+.search-field .react-datepicker-wrapper input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+}
+
+/* Search button */
+.search-btn {
+  background-color: #d66a6a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  align-self: flex-end;
+}
+
+.search-btn:hover {
+  background-color: #b85252;
+}
