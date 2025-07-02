@@ -1,7 +1,11 @@
 import React from 'react';
 import { FiMapPin, FiChevronDown } from 'react-icons/fi';
 import { AiFillStar } from 'react-icons/ai';
+import { useNavigate } from "react-router-dom";
+import { Plane } from "lucide-react";
+import { Link } from "react-router-dom";
 import './HotelDetailsPage.css';
+
 
 const amenities = [
   'Air Conditioning', 'Business Center', 'Clothing Iron', 'Data Ports',
@@ -23,22 +27,17 @@ const reviews = [
 export default function HotelDetailsPage() {
   return (
     <div className="hotel-page">
-      <header className="header">
+      {/* Header with icon, title, and auth links */}
+      <div className="header">
         <div className="header-left">
-          <div className="logo">OCBC TRAVELS</div>
-          <nav className="nav-links">
-            <a href="#">Home</a>
-            <a href="#">Services</a>
-            <a href="#">Bookings</a>
-            <a href="#">Explore</a>
-            <a href="#">Membership</a>
-          </nav>
+          <Plane size={28} />
+          <div className="header-title">OCBC Travel</div>
         </div>
-        <div className="header-right">
-          <button className="btn-outline">Register</button>
-          <button className="btn-filled">Sign In</button>
+        <div className="header-actions">
+          <Link to="/login" className="login-btn">Login</Link>
+          <Link to="/signup" className="signup-btn">Sign Up</Link>
         </div>
-      </header>
+      </div>
 
       <section className="search-bar">
         <div className="search-item">

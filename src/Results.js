@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { Plane } from "lucide-react";
+import { Link } from "react-router-dom";
 
 
 const hotels = [
@@ -33,6 +35,18 @@ export default function Results() {
 
   return (
     <div>
+      {/* Header with icon, title, and auth links */}
+      <div className="header">
+        <div className="header-left">
+          <Plane size={28} />
+          <div className="header-title">OCBC Travel</div>
+        </div>
+        <div className="header-actions">
+          <Link to="/login" className="login-btn">Login</Link>
+          <Link to="/signup" className="signup-btn">Sign Up</Link>
+        </div>
+      </div>
+
       <h1>Hotel Search Results</h1>
 
       {/* Filters */}
