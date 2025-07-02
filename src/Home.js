@@ -1,11 +1,23 @@
 // src/Home.js
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import DateRangePicker from "./ReactDatePicker";
 import NumberSelector from "./NumberSelector";
 import { Plane } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Home() {
+  const [destination, setDestination] = useState("");
+  const navigate = useNavigate();
+
+
+  const handleSearch = () => {
+  if (destination.trim() !== "") {
+    navigate(`/results?destination=${encodeURIComponent(destination)}`);
+  }
+  };
+
   return (
     <div>
       {/* Header with icon, title, and auth links */}
@@ -43,8 +55,9 @@ export default function Home() {
           <input
             type="text"
             id="Destination"
-            name="Destination"
             placeholder="Where are you going?"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
           />
         </div>
 
@@ -68,7 +81,9 @@ export default function Home() {
 
         {/* Search button */}
         <div className="search-field">
-          <button className="search-btn">Search</button>
+            <button className="search-btn" onClick={handleSearch}>
+            Search
+          </button>
         </div>
       </div>
     </div>
