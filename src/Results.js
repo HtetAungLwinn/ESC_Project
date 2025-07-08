@@ -17,12 +17,15 @@ export default function Results() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const destination = searchParams.get("destination") || "";
+  const [sortOrder, setSortOrder] = useState("PriceLowToHigh");
+
 
   //other filters
   const [guestRatingFilter, setGuestRatingFilter] = useState(0);
   const [starRatingFilter, setStarRatingFilter] = useState(0);
   const [priceRange, setPriceRange] = useState([0, 1000]);
 
+  /*
   const filteredHotels = hotels.filter(hotel => {
     return (
       hotel.location.toLowerCase() === destination.toLowerCase() &&  // filter by location
@@ -32,6 +35,29 @@ export default function Results() {
       hotel.price <= priceRange[1]
     );
   });
+  */
+
+
+  const sortedHotels = hotels
+    .filter(hotel => hotel.location.toLowerCase() === destination.toLowerCase())
+    .sort((a, b) => {
+      switch (sortOrder) {
+        case "PriceLowToHigh":
+          return a.price - b.price;
+        case "PriceHighToLow":
+          return b.price - a.price;
+        case "StarLowToHigh":
+          return a.starRating - b.starRating;
+        case "StarHighToLow":
+          return b.starRating - a.starRating;
+        case "GuestLowToHigh":
+          return a.guestRating - b.guestRating;
+        case "GuestHighToLow":
+          return b.guestRating - a.guestRating;
+        default:
+          return 0;
+      }
+    });
 
   return (
     <div>
@@ -49,57 +75,25 @@ export default function Results() {
 
       <h1>Hotel Search Results</h1>
 
-      {/* Filters */}
-      <div>
-        <label>
-          Min Guest Rating:
-          <input
-            type="number"
-            min="0"
-            max="10"
-            step="0.1"
-            value={guestRatingFilter}
-            onChange={e => setGuestRatingFilter(parseFloat(e.target.value) || 0)}
-          />
-        </label>
+      {/* Sorting Dropdown */}
+      <label htmlFor="filters">Sort By:</label>
+      <select
+        id="filters"
+        value={sortOrder}
+        onChange={e => setSortOrder(e.target.value)}
+      >
+        <option value="PriceLowToHigh">Price (Lowest to Highest)</option>
+        <option value="PriceHighToLow">Price (Highest to Lowest)</option>
+        <option value="StarLowToHigh">Star Rating (Lowest to Highest)</option>
+        <option value="StarHighToLow">Star Rating (Highest to Lowest)</option>
+        <option value="GuestLowToHigh">Guest Rating (Lowest to Highest)</option>
+        <option value="GuestHighToLow">Guest Rating (Highest to Lowest)</option>
+      </select>
 
-        <label>
-          Min Star Rating:
-          <input
-            type="number"
-            min="0"
-            max="5"
-            step="1"
-            value={starRatingFilter}
-            onChange={e => setStarRatingFilter(parseInt(e.target.value) || 0)}
-          />
-        </label>
 
-        <label>
-          Price Range:
-          <input
-            type="number"
-            min="0"
-            max="10000"
-            step="1"
-            value={priceRange[0]}
-            onChange={e => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
-          />
-          to
-          <input
-            type="number"
-            min="0"
-            max="10000"
-            step="1"
-            value={priceRange[1]}
-            onChange={e => setPriceRange([priceRange[0], parseInt(e.target.value) || 0])}
-          />
-        </label>
-      </div>
-
-      {/* Display filtered hotels */}
+      {/* Hotel Results */}
       <ul>
-        {filteredHotels.map((hotel, index) => (
+        {sortedHotels.map((hotel, index) => (
           <li key={index}>
             <h2>{hotel.name}</h2>
             <p>Location: {hotel.location}</p>
@@ -109,6 +103,9 @@ export default function Results() {
           </li>
         ))}
       </ul>
+      
+      
+      
     </div>
   );
 }
