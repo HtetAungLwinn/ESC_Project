@@ -61,7 +61,16 @@ body {
 .flex-container {
   display: flex;
   justify-content: center;
+  margin: 50px;
+  gap: 20px;  
 }
+
+.input-group {
+  display: flex;
+  justify-content: center;
+  gap: 8px; /* gap between label and input */
+}
+
 
 /* Header banner */
 .flex-container.header {
