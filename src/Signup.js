@@ -1,9 +1,22 @@
 import React from "react";
+import { Plane } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Signup() {
   return (
     <div className="centered">
-      <h2 style={{ padding: "50px" }}>Sign Up</h2>
+      <div className="hotel-page">
+    {/* Header with icon, title, and auth links */}
+    <div className="header">
+         <div className="header-left">
+          <Plane size={28} />
+          <Link to="/" className="header-title">OCBC Travel</Link>
+        </div>
+    </div>
+    </div>
+    
+    <div className="centered">
+      <h2 style={{ padding: "40px" }}>Sign Up</h2>
       <form>
         <h3 className="section-header">1. Identification details</h3>
         <div className="flex-container">
@@ -57,6 +70,7 @@ export default function Signup() {
           <button type="submit">Create Account</button>
         </div>
       </form>
+    </div>
     </div>
   );
 }

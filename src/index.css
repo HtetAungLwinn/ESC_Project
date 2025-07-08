@@ -22,6 +22,7 @@
   color: white;
   text-transform: uppercase;
   margin: 0;
+  text-decoration: none
 }
 
 /* Right side: Login / Sign Up */
@@ -144,12 +145,16 @@ body {
   background-color: #b85252;
 }
 
-/* Form section headers */
 .section-header {
   background-color: #dbdbdb;
   padding-left: 100px;
   text-align: left;
   font-weight: bold;
+  height: 30px;
+  
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
 }
 
 /* Form layout */

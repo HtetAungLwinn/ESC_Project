@@ -37,9 +37,9 @@ export default function Results() {
     <div>
       {/* Header with icon, title, and auth links */}
       <div className="header">
-        <div className="header-left">
+       <div className="header-left">
           <Plane size={28} />
-          <div className="header-title">OCBC Travel</div>
+          <Link to="/" className="header-title">OCBC Travel</Link>
         </div>
         <div className="header-actions">
           <Link to="/login" className="login-btn">Login</Link>
