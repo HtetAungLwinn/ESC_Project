@@ -225,3 +225,21 @@ button[type="submit"]:hover {
   gap: 20px;
   margin-bottom: 30px;
 }
+
+
+.address-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #f9f9f9;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  min-width: 300px;
+  width: 100%;
+}
+
+.address-box .input-group input {
+  width: 100%;
+  min-width: 400px;
+}

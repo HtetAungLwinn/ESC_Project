@@ -16,7 +16,7 @@ export default function Signup() {
     </div>
     
     <div className="centered">
-      <h2 style={{ padding: "40px" }}>Sign Up</h2>
+      <h2 style={{ padding: "30px" }}>Sign Up</h2>
       <form>
         <h3 className="section-header">1. Identification details</h3>
         <div className="flex-container">
@@ -43,9 +43,25 @@ export default function Signup() {
         <h3 className="section-header">2. Contact details</h3>
         <div className="flex-container">
           <div className="input-group">
-            <label htmlFor="contact">Contact:</label>
+            <label htmlFor="contact">Phone contact:</label>
             <input type="text" id="contact" name="contact" />
           </div>
+          <div className="input-group">
+            <label>Billing Address:</label>
+            <div className="address-box">
+              <div className="input-group">
+                <label htmlFor="fulladdress">Address details</label>
+                <input type="text" id="fulladdress" name="fulladdress" />
+              </div>
+              <div className="input-group">
+                <label htmlFor="postal">Postal Code</label>
+                <input type="text" id="postal" name="postal" />
+              </div>
+            </div>
+          </div>
+
+
+
         </div>
 
         <h3 className="section-header">3. Login details</h3>
