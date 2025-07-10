@@ -54,12 +54,26 @@ export default function Results() {
 
 
   return (
+<<<<<<< HEAD
   <div>
     {/* Header */}
     <div className="header">
       <div className="header-left">
         <Plane size={28} />
         <div className="header-title">OCBC Travel</div>
+=======
+    <div>
+      {/* Header with icon, title, and auth links */}
+      <div className="header">
+       <div className="header-left">
+          <Plane size={28} />
+          <Link to="/" className="header-title">OCBC Travel</Link>
+        </div>
+        <div className="header-actions">
+          <Link to="/login" className="login-btn">Login</Link>
+          <Link to="/signup" className="signup-btn">Sign Up</Link>
+        </div>
+>>>>>>> 6ab2a5ccf4506a48e2abd4fe3d3af8ea18604cb8
       </div>
       <div className="header-actions">
         <Link to="/login" className="login-btn">Login</Link>
