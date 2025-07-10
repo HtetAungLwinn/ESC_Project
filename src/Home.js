@@ -14,9 +14,24 @@ export default function Home() {
 
   const handleSearch = () => {
   if (destination.trim() !== "") {
-    navigate(`/results?destination=${encodeURIComponent(destination)}`);
+    const nights = getNights();
+    navigate(
+      `/results?destination=${encodeURIComponent(destination)}&nights=${nights}&rooms=${rooms}`
+    );
   }
+};
+
+
+  // Calculate nights difference helper
+  const getNights = () => {
+    if (!dateRange.startDate || !dateRange.endDate) return 0;
+    const diffTime = dateRange.endDate.getTime() - dateRange.startDate.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
+
+  const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
+  const [rooms, setRooms] = useState(1);
+
 
   return (
     <div>
@@ -64,7 +79,7 @@ export default function Home() {
         {/* Stay Period */}
         <div className="search-field">
           <label>Stay Period:</label>
-          <DateRangePicker />
+          <DateRangePicker onChange={setDateRange} />
         </div>
 
         {/* Guests */}
