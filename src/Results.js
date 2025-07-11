@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Plane } from "lucide-react";
 import { Link } from "react-router-dom";
+import "./Results.css";
+
 
 const hotels = [
   { name: "Marina Bay Sands", location: "Singapore", price: 500, guestRating: 9.1, starRating: 5 },
@@ -54,7 +56,6 @@ export default function Results() {
   // HI MODIFY THIS PART TO GO TO HOTEL DETAILS PAGE FOR EACH HOTEL
   const handleSelect = (hotel) => {
     alert(`Selected ${hotel.name} for ${rooms} room(s), ${nights} night(s).`);
-    // Here you can add navigation or other logic
   };
 
   return (
