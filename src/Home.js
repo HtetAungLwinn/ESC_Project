@@ -93,14 +93,22 @@ export default function Home() {
   // Search
   const handleSearch = () => {
     if (!destination.trim()) return;
-    const nights = getNights();
-    navigate(
-      `/results?destination=${encodeURIComponent(destination)}` +
-      `&nights=${nights}` +
-      `&rooms=${rooms}` +
-      `&adults=${adults}` +
-      `&children=${children}`
-    );
+
+    fetch(`http://localhost:5000/api/destinations/uid?term=${encodeURIComponent(destination)}`)
+      .then(res => res.json())
+      .then(data => {
+        const uid = data.uid;
+        const nights = getNights();
+
+        navigate(
+          `/results?destination=${encodeURIComponent(destination)}` +
+          `&uid=${encodeURIComponent(uid)}` +
+          `&nights=${nights}` +
+          `&rooms=${rooms}` +
+          `&adults=${adults}` +
+          `&children=${children}`
+        );
+      });
   };
 
   return (

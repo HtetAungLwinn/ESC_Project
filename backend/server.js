@@ -12,7 +12,10 @@ app.use(express.json());
 
 // Routes
 const destinationRoutes = require('./routes/destinations');
+const hotelsRoutes = require('./routes/hotels');
+
 app.use('/api/destinations', destinationRoutes);
+app.use('/api/hotels', hotelsRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
