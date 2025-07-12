@@ -1,16 +1,72 @@
 // src/Home.js
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import DateRangePicker from "./ReactDatePicker";
 import NumberSelector from "./NumberSelector";
 import { Plane } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import Fuse from "fuse.js";
+import "./Home.css";
 
 export default function Home() {
   const [destination, setDestination] = useState("");
   const navigate = useNavigate();
 
+  const [allDestinations, setAllDestinations] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef(null);
+
+  // Load destinations
+  useEffect(() => {
+    fetch("/api/destinations/all")
+      .then((res) => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json();
+      })
+      .then((data) => {
+        const cleaned = data.map(d => typeof d === "string" ? d : d.destination).filter(Boolean);
+        setAllDestinations(cleaned);
+      })
+      .catch((err) => console.error("Error loading destinations:", err));
+    // setAllDestinations(["Paris", "London", "Tokyo", "New York", "Singapore"]);
+  }, []);
+
+  // Configure Fuse.js
+  const fuse = useMemo(() => new Fuse(allDestinations, {
+    threshold: 0.3,
+    minMatchCharLength: 2,
+  }), [allDestinations]);
+
+  // Destination input change
+  const handleDestinationChange = (e) => {
+    const value = e.target.value;
+    setDestination(value);
+
+    if (value.length > 1) {
+      const results = fuse.search(value).slice(0, 5); // Limit to 5 matches
+      setSuggestions(results.map(r => r.item));
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setDestination(suggestion);
+    setShowSuggestions(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      if (suggestions.length > 0 && showSuggestions) {
+        setDestination(suggestions[0]);
+        setShowSuggestions(false);
+      }
+      handleSearch();
+    }
+  };
 
   const handleSearch = () => {
   if (destination.trim() !== "") {
@@ -65,15 +121,35 @@ export default function Home() {
       {/* Search box */}
       <div className="search-box">
         {/* Destination field */}
-        <div className="search-field">
+        {/* Destination field */}
+        <div className="search-field" ref={searchRef}>
           <label htmlFor="Destination">Destination:</label>
-          <input
-            type="text"
-            id="Destination"
-            placeholder="Where are you going?"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-          />
+          <div style={{ position: "relative" }}>
+            <input
+              type="text"
+              id="Destination"
+              placeholder="Where are you going?"
+              value={destination}
+              onChange={handleDestinationChange}
+              onKeyDown={handleKeyDown}
+              onFocus={() => destination.length > 1 && setShowSuggestions(true)}
+              autoComplete="off"
+              style={{ width: "100%", padding: "10px" }}
+            />
+            {showSuggestions && suggestions.length > 0 && (
+              <ul className="suggestions-list">
+                {suggestions.map((suggestion, index) => (
+                  <li
+                    key={index}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    {suggestion}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
         {/* Stay Period */}
