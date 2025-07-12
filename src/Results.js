@@ -1,76 +1,87 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, Link } from "react-router-dom";
 import { Plane } from "lucide-react";
-import { Link } from "react-router-dom";
 import "./Results.css";
 
-
-const hotels = [
-  { name: "Marina Bay Sands", location: "Singapore", price: 500, guestRating: 9.1, starRating: 5 },
-  { name: "Orchard Hotel", location: "Singapore", price: 200, guestRating: 8.0, starRating: 4 },
-  { name: "Bali Beach Resort", location: "Bali", price: 150, guestRating: 7.5, starRating: 3 },
-  { name: "Bangkok Grand", location: "Bangkok", price: 100, guestRating: 6.8, starRating: 2 },
-];
+const HOTELS_PER_PAGE = 18;
 
 export default function Results() {
+  const [hotels, setHotels] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const destination = searchParams.get("destination") || "";
+  const uid = searchParams.get("uid") || "";
 
-  const nights = parseInt(searchParams.get("nights")) || 1;
-  const rooms = parseInt(searchParams.get("rooms")) || 1;
+  useEffect(() => {
+    const fetchHotels = async () => {
+      if (!uid) return;
 
-  const [sortOrder, setSortOrder] = useState("PriceLowToHigh");
-  const [guestRatingFilter, setGuestRatingFilter] = useState(0);
-  const [starRatingFilter, setStarRatingFilter] = useState(0);
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+      try {
+        const hotelRes = await fetch(`/api/hotels?destination_id=${uid}`);
+        if (!hotelRes.ok) throw new Error("Failed to fetch hotels");
 
-  const filteredAndSortedHotels = hotels
-    .filter(
-      (hotel) =>
-        hotel.location.toLowerCase() === destination.toLowerCase() &&
-        hotel.guestRating >= guestRatingFilter &&
-        hotel.starRating >= starRatingFilter &&
-        hotel.price >= priceRange[0] &&
-        hotel.price <= priceRange[1]
-    )
-    .sort((a, b) => {
-      switch (sortOrder) {
-        case "PriceLowToHigh":
-          return a.price - b.price;
-        case "PriceHighToLow":
-          return b.price - a.price;
-        case "StarLowToHigh":
-          return a.starRating - b.starRating;
-        case "StarHighToLow":
-          return b.starRating - a.starRating;
-        case "GuestLowToHigh":
-          return a.guestRating - b.guestRating;
-        case "GuestHighToLow":
-          return b.guestRating - a.guestRating;
-        default:
-          return 0;
+        const hotelData = await hotelRes.json();
+        console.log("Fetched hotels data:", hotelData);
+
+        // Normalize hotel data
+        const formattedHotels = hotelData.map((h) => ({
+          id: h.id || Math.random().toString(36).substr(2, 9),
+          name: h.name,
+          price: h.price || 100,
+          imageUrl:
+            h.image_details && h.image_details.prefix && h.image_details.suffix
+              ? `${h.image_details.prefix}${h.default_image_index ?? 0}${h.image_details.suffix}`
+              : null,
+        }));
+
+        setHotels(formattedHotels);
+        setCurrentPage(1); // reset page when hotels reload
+      } catch (err) {
+        console.error("Error fetching hotels:", err);
+        setHotels([]);
       }
-    });
+    };
 
-  // HI MODIFY THIS PART TO GO TO HOTEL DETAILS PAGE FOR EACH HOTEL
-  const handleSelect = (hotel) => {
-    alert(`Selected ${hotel.name} for ${rooms} room(s), ${nights} night(s).`);
+    fetchHotels();
+  }, [uid]);
+
+  // Calculate pagination data
+  const totalPages = Math.ceil(hotels.length / HOTELS_PER_PAGE);
+
+  // Slice hotels for current page
+  const hotelsToShow = hotels.slice(
+    (currentPage - 1) * HOTELS_PER_PAGE,
+    currentPage * HOTELS_PER_PAGE
+  );
+
+  // Handler for page change
+  const goToPage = (pageNum) => {
+    if (pageNum < 1 || pageNum > totalPages) return;
+    setCurrentPage(pageNum);
   };
 
   return (
-    <div style={{ padding: "1rem" }}>
+    <div>
       {/* Header */}
       <div
         className="header"
-        style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1rem",
+        }}
       >
-        <div className="header-left" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <Plane size={28} />
-          <Link to="/" className="header-title">OCBC Travel</Link>
+          <Link to="/" className="header-title" style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
+            OCBC Travel
+          </Link>
         </div>
-        <div className="header-actions">
-          <Link to="/login" className="login-btn" style={{ marginRight: "1rem" }}>
+        <div style={{ display: "flex", gap: "1rem" }}>
+          <Link to="/login" className="login-btn">
             Login
           </Link>
           <Link to="/signup" className="signup-btn">
@@ -79,134 +90,169 @@ export default function Results() {
         </div>
       </div>
 
-      <h1>Hotel Search Results</h1>
+      <h1 style={{ marginBottom: "1rem" }}>Hotels in {destination}</h1>
 
-      {/* Sorting dropdown */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
-        <label htmlFor="filters">Sort By:&nbsp;</label>
-        <select
-          id="filters"
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-          style={{ padding: "0.25rem", fontSize: "1rem" }}
+      <div style={{ display: "flex", gap: "2rem" }}>
+        {/* Left: Hotels grid */}
+        <div
+          style={{
+            flex: 3,
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gridAutoRows: "minmax(280px, auto)",
+            gap: "1rem",
+          }}
         >
-          <option value="PriceLowToHigh">Price (Lowest to Highest)</option>
-          <option value="PriceHighToLow">Price (Highest to Lowest)</option>
-          <option value="StarLowToHigh">Star Rating (Lowest to Highest)</option>
-          <option value="StarHighToLow">Star Rating (Highest to Lowest)</option>
-          <option value="GuestLowToHigh">Guest Rating (Lowest to Highest)</option>
-          <option value="GuestHighToLow">Guest Rating (Highest to Highest)</option>
-        </select>
-      </div>
-
-      {/* Main content */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "2rem" }}>
-        {/* Filters sidebar */}
-        <div style={{ minWidth: "220px", borderRight: "1px solid #ccc", paddingRight: "1rem" }}>
-          <h3>Filter Results</h3>
-          <div style={{ marginBottom: "1rem" }}>
-            <label>
-              Min Guest Rating:<br />
-              <input
-                type="number"
-                min="0"
-                max="10"
-                step="0.1"
-                value={guestRatingFilter}
-                onChange={(e) => setGuestRatingFilter(parseFloat(e.target.value) || 0)}
-                style={{ width: "100%" }}
-              />
-            </label>
-          </div>
-          <div style={{ marginBottom: "1rem" }}>
-            <label>
-              Min Star Rating:<br />
-              <input
-                type="number"
-                min="0"
-                max="5"
-                step="1"
-                value={starRatingFilter}
-                onChange={(e) => setStarRatingFilter(parseInt(e.target.value) || 0)}
-                style={{ width: "100%" }}
-              />
-            </label>
-          </div>
-          <div style={{ marginBottom: "1rem" }}>
-            <label>
-              Price Range:<br />
-              <input
-                type="number"
-                min="0"
-                max="10000"
-                value={priceRange[0]}
-                onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
-                style={{ width: "48%", marginRight: "4%" }}
-              />
-              <input
-                type="number"
-                min="0"
-                max="10000"
-                value={priceRange[1]}
-                onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 0])}
-                style={{ width: "48%" }}
-              />
-            </label>
-          </div>
-        </div>
-
-        {/* Hotel results list */}
-        <div style={{ flex: 1 }}>
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            {filteredAndSortedHotels.map((hotel, index) => {
-              const totalPrice = hotel.price * nights * rooms;
-              return (
-                <li
-                  key={index}
+          {hotelsToShow.length === 0 ? (
+            <p>No hotels available for this destination.</p>
+          ) : (
+            hotelsToShow.map((hotel) => (
+              <div
+                key={hotel.id}
+                style={{
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                  cursor: "pointer",
+                  boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+                  transition: "transform 0.2s",
+                }}
+                onClick={() => alert(`Go to details page for ${hotel.name}`)}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              >
+                {hotel.imageUrl ? (
+                  <img
+                    src={hotel.imageUrl}
+                    alt={hotel.name}
+                    style={{ width: "100%", height: "180px", objectFit: "cover" }}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "180px",
+                      backgroundColor: "#ccc",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#666",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    No Image
+                  </div>
+                )}
+                <div
                   style={{
-                    borderBottom: "1px solid #ccc",
-                    padding: "1rem 0",
+                    padding: "0.5rem 1rem",
+                    flexGrow: 1,
                     display: "flex",
+                    flexDirection: "column",
                     justifyContent: "space-between",
-                    alignItems: "center",
                   }}
                 >
-                  <div>
-                    <h2>{hotel.name}</h2>
-                    <p>Location: {hotel.location}</p>
-                    <p>Guest Rating: {hotel.guestRating}</p>
-                    <p>Star Rating: {hotel.starRating}</p>
-                  </div>
+                  <h3
+                    style={{
+                      fontSize: "1.1rem",
+                      margin: "0 0 0.5rem",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                    title={hotel.name}
+                  >
+                    {hotel.name}
+                  </h3>
+                  <p
+                    style={{
+                      fontWeight: "bold",
+                      fontSize: "1rem",
+                      margin: 0,
+                      color: "#007bff",
+                    }}
+                  >
+                    ${hotel.price.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
 
-                  {/* Total price and select button */}
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontWeight: "bold", fontSize: "1.1rem", marginBottom: "0.5rem" }}>
-                      Total Price: ${totalPrice.toLocaleString()}
-                      <br />
-                      ({rooms} room{rooms > 1 ? "s" : ""}, {nights} night{nights > 1 ? "s" : ""} × ${hotel.price} per night)
-                    </div>
-                    <button
-                      onClick={() => handleSelect(hotel)}
-                      style={{
-                        padding: "0.5rem 1rem",
-                        fontSize: "1rem",
-                        cursor: "pointer",
-                        borderRadius: "4px",
-                        border: "1px solid #007bff",
-                        backgroundColor: "#007bff",
-                        color: "white",
-                      }}
-                    >
-                      Select
-                    </button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+        {/* Right: Placeholder image */}
+        <div
+          style={{
+            flex: 1,
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            height: "calc(6 * 280px + 5 * 1rem)", // height to roughly match 6 rows + gaps
+            overflow: "hidden",
+          }}
+        >
+          <img
+            src="https://via.placeholder.com/400x1700?text=Map+Placeholder"
+            alt="Map Placeholder"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
         </div>
       </div>
+
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div
+          style={{
+            marginTop: "1.5rem",
+            display: "flex",
+            justifyContent: "center",
+            gap: "0.5rem",
+            flexWrap: "wrap",
+          }}
+        >
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            style={{
+              padding: "0.4rem 0.8rem",
+              cursor: currentPage === 1 ? "not-allowed" : "pointer",
+            }}
+          >
+            Prev
+          </button>
+
+          {[...Array(totalPages)].map((_, idx) => {
+            const pageNum = idx + 1;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => goToPage(pageNum)}
+                style={{
+                  padding: "0.4rem 0.8rem",
+                  fontWeight: currentPage === pageNum ? "bold" : "normal",
+                  textDecoration: currentPage === pageNum ? "underline" : "none",
+                  cursor: "pointer",
+                }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            style={{
+              padding: "0.4rem 0.8rem",
+              cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+            }}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
-
 }

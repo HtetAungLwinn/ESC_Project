@@ -11,11 +11,15 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-const destinationRoutes = require('./routes/destinations');
-app.use('/api/destinations', destinationRoutes);
 const signupRoutes = require('./routes/signup');
+const destinationRoutes = require('./routes/destinations');
+const hotelsRoutes = require('./routes/hotels');
+
 app.use('/api/signup', signupRoutes);
+app.use('/api/destinations', destinationRoutes);
+app.use('/api/hotels', hotelsRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
