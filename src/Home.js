@@ -1,66 +1,76 @@
 // src/Home.js
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { Link } from "react-router-dom";
-import DateRangePicker from "./ReactDatePicker";
-import NumberSelector from "./NumberSelector";
+import { Link, useNavigate } from "react-router-dom";
 import { Plane } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import Fuse from "fuse.js";
-import "./Home.css";
+
+import DateRangePicker from "./ReactDatePicker";
+// inlined Rooms & Guests dropdown; no separate component
 
 export default function Home() {
   const [destination, setDestination] = useState("");
-  const navigate = useNavigate();
-
   const [allDestinations, setAllDestinations] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef(null);
 
-  // Load destinations
+  const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
+  const [rooms, setRooms]       = useState(1);
+  const [adults, setAdults]     = useState(1);
+  const [children, setChildren] = useState(0);
+
+  // Dropdown open state and ref
+  const [rgOpen, setRgOpen] = useState(false);
+  const rgRef = useRef(null);
+
+  const navigate = useNavigate();
+
+  // Close room/guest dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (rgRef.current && !rgRef.current.contains(e.target)) {
+        setRgOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Fetch destinations
   useEffect(() => {
     fetch("/api/destinations/all")
-      .then((res) => {
+      .then(res => {
         if (!res.ok) throw new Error("Network response was not ok");
         return res.json();
       })
-      .then((data) => {
-        const cleaned = data.map(d => typeof d === "string" ? d : d.destination).filter(Boolean);
-        setAllDestinations(cleaned);
+      .then(data => {
+        const list = data.map(d => (typeof d === "string" ? d : d.destination)).filter(Boolean);
+        setAllDestinations(list);
       })
-      .catch((err) => console.error("Error loading destinations:", err));
-    // setAllDestinations(["Paris", "London", "Tokyo", "New York", "Singapore"]);
+      .catch(console.error);
   }, []);
 
-  // Configure Fuse.js
-  const fuse = useMemo(() => new Fuse(allDestinations, {
-    threshold: 0.3,
-    minMatchCharLength: 2,
-  }), [allDestinations]);
 
-  // Destination input change
-  const handleDestinationChange = (e) => {
-    const value = e.target.value;
-    setDestination(value);
+  const fuse = useMemo(
+    () => new Fuse(allDestinations, { threshold: 0.3, minMatchCharLength: 2 }),
+    [allDestinations]
+  );
 
-    if (value.length > 1) {
-      const results = fuse.search(value).slice(0, 5); // Limit to 5 matches
-      setSuggestions(results.map(r => r.item));
+  // Handlers
+  const handleDestinationChange = e => {
+    const v = e.target.value;
+    setDestination(v);
+    if (v.length > 1) {
+      setSuggestions(fuse.search(v).slice(0, 5).map(r => r.item));
       setShowSuggestions(true);
     } else {
-      setSuggestions([]);
       setShowSuggestions(false);
     }
   };
-
-  const handleSuggestionClick = (suggestion) => {
-    setDestination(suggestion);
-    setShowSuggestions(false);
-  };
-
-  const handleKeyDown = (e) => {
+  const handleSuggestionClick = s => { setDestination(s); setShowSuggestions(false); };
+  const handleKeyDown = e => {
     if (e.key === "Enter") {
-      if (suggestions.length > 0 && showSuggestions) {
+      if (showSuggestions && suggestions.length) {
         setDestination(suggestions[0]);
         setShowSuggestions(false);
       }
@@ -68,30 +78,34 @@ export default function Home() {
     }
   };
 
-  const handleSearch = () => {
-  if (destination.trim() !== "") {
-    const nights = getNights();
-    navigate(
-      `/results?destination=${encodeURIComponent(destination)}&nights=${nights}&rooms=${rooms}`
-    );
-  }
-};
-
-
-  // Calculate nights difference helper
+  // Night difference
   const getNights = () => {
-    if (!dateRange.startDate || !dateRange.endDate) return 0;
-    const diffTime = dateRange.endDate.getTime() - dateRange.startDate.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const { startDate, endDate } = dateRange;
+    if (!startDate || !endDate) return 0;
+    const diff = endDate.getTime() - startDate.getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
-  const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
-  const [rooms, setRooms] = useState(1);
+  // Increment/Decrement helpers
+  const inc = (fn, max) => () => fn(v => Math.min(v + 1, max));
+  const dec = (fn, min) => () => fn(v => Math.max(v - 1, min));
 
+  // Search
+  const handleSearch = () => {
+    if (!destination.trim()) return;
+    const nights = getNights();
+    navigate(
+      `/results?destination=${encodeURIComponent(destination)}` +
+      `&nights=${nights}` +
+      `&rooms=${rooms}` +
+      `&adults=${adults}` +
+      `&children=${children}`
+    );
+  };
 
   return (
     <div>
-      {/* Header with icon, title, and auth links */}
+      {/* Header */}
       <div className="header">
         <div className="header-left">
           <Plane size={28} />
@@ -103,48 +117,38 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Banner image */}
+      {/* Banner */}
       <div className="img">
-        <img
-          src={process.env.PUBLIC_URL + "/photos/headliner.jpg"}
-          alt="Banner"
-        />
+        <img src={process.env.PUBLIC_URL + "/photos/headliner.jpg"} alt="Banner" />
       </div>
 
-      {/* Main title and subtitle */}
+      {/* Title */}
       <h1 className="centered">Travel Website</h1>
       <p className="subheading">
         Discover amazing hotels, compare prices, and book your ideal
         accommodation for your next adventure.
       </p>
 
-      {/* Search box */}
+      {/* Search card */}
       <div className="search-box">
-        {/* Destination field */}
-        {/* Destination field */}
+        {/* Destination */}
         <div className="search-field" ref={searchRef}>
-          <label htmlFor="Destination">Destination:</label>
+          <label>Destination:</label>
           <div style={{ position: "relative" }}>
             <input
               type="text"
-              id="Destination"
               placeholder="Where are you going?"
               value={destination}
               onChange={handleDestinationChange}
               onKeyDown={handleKeyDown}
               onFocus={() => destination.length > 1 && setShowSuggestions(true)}
               autoComplete="off"
-              style={{ width: "100%", padding: "10px" }}
             />
             {showSuggestions && suggestions.length > 0 && (
               <ul className="suggestions-list">
-                {suggestions.map((suggestion, index) => (
-                  <li
-                    key={index}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                    onMouseDown={(e) => e.preventDefault()}
-                  >
-                    {suggestion}
+                {suggestions.map((s,i) => (
+                  <li key={i} onMouseDown={e => e.preventDefault()} onClick={() => handleSuggestionClick(s)}>
+                    {s}
                   </li>
                 ))}
               </ul>
@@ -158,23 +162,50 @@ export default function Home() {
           <DateRangePicker onChange={setDateRange} />
         </div>
 
-        {/* Guests */}
-        <div className="search-field">
-          <label htmlFor="numberOfGuest">No. of Guests:</label>
-          <NumberSelector id="numberOfGuest" label="" min={1} max={5} />
-        </div>
-
-        {/* Rooms */}
-        <div className="search-field">
-          <label htmlFor="numberOfRoom">No. of Rooms:</label>
-          <NumberSelector id="numberOfRoom" label="" min={1} max={5} />
+        {/* Rooms & Guests Dropdown */}
+        <div className="search-field" ref={rgRef}>
+          <label>Rooms & Guests:</label>
+          <div className="rg-dropdown">
+            <button className="rg-toggle" type="button" onClick={() => setRgOpen(o => !o)}>
+              Room {rooms}, Guest {adults + children}
+            </button>
+            {rgOpen && (
+              <div className="rg-panel">
+                <div className="rg-row">
+                  <span>Rooms</span>
+                  <div className="rg-controls">
+                    <button onClick={dec(setRooms,1)}>-</button>
+                    <span>{rooms}</span>
+                    <button onClick={inc(setRooms,10)}>+</button>
+                  </div>
+                </div>
+                <div className="rg-row">
+                  <span>Adults</span>
+                  <div className="rg-controls">
+                    <button onClick={dec(setAdults,1)}>-</button>
+                    <span>{adults}</span>
+                    <button onClick={inc(setAdults,10)}>+</button>
+                  </div>
+                </div>
+                <div className="rg-row">
+                  <span>Children</span>
+                  <div className="rg-controls">
+                    <button onClick={dec(setChildren,0)}>-</button>
+                    <span>{children}</span>
+                    <button onClick={inc(setChildren,10)}>+</button>
+                  </div>
+                </div>
+                <button className="rg-done" type="button" onClick={() => setRgOpen(false)}>
+                  Done
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Search button */}
-        <div className="search-field">
-            <button className="search-btn" onClick={handleSearch}>
-            Search
-          </button>
+        <div className="search-field search-button">
+            <button className="search-btn" onClick={handleSearch}>Search</button>
         </div>
       </div>
     </div>
