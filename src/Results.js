@@ -63,6 +63,8 @@ export default function Results() {
   };
 
   return (
+
+    
     <div>
       {/* Header */}
       <div
@@ -189,7 +191,7 @@ export default function Results() {
             flex: 1,
             border: "1px solid #ddd",
             borderRadius: "8px",
-            height: "calc(6 * 280px + 5 * 1rem)", // height to roughly match 6 rows + gaps
+            height: "calc(6 * 280px + 5 * 1rem)",
             overflow: "hidden",
           }}
         >
