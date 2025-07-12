@@ -13,6 +13,8 @@ app.use(express.json());
 // Routes
 const destinationRoutes = require('./routes/destinations');
 app.use('/api/destinations', destinationRoutes);
+const signupRoutes = require('./routes/signup');
+app.use('/api/signup', signupRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
