@@ -38,7 +38,7 @@ export default function Home() {
 
   // Fetch destinations
   useEffect(() => {
-    fetch("/api/destinations/all")
+    fetch("http://localhost:5000/api/destinations/all")
       .then(res => {
         if (!res.ok) throw new Error("Network response was not ok");
         return res.json();
@@ -61,7 +61,7 @@ export default function Home() {
     const v = e.target.value;
     setDestination(v);
     if (v.length > 1) {
-      setSuggestions(fuse.search(v).slice(0, 5).map(r => r.item));
+      setSuggestions(fuse.search(v).slice(0, 8).map(r => r.item));
       setShowSuggestions(true);
     } else {
       setShowSuggestions(false);

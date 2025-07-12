@@ -267,7 +267,7 @@ button[type="submit"]:hover {
 .suggestions-list {
   position: absolute;
   width: calc(100% - 2px); /* Account for border */
-  max-height: 200px;
+  max-height: 130px;
   overflow-y: auto;
   background: white;
   border: 1px solid #ddd;
@@ -283,6 +283,7 @@ button[type="submit"]:hover {
 }
 
 .suggestions-list li {
+  font-size: 0.85rem;
   padding: 8px 12px;
   cursor: pointer;
   transition: background-color 0.2s;
