@@ -67,7 +67,7 @@ export default function Results() {
       >
         <div className="header-left" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <Plane size={28} />
-          <div className="header-title">OCBC Travel</div>
+          <Link to="/" className="header-title">OCBC Travel</Link>
         </div>
         <div className="header-actions">
           <Link to="/login" className="login-btn" style={{ marginRight: "1rem" }}>
