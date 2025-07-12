@@ -20,6 +20,7 @@ export default function Login() {
       </div>
       </div>
       <h2 style={{ padding: "50px" }}>Login</h2>
+      <div className="login-card">
       <form>
         <div className="login-form-container">
           <div className="input-group">
@@ -35,6 +36,7 @@ export default function Login() {
           <button type="submit">Log In</button>
         </div>
       </form>
+    </div>
     </div>
   );
 }

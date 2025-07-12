@@ -16,7 +16,8 @@ export default function Signup() {
     </div>
     
     <div className="centered">
-      <h2 style={{ padding: "30px" }}>Sign Up</h2>
+      <h2 style={{ padding: "20px" }}>Sign Up</h2>
+      <div className="signup-card">
       <form>
         <h3 className="section-header">1. Identification details</h3>
         <div className="flex-container">
@@ -84,6 +85,7 @@ export default function Signup() {
           <button type="submit">Create Account</button>
         </div>
       </form>
+    </div>
     </div>
     </div>
   );

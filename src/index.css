@@ -243,3 +243,21 @@ button[type="submit"]:hover {
   width: 100%;
   min-width: 400px;
 }
+
+.signup-card {
+  background-color: #fff;
+  border-radius: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+}
+
+.login-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  max-width: 200px;
+  margin: 0 auto 2rem;  
+}
