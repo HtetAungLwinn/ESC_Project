@@ -149,14 +149,12 @@ export default function Results() {
   return (
     <div>
       {/* Header */}
-      <div className="header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+      <div className="header">
+        <div className="header-left">
           <Plane size={28} />
-          <Link to="/" className="header-title" style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
-            OCBC Travel
-          </Link>
+          <Link to="/" className="header-title">OCBC Travel</Link>
         </div>
-        <div style={{ display: "flex", gap: "1rem" }}>
+        <div className="header-actions">
           <Link to="/login" className="login-btn">Login</Link>
           <Link to="/signup" className="signup-btn">Sign Up</Link>
         </div>
@@ -240,9 +238,9 @@ export default function Results() {
         </div>
       </div>
 
-      <h1 style={{ marginBottom: "1rem" }}>Hotels in {destination}</h1>
+      <h1 style={{ marginBottom: "1rem", marginLeft: "2rem" }}>Hotels in {destination}</h1>
 
-      <div style={{ display: "flex", gap: "2rem" }}>
+      <div style={{ display: "flex", gap: "2rem", marginLeft: "2rem" }}>
         {/* Left: Hotels grid */}
         <div style={{
           flex: 3,
