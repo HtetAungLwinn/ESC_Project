@@ -16,6 +16,12 @@ export default function Results() {
   const searchParams = new URLSearchParams(location.search);
   const destination = searchParams.get("destination") || "";
   const uid = searchParams.get("uid") || "";
+  const checkinParam = searchParams.get("checkin");
+  const checkoutParam = searchParams.get("checkout");
+  const roomsParam = parseInt(searchParams.get("rooms") || "1", 10);
+  const adultsParam = parseInt(searchParams.get("adults") || "1", 10);
+  const childrenParam = parseInt(searchParams.get("children") || "0", 10);
+  const totalGuests = adultsParam + childrenParam;
 
   const [destinationInput, setDestinationInput] = useState(destination);
   const [allDestinations, setAllDestinations] = useState([]);
@@ -85,6 +91,9 @@ export default function Results() {
   const handleSearch = () => {
     if (!destinationInput.trim()) return;
 
+    const checkin = dateRange.startDate?.toISOString().split("T")[0];
+    const checkout = dateRange.endDate?.toISOString().split("T")[0];
+
     fetch(`http://localhost:5000/api/destinations/uid?term=${encodeURIComponent(destinationInput)}`)
       .then(res => res.json())
       .then(data => {
@@ -94,6 +103,8 @@ export default function Results() {
         navigate(
           `/results?destination=${encodeURIComponent(destinationInput)}` +
           `&uid=${encodeURIComponent(uid)}` +
+          `&checkin=${checkin}` +
+          `&checkout=${checkout}` +
           `&nights=${nights}` +
           `&rooms=${rooms}` +
           `&adults=${adults}` +
@@ -103,9 +114,37 @@ export default function Results() {
   };
 
   useEffect(() => {
-    const fetchHotels = async () => {
-      if (!uid) return;
+    if (!uid || !checkinParam || !checkoutParam || !totalGuests) return;
 
+    const fetchHotelPrices = async (hotelList) => {
+      try {
+        const res = await fetch(
+          `/api/hotels/prices?destination_id=${uid}` +
+          `&checkin=${checkinParam}` +
+          `&checkout=${checkoutParam}` +
+          `&lang=en_US&currency=SGD&country_code=SG&guests=${totalGuests}&partner_id=1`
+        );
+
+        if (!res.ok) throw new Error("Failed to fetch bulk prices");
+
+        const priceData = await res.json();
+
+        const priceMap = {};
+        priceData.hotels?.forEach(h => {
+          priceMap[h.id] = h.price;
+        });
+
+        return hotelList.map(hotel => ({
+          ...hotel,
+          price: priceMap[hotel.id] || hotel.price || 0,
+        }));
+      } catch (err) {
+        console.error("Failed to fetch bulk prices:", err);
+        return hotelList;
+      }
+    };
+
+    const fetchHotels = async () => {
       try {
         const hotelRes = await fetch(`/api/hotels?destination_id=${uid}`);
         if (!hotelRes.ok) throw new Error("Failed to fetch hotels");
@@ -116,14 +155,19 @@ export default function Results() {
         const formattedHotels = hotelData.map((h) => ({
           id: h.id || Math.random().toString(36).substr(2, 9),
           name: h.name,
-          price: h.price || 100,
+          price: h.price || 0,
           imageUrl:
             h.image_details && h.image_details.prefix && h.image_details.suffix
               ? `${h.image_details.prefix}${h.default_image_index ?? 0}${h.image_details.suffix}`
               : null,
         }));
 
-        setHotels(formattedHotels);
+        const hotelsWithPrices = await fetchHotelPrices(formattedHotels);
+        // Filter out hotels with null, undefined, or 0 price
+        const validHotels = hotelsWithPrices.filter(h => h.price);
+
+        setHotels(validHotels);
+
         setCurrentPage(1);
       } catch (err) {
         console.error("Error fetching hotels:", err);
@@ -132,7 +176,7 @@ export default function Results() {
     };
 
     fetchHotels();
-  }, [uid]);
+  }, [uid, checkinParam, checkoutParam, totalGuests]);
 
   const totalPages = Math.ceil(hotels.length / HOTELS_PER_PAGE);
 

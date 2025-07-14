@@ -16,7 +16,7 @@ async function getAllDestinations(req, res) {
   return res.json(cachedDestinations);
 }
 
-// Feature 2: Get UID by destination term and display all relevant hotels based on the matched UID
+// Feature 2: Get UID by destination term from the SQL database
 async function getUidByDestinationTerm(req, res) {
   const { term } = req.query;
 

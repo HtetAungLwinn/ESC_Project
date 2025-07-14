@@ -100,9 +100,14 @@ export default function Home() {
         const uid = data.uid;
         const nights = getNights();
 
+        const checkin = dateRange.startDate?.toISOString().split("T")[0];
+        const checkout = dateRange.endDate?.toISOString().split("T")[0];
+
         navigate(
           `/results?destination=${encodeURIComponent(destination)}` +
           `&uid=${encodeURIComponent(uid)}` +
+          `&checkin=${checkin}` +
+          `&checkout=${checkout}` +
           `&nights=${nights}` +
           `&rooms=${rooms}` +
           `&adults=${adults}` +
