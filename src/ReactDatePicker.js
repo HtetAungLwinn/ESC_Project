@@ -21,6 +21,7 @@ export default function DateRangePicker({ onChange }) {
         onChange={setStartDate}
         startDate={startDate}
         endDate={endDate}
+        minDate={new Date()}
         placeholderText="Start date"
       />
       <DatePicker
@@ -29,7 +30,7 @@ export default function DateRangePicker({ onChange }) {
         onChange={setEndDate}
         startDate={startDate}
         endDate={endDate}
-        minDate={startDate}
+        minDate={startDate || new Date()}
         placeholderText="End date"
       />
     </div>
