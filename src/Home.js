@@ -3,9 +3,6 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Plane } from "lucide-react";
 import Fuse from "fuse.js";
-
-import DateRangePicker from "./ReactDatePicker";
-import HeaderBanner from "./DestinationBanner";
 import DestinationBanner from "./DestinationBanner";
 // inlined Rooms & Guests dropdown; no separate component
 
@@ -152,6 +149,7 @@ export default function Home() {
           handleDestinationChange={handleDestinationChange}
           handleKeyDown={handleKeyDown}
           showSuggestions={showSuggestions}
+          setShowSuggestions={setShowSuggestions}
           suggestions={suggestions}
           handleSuggestionClick={handleSuggestionClick}
           setDateRange={setDateRange}

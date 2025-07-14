@@ -7,6 +7,7 @@ export default function DestinationBanner({
   handleDestinationChange,
   handleKeyDown,
   showSuggestions,
+  setShowSuggestions,
   suggestions,
   handleSuggestionClick,
   setDateRange,
@@ -24,6 +25,7 @@ export default function DestinationBanner({
   dec,
 }) {
   return (
+    
     <div>
       <div className="search-box">
         {/* Destination */}
