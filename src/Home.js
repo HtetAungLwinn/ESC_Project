@@ -3,8 +3,9 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Plane } from "lucide-react";
 import Fuse from "fuse.js";
-import DestinationBanner from "./DestinationBanner";
-// inlined Rooms & Guests dropdown; no separate component
+import DateRangePicker from "./ReactDatePicker";
+
+
 
 export default function Home() {
   const [destination, setDestination] = useState("");
@@ -143,29 +144,84 @@ export default function Home() {
       </p>
 
           {/* Search card */}
-          <DestinationBanner
-          searchRef={searchRef}
-          destination={destination}
-          handleDestinationChange={handleDestinationChange}
-          handleKeyDown={handleKeyDown}
-          showSuggestions={showSuggestions}
-          setShowSuggestions={setShowSuggestions}
-          suggestions={suggestions}
-          handleSuggestionClick={handleSuggestionClick}
-          setDateRange={setDateRange}
-          rgRef={rgRef}
-          rgOpen={rgOpen}
-          setRgOpen={setRgOpen}
-          rooms={rooms}
-          adults={adults}
-          children={children}
-          setRooms={setRooms}
-          setAdults={setAdults}
-          setChildren={setChildren}
-          handleSearch={handleSearch}
-          inc={inc}
-          dec={dec}
-        />
+          <div>
+      <div className="search-box">
+        {/* Destination */}
+        <div className="search-field" ref={searchRef}>
+          <label>Destination:</label>
+          <div style={{ position: "relative" }}>
+            <input
+              type="text"
+              placeholder="Where are you going?"
+              value={destination}
+              onChange={handleDestinationChange}
+              onKeyDown={handleKeyDown}
+              onFocus={() => destination.length > 1 && setShowSuggestions(true)}
+              autoComplete="off"
+            />
+            {showSuggestions && suggestions.length > 0 && (
+              <ul className="suggestions-list">
+                {suggestions.map((s, i) => (
+                  <li
+                    key={i}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => handleSuggestionClick(s)}
+                  >
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        {/* Stay Period */}
+        <div className="search-field">
+          <label>Stay Period:</label>
+          <DateRangePicker onChange={setDateRange} />
+        </div>
+
+        {/* Rooms & Guests Dropdown */}
+        <div className="search-field" ref={rgRef}>
+          <label>Rooms & Guests:</label>
+          <div className="rg-dropdown">
+            <button
+              className="rg-toggle"
+              type="button"
+              onClick={() => setRgOpen((o) => !o)}
+            >
+              Room {rooms}, Guest {adults + children}
+            </button>
+            {rgOpen && (
+              <div className="rg-panel">
+                {[
+                  { label: "Rooms", value: rooms, set: setRooms, min: 1 },
+                  { label: "Adults", value: adults, set: setAdults, min: 1 },
+                  { label: "Children", value: children, set: setChildren, min: 0 },
+                ].map(({ label, value, set, min }) => (
+                  <div className="rg-row" key={label}>
+                    <span>{label}</span>
+                    <div className="rg-controls">
+                      <button onClick={dec(set, min)}>-</button>
+                      <span>{value}</span>
+                      <button onClick={inc(set, 10)}>+</button>
+                    </div>
+                  </div>
+                ))}
+                <button className="rg-done" type="button" onClick={() => setRgOpen(false)}>
+                  Done
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Search button */}
+        <div className="search-field search-button">
+          <button className="search-btn" onClick={handleSearch}>Search</button>
+        </div>
+      </div>
+    </div>
     </div>
   );
 }
