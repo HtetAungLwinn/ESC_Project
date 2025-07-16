@@ -14,10 +14,12 @@ app.use(express.json());
 const signupRoutes = require('./routes/signup');
 const destinationRoutes = require('./routes/destinations');
 const hotelsRoutes = require('./routes/hotels');
+const paymentRoutes = require('./routes/paymentMock');
 
 app.use('/api/signup', signupRoutes);
 app.use('/api/destinations', destinationRoutes);
 app.use('/api/hotels', hotelsRoutes);
+app.use('/api/payment', paymentRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

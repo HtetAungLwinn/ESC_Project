@@ -6,6 +6,8 @@ import Login  from "./Login";
 import Signup from "./Signup";
 import Results from "./Results";
 import HotelDetailsPage from "./HotelDetailsPage";
+import Payment from "./Payment";
+import Confirmation from "./Confirmation";
 
 export default function App() {
   console.log("👉 Signup import is:", Signup);
@@ -18,6 +20,8 @@ export default function App() {
       <Route path="/signup" element={<Signup/>} />
       <Route path="/results" element={<Results />} />
       <Route path="/room" element={<HotelDetailsPage />} />
+      <Route path="/payment" element={<Payment />} />
+      <Route path="/confirmation" element={<Confirmation />} />
     </Routes>
   );
 }
