@@ -46,14 +46,13 @@ function PaymentPage() {
                 })
             });
 
-            if (res.ok) {
-                const data = await res.json();
-                if (data.success) {
+            const data = await res.json();
+
+            if (res.ok && data.success) { 
                     window.location.href = '/confirmation';
                 } else {
-                    setError(data.message || 'Payment failed');
-                }
-            };
+                    setError(data.error || 'Payment failed');
+                };
         } catch (err) {
             setError('Something went wrong. Please try again.');
             console.error('Payment error:', err);
