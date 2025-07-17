@@ -200,16 +200,7 @@ export default function Results() {
   return (
     <div>
       {/* Header */}
-      <div className="header">
-        <div className="header-left">
-          <Plane size={28} />
-          <Link to="/" className="header-title">OCBC Travel</Link>
-        </div>
-        <div className="header-actions">
-          <Link to="/login" className="login-btn">Login</Link>
-          <Link to="/signup" className="signup-btn">Sign Up</Link>
-        </div>
-      </div>
+
 
       {/* Search card */}
       <div className="search-box">

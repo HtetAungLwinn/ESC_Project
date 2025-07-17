@@ -26,28 +26,7 @@ const reviews = [
 
 export default function HotelDetailsPage() {
   return (
-    <div className="hotel-page">
-      {/* Header with icon, title, and auth links */}
-      <div className="header">
-        <div className="header-left">
-          <Plane size={28} />
-          <Link to="/" className="header-title">OCBC Travel</Link>
-        </div>
-        <div className="header-actions">
-          <Link to="/login" className="login-btn">Login</Link>
-          <Link to="/signup" className="signup-btn">Sign Up</Link>
-        </div>
-      </div>
-
-      <section className="search-bar">
-        <div className="search-item">
-          <FiMapPin /> <span>Singapore</span> <FiChevronDown />
-        </div>
-        <div className="search-item">07 Jul 2024</div>
-        <div className="search-item">10 Jul 2024</div>
-        <div className="search-item">1 Room | 2 Adults</div>
-        <button className="btn-search">Search Again</button>
-      </section>
+    <div>
 
       <section className="gallery">
         <div className="gallery-main">

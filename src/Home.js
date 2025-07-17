@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Plane } from "lucide-react";
 import Fuse from "fuse.js";
 import DateRangePicker from "./ReactDatePicker";
+import HeaderBanner from "./HeaderBanner";
 
 
 
@@ -38,7 +39,7 @@ export default function Home() {
 
   // Fetch destinations
   useEffect(() => {
-    fetch("http://localhost:5000/api/destinations/all")
+    fetch("/api/destinations/all")
       .then(res => {
         if (!res.ok) throw new Error("Network response was not ok");
         return res.json();
@@ -94,7 +95,7 @@ export default function Home() {
   const handleSearch = () => {
     if (!destination.trim()) return;
 
-    fetch(`http://localhost:5000/api/destinations/uid?term=${encodeURIComponent(destination)}`)
+    fetch(`/api/destinations/uid?term=${encodeURIComponent(destination)}`)
       .then(res => res.json())
       .then(data => {
         const uid = data.uid;
@@ -120,16 +121,7 @@ export default function Home() {
     <div>
 
       {/* Header */}
-      <div className="header">
-        <div className="header-left">
-          <Plane size={28} />
-          <Link to="/" className="header-title">OCBC Travel</Link>
-        </div>
-        <div className="header-actions">
-          <Link to="/login" className="login-btn">Login</Link>
-          <Link to="/signup" className="signup-btn">Sign Up</Link>
-        </div>
-      </div>
+  
 
       {/* Banner */}
       <div className="img">

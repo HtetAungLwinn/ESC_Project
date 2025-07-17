@@ -77,15 +77,7 @@ export default function Signup() {
 
   return (
     <div className="centered">
-      <div className="hotel-page">
-    {/* Header with icon, title, and auth links */}
-    <div className="header">
-         <div className="header-left">
-          <Plane size={28} />
-          <Link to="/" className="header-title">OCBC Travel</Link>
-        </div>
-    </div>
-    </div>
+    
     
     <div className="centered">
       <h2 style={{ padding: "20px" }}>Sign Up</h2>
