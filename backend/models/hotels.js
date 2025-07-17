@@ -63,27 +63,59 @@ async function getBulkHotelPrices(req, res) {
     return res.status(400).json({ error: 'Missing required query parameters' });
   }
 
+  const url = `https://hotelapi.loyalty.dev/api/hotels/prices?destination_id=${destination_id}` +
+              `&checkin=${checkin}&checkout=${checkout}&lang=en_US&currency=SGD&country_code=SG` +
+              `&guests=${guests}&partner_id=1`;
+
   try {
-    const response = await fetch(
-      `https://hotelapi.loyalty.dev/api/hotels/prices?destination_id=${destination_id}` +
-      `&checkin=${checkin}&checkout=${checkout}&guests=${guests}&partner_id=1&lang=en_US&currency=SGD&country_code=SG`
-    );
+    const MAX_RETRIES = 10;
+    const RETRY_INTERVAL_MS = 1500; // 1.5 seconds
 
-    const text = await response.text();
-    console.log("🌐 Status:", response.status);
-    console.log("📄 Bulk response body:", text);
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      console.log(`🔍 Attempt ${attempt} fetching bulk hotel prices from: ${url}`);
 
-    if (!response.ok) {
-      return res.status(response.status).json({ error: 'Failed to fetch bulk prices from external API' });
+      const response = await fetch(url);
+      const text = await response.text();
+
+      console.log("🌐 Status:", response.status);
+      console.log("📄 Raw response body:", text);
+
+      if (!response.ok) {
+        return res.status(response.status).json({
+          error: 'Failed to fetch bulk prices from external API',
+          details: text
+        });
+      }
+
+      let pricesData;
+      try {
+        pricesData = JSON.parse(text);
+      } catch (jsonError) {
+        console.error("🚨 JSON parse error:", jsonError);
+        return res.status(500).json({ error: "Failed to parse response from external API" });
+      }
+
+      // Check if API call is complete
+      if (pricesData.completed) {
+        console.log("✅ Data ready, returning prices");
+        return res.json(pricesData);
+      } else {
+        console.log("⏳ Data not ready yet, retrying after delay...");
+        await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL_MS));
+      }
     }
 
-    const pricesData = JSON.parse(text);
-    return res.json(pricesData);
+    // After max retries, return partial or empty response
+    return res.status(202).json({ 
+      error: 'Data not ready after multiple retries, please try again later.' 
+    });
+
   } catch (err) {
     console.error('🔥 Error fetching bulk hotel prices:', err);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
+
 
 
 module.exports = { getHotelsByDestinationId, getHotelPricesById, getBulkHotelPrices };
