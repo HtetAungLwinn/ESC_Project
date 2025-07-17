@@ -8,7 +8,7 @@ import "./Results.css";
 const HOTELS_PER_PAGE = 18;
 
 export default function Results() {
-  const [hotels, setHotels] = useState([]);
+  //const [hotels, setHotels] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   const location = useLocation();
@@ -36,6 +36,13 @@ export default function Results() {
   const searchRef = useRef(null);
   const rgRef = useRef(null);
   const [rgOpen, setRgOpen] = useState(false);
+
+  const hotels = [
+    { name: "Marina Bay Sands", location: "Singapore", price: 500, guestRating: 9.1, starRating: 5 },
+    { name: "Orchard Hotel", location: "Singapore", price: 200, guestRating: 8.0, starRating: 4 },
+    { name: "Bali Beach Resort", location: "Bali", price: 150, guestRating: 7.5, starRating: 3 },
+    { name: "Bangkok Grand", location: "Bangkok", price: 100, guestRating: 6.8, starRating: 2 },
+  ];
 
   const fuse = useMemo(
     () => new Fuse(allDestinations, { threshold: 0.3, minMatchCharLength: 2 }),
@@ -288,11 +295,11 @@ export default function Results() {
         {/* Left: Hotels grid */}
         <div style={{
           flex: 3,
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gridAutoRows: "minmax(280px, auto)",
+          display: "flex",
+          flexDirection: "column",
           gap: "1rem",
         }}>
+
           {hotelsToShow.length === 0 ? (
             <p>No hotels available for this destination.</p>
           ) : (
@@ -305,38 +312,62 @@ export default function Results() {
                   overflow: "hidden",
                   display: "flex",
                   flexDirection: "column",
-                  cursor: "pointer",
+                  justifyContent: "space-between",
                   boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
                   transition: "transform 0.2s",
+                  backgroundColor: "#fff"
                 }}
-                onClick={() => alert(`Go to details page for ${hotel.name}`)}
                 onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                 onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
               >
                 {hotel.imageUrl ? (
-                  <img src={hotel.imageUrl} alt={hotel.name} style={{ width: "100%", height: "180px", objectFit: "cover" }} loading="lazy" />
+                  <img
+                    src={hotel.imageUrl}
+                    alt={hotel.name}
+                    style={{ width: "100%", height: "180px", objectFit: "cover" }}
+                    loading="lazy"
+                  />
                 ) : (
-                  <div style={{
-                    width: "100%",
-                    height: "180px",
-                    backgroundColor: "#ccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#666",
-                    fontSize: "0.9rem",
-                  }}>No Image</div>
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "180px",
+                      backgroundColor: "#ccc",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#666",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    No Image
+                  </div>
                 )}
-                <div style={{ padding: "0.5rem 1rem", flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                  <h3 style={{ fontSize: "1.1rem", margin: "0 0 0.5rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={hotel.name}>
-                    {hotel.name}
-                  </h3>
-                  <p style={{ fontWeight: "bold", fontSize: "1rem", margin: 0, color: "#007bff" }}>
+                <div style={{ padding: "1rem" }}>
+                  <h3 style={{ fontSize: "1.2rem", margin: "0 0 0.5rem" }}>{hotel.name}</h3>
+                  <p style={{ margin: 0, color: "#555" }}>{destination}</p>
+                  <p style={{ margin: "0.5rem 0", fontWeight: "bold", color: "#007bff" }}>
                     ${hotel.price.toLocaleString()}
                   </p>
+                  <button
+                    onClick={() => alert(`Selected: ${hotel.name}`)}
+                    style={{
+                      marginTop: "0.5rem",
+                      padding: "0.5rem 1rem",
+                      backgroundColor: "#007bff",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      width: "100%",
+                    }}
+                  >
+                    Select
+                  </button>
                 </div>
               </div>
             ))
+
           )}
         </div>
 
