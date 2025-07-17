@@ -100,8 +100,8 @@ export default function Home() {
         const uid = data.uid;
         const nights = getNights();
 
-        const checkin = dateRange.startDate?.toISOString().split("T")[0];
-        const checkout = dateRange.endDate?.toISOString().split("T")[0];
+      const checkin = dateRange.startDate?.toLocaleDateString('en-CA');
+      const checkout = dateRange.endDate?.toLocaleDateString('en-CA');
 
         navigate(
           `/results?destination=${encodeURIComponent(destination)}` +

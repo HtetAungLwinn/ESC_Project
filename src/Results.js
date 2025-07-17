@@ -98,8 +98,8 @@ export default function Results() {
   const handleSearch = () => {
     if (!destinationInput.trim()) return;
 
-    const checkin = dateRange.startDate?.toISOString().split("T")[0];
-    const checkout = dateRange.endDate?.toISOString().split("T")[0];
+    const checkin = dateRange.startDate?.toLocaleDateString('en-CA');
+    const checkout = dateRange.endDate?.toLocaleDateString('en-CA');
 
     fetch(`/api/destinations/uid?term=${encodeURIComponent(destinationInput)}`)
       .then(res => res.json())
