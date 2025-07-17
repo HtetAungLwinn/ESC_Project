@@ -126,7 +126,7 @@ export default function Results() {
     const fetchHotelPrices = async (hotelList) => {
       try {
         const res = await fetch(
-          `/api/hotels/prices?destination_id=${uid}` +
+          `http://localhost:5000/api/hotels/prices?destination_id=${uid}` +
           `&checkin=${checkinParam}` +
           `&checkout=${checkoutParam}` +
           `&lang=en_US&currency=SGD&country_code=SG&guests=${totalGuests}&partner_id=1`
@@ -153,7 +153,7 @@ export default function Results() {
 
     const fetchHotels = async () => {
       try {
-        const hotelRes = await fetch(`/api/hotels?destination_id=${uid}`);
+        const hotelRes = await fetch(`http://localhost:5000/api/hotels?destination_id=${uid}`);
         if (!hotelRes.ok) throw new Error("Failed to fetch hotels");
 
         const hotelData = await hotelRes.json();

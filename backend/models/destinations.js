@@ -7,7 +7,7 @@ async function getAllDestinations(req, res) {
     try {
         const [rows] = await db.query('SELECT term FROM destinations');
         cachedDestinations  = rows.map(row => row.term); // extract just strings
-        console.log('Retreived terms: ', terms); // returns ["Singapore", "Tokyo", ...]
+        console.log('Retreived terms: ', cachedDestinations); // returns ["Singapore", "Tokyo", ...]
     } catch (err) {
         console.error('Database error:', err);
         return res.status(500).json({ error: 'Failed to fetch terms' });
