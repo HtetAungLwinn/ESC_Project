@@ -1,28 +1,41 @@
 // src/SearchBanner.js
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Fuse from "fuse.js";
 import DateRangePicker from "./ReactDatePicker";
 
 export default function SearchBanner() {
-  // — State & refs —
-  const [destination, setDestination]       = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const qs       = new URLSearchParams(location.search);
+
+  // ── Initialize from URL or fall back to defaults ──
+  const initialDestination = qs.get("destination") || "";
+  const initialCheckin     = qs.get("checkin");
+  const initialCheckout    = qs.get("checkout");
+  const initialRooms       = parseInt(qs.get("rooms")    || "1", 10);
+  const initialAdults      = parseInt(qs.get("adults")   || "1", 10);
+  const initialChildren    = parseInt(qs.get("children") || "0", 10);
+
+  const [destination, setDestination] = useState(initialDestination);
   const [allDestinations, setAllDestinations] = useState([]);
-  const [suggestions, setSuggestions]       = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const searchRef                          = useRef(null);
+  const searchRef = useRef(null);
 
-  const [dateRange, setDateRange]          = useState({ startDate: null, endDate: null });
-  const [rooms, setRooms]                  = useState(1);
-  const [adults, setAdults]                = useState(1);
-  const [children, setChildren]            = useState(0);
+  const [dateRange, setDateRange] = useState({
+    startDate: initialCheckin  ? new Date(initialCheckin)  : null,
+    endDate:   initialCheckout ? new Date(initialCheckout) : null
+  });
 
-  const [rgOpen, setRgOpen]                = useState(false);
-  const rgRef                              = useRef(null);
+  const [rooms, setRooms]       = useState(initialRooms);
+  const [adults, setAdults]     = useState(initialAdults);
+  const [children, setChildren] = useState(initialChildren);
 
-  const navigate                          = useNavigate();
+  const [rgOpen, setRgOpen] = useState(false);
+  const rgRef               = useRef(null);
 
-  // — Fetch destinations once —
+  // ── Fetch destinations list once ──
   useEffect(() => {
     fetch("/api/destinations/all")
       .then(res => {
@@ -38,24 +51,24 @@ export default function SearchBanner() {
       .catch(console.error);
   }, []);
 
-  // — Fuse.js index —
+  // ── Build Fuse index ──
   const fuse = useMemo(
     () => new Fuse(allDestinations, { threshold: 0.3, minMatchCharLength: 2 }),
     [allDestinations]
   );
 
-  // — Close dropdown if clicked outside —
+  // ── Close dropdown on outside click ──
   useEffect(() => {
-    function handleClickOutside(e) {
+    const handleClickOutside = e => {
       if (rgRef.current && !rgRef.current.contains(e.target)) {
         setRgOpen(false);
       }
-    }
+    };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // — Handlers for destination autocomplete —
+  // ── Autocomplete handlers ──
   const handleDestinationChange = e => {
     const v = e.target.value;
     setDestination(v);
@@ -81,11 +94,11 @@ export default function SearchBanner() {
     }
   };
 
-  // — Room/guest increment helpers —
+  // ── Helper for increment/decrement ──
   const inc = (fn, max) => () => fn(v => Math.min(v + 1, max));
   const dec = (fn, min) => () => fn(v => Math.max(v - 1, min));
 
-  // — Compute nights between dates —
+  // ── Nights between dates ──
   const getNights = () => {
     const { startDate, endDate } = dateRange;
     if (!startDate || !endDate) return 0;
@@ -93,7 +106,7 @@ export default function SearchBanner() {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
-  // — On “Search” click, navigate with all params —
+  // ── Fire the search ──
   const handleSearch = () => {
     if (!destination.trim()) return;
     fetch(`/api/destinations/uid?term=${encodeURIComponent(destination)}`)
@@ -114,7 +127,8 @@ export default function SearchBanner() {
           `&adults=${adults}` +
           `&children=${children}`
         );
-      });
+      })
+      .catch(console.error);
   };
 
   return (
@@ -135,8 +149,7 @@ export default function SearchBanner() {
           {showSuggestions && suggestions.length > 0 && (
             <ul className="suggestions-list">
               {suggestions.map((s, i) => (
-                <li
-                  key={i}
+                <li key={i}
                   onMouseDown={e => e.preventDefault()}
                   onClick={() => handleSuggestionClick(s)}
                 >
@@ -168,9 +181,9 @@ export default function SearchBanner() {
           {rgOpen && (
             <div className="rg-panel">
               {[
-                { label: "Rooms",    value: rooms,   set: setRooms,   min: 1 },
-                { label: "Adults",   value: adults,  set: setAdults,  min: 1 },
-                { label: "Children", value: children,set: setChildren,min: 0 },
+                { label: "Rooms",    value: rooms,    set: setRooms,    min: 1 },
+                { label: "Adults",   value: adults,   set: setAdults,   min: 1 },
+                { label: "Children", value: children, set: setChildren, min: 0 },
               ].map(({ label, value, set, min }) => (
                 <div className="rg-row" key={label}>
                   <span>{label}</span>
