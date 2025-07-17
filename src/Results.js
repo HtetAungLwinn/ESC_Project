@@ -8,7 +8,7 @@ import "./Results.css";
 const HOTELS_PER_PAGE = 18;
 
 export default function Results() {
-  //const [hotels, setHotels] = useState([]);
+  const [hotels, setHotels] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   const location = useLocation();
@@ -37,12 +37,12 @@ export default function Results() {
   const rgRef = useRef(null);
   const [rgOpen, setRgOpen] = useState(false);
 
-  const hotels = [
-    { name: "Marina Bay Sands", location: "Singapore", price: 500, guestRating: 9.1, starRating: 5 },
-    { name: "Orchard Hotel", location: "Singapore", price: 200, guestRating: 8.0, starRating: 4 },
-    { name: "Bali Beach Resort", location: "Bali", price: 150, guestRating: 7.5, starRating: 3 },
-    { name: "Bangkok Grand", location: "Bangkok", price: 100, guestRating: 6.8, starRating: 2 },
-  ];
+  // const hotels = [
+  //   { name: "Marina Bay Sands", location: "Singapore", price: 500, guestRating: 9.1, starRating: 5 },
+  //   { name: "Orchard Hotel", location: "Singapore", price: 200, guestRating: 8.0, starRating: 4 },
+  //   { name: "Bali Beach Resort", location: "Bali", price: 150, guestRating: 7.5, starRating: 3 },
+  //   { name: "Bangkok Grand", location: "Bangkok", price: 100, guestRating: 6.8, starRating: 2 },
+  // ];
 
   const fuse = useMemo(
     () => new Fuse(allDestinations, { threshold: 0.3, minMatchCharLength: 2 }),
@@ -50,7 +50,7 @@ export default function Results() {
   );
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/destinations/all")
+    fetch("/api/destinations/all")
       .then(res => res.json())
       .then(data => {
         const list = data.map(d => (typeof d === "string" ? d : d.destination)).filter(Boolean);
@@ -101,7 +101,7 @@ export default function Results() {
     const checkin = dateRange.startDate?.toISOString().split("T")[0];
     const checkout = dateRange.endDate?.toISOString().split("T")[0];
 
-    fetch(`http://localhost:5000/api/destinations/uid?term=${encodeURIComponent(destinationInput)}`)
+    fetch(`/api/destinations/uid?term=${encodeURIComponent(destinationInput)}`)
       .then(res => res.json())
       .then(data => {
         const uid = data.uid;
@@ -126,7 +126,7 @@ export default function Results() {
     const fetchHotelPrices = async (hotelList) => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/hotels/prices?destination_id=${uid}` +
+          `/api/hotels/prices?destination_id=${uid}` +
           `&checkin=${checkinParam}` +
           `&checkout=${checkoutParam}` +
           `&lang=en_US&currency=SGD&country_code=SG&guests=${totalGuests}&partner_id=1`
@@ -153,14 +153,14 @@ export default function Results() {
 
     const fetchHotels = async () => {
       try {
-        const hotelRes = await fetch(`http://localhost:5000/api/hotels?destination_id=${uid}`);
+        const hotelRes = await fetch(`/api/hotels?destination_id=${uid}`);
         if (!hotelRes.ok) throw new Error("Failed to fetch hotels");
 
         const hotelData = await hotelRes.json();
         console.log("Fetched hotels data:", hotelData);
 
         const formattedHotels = hotelData.map((h) => ({
-          id: h.id || Math.random().toString(36).substr(2, 9),
+          id: h.id,
           name: h.name,
           price: h.price || 0,
           imageUrl:
