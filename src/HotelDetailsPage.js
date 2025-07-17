@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { Plane } from "lucide-react";
 import { Link } from "react-router-dom";
 import './HotelDetailsPage.css';
+import SearchBanner from "./SearchBanner";
+
 
 
 const amenities = [
@@ -27,6 +29,8 @@ const reviews = [
 export default function HotelDetailsPage() {
   return (
     <div>
+      {/* SearchBanner */}
+      <SearchBanner />
 
       <section className="gallery">
         <div className="gallery-main">

@@ -4,6 +4,7 @@ import { Plane } from "lucide-react";
 import Fuse from "fuse.js";
 import DateRangePicker from "./ReactDatePicker";
 import "./Results.css";
+import SearchBanner from "./SearchBanner";
 
 const HOTELS_PER_PAGE = 18;
 
@@ -202,83 +203,8 @@ export default function Results() {
       {/* Header */}
 
 
-      {/* Search card */}
-      <div className="search-box">
-        {/* Destination */}
-        <div className="search-field" ref={searchRef}>
-          <label>Destination:</label>
-          <div style={{ position: "relative" }}>
-            <input
-              type="text"
-              placeholder="Where are you going?"
-              value={destinationInput}
-              onChange={handleDestinationChange}
-              onKeyDown={handleKeyDown}
-              onFocus={() => destinationInput.length > 1 && setShowSuggestions(true)}
-              autoComplete="off"
-            />
-            {showSuggestions && suggestions.length > 0 && (
-              <ul className="suggestions-list">
-                {suggestions.map((s, i) => (
-                  <li key={i} onMouseDown={(e) => e.preventDefault()} onClick={() => handleSuggestionClick(s)}>
-                    {s}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-
-        {/* Stay Period */}
-        <div className="search-field">
-          <label>Stay Period:</label>
-          <DateRangePicker onChange={setDateRange} />
-        </div>
-
-        {/* Rooms & Guests Dropdown */}
-        <div className="search-field" ref={rgRef}>
-          <label>Rooms & Guests:</label>
-          <div className="rg-dropdown">
-            <button className="rg-toggle" type="button" onClick={() => setRgOpen(o => !o)}>
-              Room {rooms}, Guest {adults + children}
-            </button>
-            {rgOpen && (
-              <div className="rg-panel">
-                <div className="rg-row">
-                  <span>Rooms</span>
-                  <div className="rg-controls">
-                    <button onClick={dec(setRooms, 1)}>-</button>
-                    <span>{rooms}</span>
-                    <button onClick={inc(setRooms, 10)}>+</button>
-                  </div>
-                </div>
-                <div className="rg-row">
-                  <span>Adults</span>
-                  <div className="rg-controls">
-                    <button onClick={dec(setAdults, 1)}>-</button>
-                    <span>{adults}</span>
-                    <button onClick={inc(setAdults, 10)}>+</button>
-                  </div>
-                </div>
-                <div className="rg-row">
-                  <span>Children</span>
-                  <div className="rg-controls">
-                    <button onClick={dec(setChildren, 0)}>-</button>
-                    <span>{children}</span>
-                    <button onClick={inc(setChildren, 10)}>+</button>
-                  </div>
-                </div>
-                <button className="rg-done" type="button" onClick={() => setRgOpen(false)}>Done</button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Search button */}
-        <div className="search-field search-button">
-          <button className="search-btn" onClick={handleSearch}>Search</button>
-        </div>
-      </div>
+        {/* SearchBanner */}
+      <SearchBanner />
 
       <h1 style={{ marginBottom: "1rem", marginLeft: "2rem" }}>Hotels in {destination}</h1>
 
