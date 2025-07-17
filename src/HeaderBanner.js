@@ -1,4 +1,4 @@
-// HeaderBanner.js
+// src/HeaderBanner.js
 import React from "react";
 import { Link } from "react-router-dom";
 import { Plane } from "lucide-react";
@@ -6,10 +6,15 @@ import { Plane } from "lucide-react";
 export default function HeaderBanner({ loggedIn, setLoggedIn }) {
   return (
     <div className="header">
+      {/* left side: only the icon+text is a link */}
       <div className="header-left">
-        <Plane size={28} />
-        <Link to="/" className="header-title">OCBC Travel</Link>
-      </div>
+       <Link to="/" className="header-title">
+         <Plane size={28} style={{ marginRight: 8 }} />
+         OCBC Travel
+       </Link>
+     </div>
+
+      {/* right side: your Login/Signup or Booking/Logout */}
       <div className="header-actions">
         {loggedIn ? (
           <>
@@ -34,7 +39,7 @@ export default function HeaderBanner({ loggedIn, setLoggedIn }) {
             </Link>
           </>
         )}
-</div>
+      </div>
     </div>
   );
 }

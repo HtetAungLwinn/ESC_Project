@@ -9,7 +9,7 @@ export default function SearchBanner() {
   const navigate = useNavigate();
   const qs       = new URLSearchParams(location.search);
 
-  // ── Initialize from URL or fall back to defaults ──
+  // Initialize from URL or fall back to defaults
   const initialDestination = qs.get("destination") || "";
   const initialCheckin     = qs.get("checkin");
   const initialCheckout    = qs.get("checkout");
@@ -35,7 +35,7 @@ export default function SearchBanner() {
   const [rgOpen, setRgOpen] = useState(false);
   const rgRef               = useRef(null);
 
-  // ── Fetch destinations list once ──
+  // Fetch destinations once
   useEffect(() => {
     fetch("/api/destinations/all")
       .then(res => {
@@ -51,24 +51,24 @@ export default function SearchBanner() {
       .catch(console.error);
   }, []);
 
-  // ── Build Fuse index ──
+  // Fuse index for autocomplete
   const fuse = useMemo(
     () => new Fuse(allDestinations, { threshold: 0.3, minMatchCharLength: 2 }),
     [allDestinations]
   );
 
-  // ── Close dropdown on outside click ──
+  // Close guest dropdown on outside click
   useEffect(() => {
-    const handleClickOutside = e => {
+    function handleClickOutside(e) {
       if (rgRef.current && !rgRef.current.contains(e.target)) {
         setRgOpen(false);
       }
-    };
+    }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ── Autocomplete handlers ──
+  // Autocomplete handlers
   const handleDestinationChange = e => {
     const v = e.target.value;
     setDestination(v);
@@ -94,11 +94,11 @@ export default function SearchBanner() {
     }
   };
 
-  // ── Helper for increment/decrement ──
+  // Helpers for guest counts
   const inc = (fn, max) => () => fn(v => Math.min(v + 1, max));
   const dec = (fn, min) => () => fn(v => Math.max(v - 1, min));
 
-  // ── Nights between dates ──
+  // Compute nights
   const getNights = () => {
     const { startDate, endDate } = dateRange;
     if (!startDate || !endDate) return 0;
@@ -106,16 +106,22 @@ export default function SearchBanner() {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
-  // ── Fire the search ──
+  // Perform the search
   const handleSearch = () => {
     if (!destination.trim()) return;
     fetch(`/api/destinations/uid?term=${encodeURIComponent(destination)}`)
       .then(res => res.json())
       .then(data => {
-        const uid      = data.uid;
-        const nights   = getNights();
-        const checkin  = dateRange.startDate?.toISOString().split("T")[0];
-        const checkout = dateRange.endDate?.toISOString().split("T")[0];
+        const uid    = data.uid;
+        const nights = getNights();
+
+        // Format in local (Singapore) time as YYYY-MM-DD
+        const checkin  = dateRange.startDate
+          ? dateRange.startDate.toLocaleDateString("en-CA")
+          : "";
+        const checkout = dateRange.endDate
+          ? dateRange.endDate.toLocaleDateString("en-CA")
+          : "";
 
         navigate(
           `/results?destination=${encodeURIComponent(destination)}` +
@@ -149,7 +155,8 @@ export default function SearchBanner() {
           {showSuggestions && suggestions.length > 0 && (
             <ul className="suggestions-list">
               {suggestions.map((s, i) => (
-                <li key={i}
+                <li
+                  key={i}
                   onMouseDown={e => e.preventDefault()}
                   onClick={() => handleSuggestionClick(s)}
                 >
@@ -164,7 +171,11 @@ export default function SearchBanner() {
       {/* Stay Period */}
       <div className="search-field">
         <label>Stay Period:</label>
-        <DateRangePicker onChange={setDateRange} />
+        <DateRangePicker
+          startDate={dateRange.startDate}
+          endDate={dateRange.endDate}
+          onChange={setDateRange}
+        />
       </div>
 
       {/* Rooms & Guests */}
@@ -208,7 +219,11 @@ export default function SearchBanner() {
 
       {/* Search button */}
       <div className="search-field search-button">
-        <button className="search-btn" onClick={handleSearch}>
+        <button
+          type="button"
+          className="search-btn"
+          onClick={handleSearch}
+        >
           Search
         </button>
       </div>

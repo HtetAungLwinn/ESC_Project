@@ -1,24 +1,15 @@
+// src/DateRangePicker.js
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import React, { useState, useEffect } from "react";
+import React from "react";
 
-export default function DateRangePicker({ onChange }) {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate]     = useState(null);
-
-   useEffect(() => {
-    if (onChange) {
-      onChange({ startDate, endDate });
-    }
-  }, [startDate, endDate, onChange]);
-
+export default function DateRangePicker({ startDate, endDate, onChange }) {
   return (
-    <div style={{ display: "flex", gap: "0rem", justifyContent: "center" }}>
-      
+    <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center" }}>
       <DatePicker
         selectsStart
         selected={startDate}
-        onChange={setStartDate}
+        onChange={(date) => onChange({ startDate: date, endDate })}
         startDate={startDate}
         endDate={endDate}
         minDate={new Date()}
@@ -27,7 +18,7 @@ export default function DateRangePicker({ onChange }) {
       <DatePicker
         selectsEnd
         selected={endDate}
-        onChange={setEndDate}
+        onChange={(date) => onChange({ startDate, endDate: date })}
         startDate={startDate}
         endDate={endDate}
         minDate={startDate || new Date()}
