@@ -9,7 +9,7 @@ import SearchBanner from "./SearchBanner";
 const HOTELS_PER_PAGE = 18;
 
 export default function Results() {
-  //const [hotels, setHotels] = useState([]);
+  const [hotels, setHotels] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   const location = useLocation();
@@ -38,12 +38,50 @@ export default function Results() {
   const rgRef = useRef(null);
   const [rgOpen, setRgOpen] = useState(false);
 
-  const hotels = [
-    { name: "Marina Bay Sands", location: "Singapore", price: 500, guestRating: 9.1, starRating: 5 },
-    { name: "Orchard Hotel", location: "Singapore", price: 200, guestRating: 8.0, starRating: 4 },
-    { name: "Bali Beach Resort", location: "Bali", price: 150, guestRating: 7.5, starRating: 3 },
-    { name: "Bangkok Grand", location: "Bangkok", price: 100, guestRating: 6.8, starRating: 2 },
-  ];
+  // const hotels = [
+  //   { name: "Marina Bay Sands", location: "Singapore", price: 500, guestRating: 9.1, starRating: 5 },
+  //   { name: "Orchard Hotel", location: "Singapore", price: 200, guestRating: 8.0, starRating: 4 },
+  //   { name: "Bali Beach Resort", location: "Bali", price: 150, guestRating: 7.5, starRating: 3 },
+  //   { name: "Bangkok Grand", location: "Bangkok", price: 100, guestRating: 6.8, starRating: 2 },
+  // ];
+
+
+  const initialFilters = {
+    starRating: searchParams.get("starRating") || "",
+    guestRating: searchParams.get("guestRating") || "",
+    minPrice: searchParams.get("minPrice") || "",
+    maxPrice: searchParams.get("maxPrice") || "",
+  };
+
+  const [filters, setFilters] = useState(initialFilters);
+
+  useEffect(() => {
+    // Build new URLSearchParams based on current filters + other existing params
+    const params = new URLSearchParams(location.search);
+
+    if (filters.starRating) params.set("starRating", filters.starRating);
+    else params.delete("starRating");
+
+    if (filters.guestRating) params.set("guestRating", filters.guestRating);
+    else params.delete("guestRating");
+
+    if (filters.minPrice) params.set("minPrice", filters.minPrice);
+    else params.delete("minPrice");
+
+    if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
+    else params.delete("maxPrice");
+
+    // Preserve existing essential params (destination, uid, checkin, etc)
+    // You can do this by copying params from location.search as above.
+
+    // Update URL without reloading (push state)
+    navigate({
+      pathname: location.pathname,
+      search: params.toString(),
+    }, { replace: true });
+  }, [filters, navigate, location.pathname]);
+
+
 
   const fuse = useMemo(
     () => new Fuse(allDestinations, { threshold: 0.3, minMatchCharLength: 2 }),
@@ -206,7 +244,84 @@ export default function Results() {
       {/* SearchBanner */}
       <SearchBanner />
 
-      <h1 style={{ marginBottom: "1rem", marginLeft: "2rem" }}>Hotels in {destination}</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "1rem 2rem",
+          gap: "1rem",
+          flexWrap: "wrap"
+        }}
+      >
+        <h1 style={{ margin: 0 }}>Hotels in {destination}</h1>
+
+        <div
+          style={{
+            display: "flex",
+            gap: "0.75rem",
+            alignItems: "center",
+            flexWrap: "wrap"
+          }}
+        >
+          {/* Star Rating Dropdown */}
+          <select
+            value={filters.starRating}
+            onChange={(e) => setFilters({ ...filters, starRating: e.target.value })}
+            style={{ padding: "0.3rem 0.5rem" }}
+          >
+            <option value="">Star Rating</option>
+            <option value="5">5 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="2">2 Stars</option>
+            <option value="1">1 Star</option>
+          </select>
+
+          {/* Guest Rating Dropdown */}
+          <select
+            value={filters.guestRating}
+            onChange={(e) => setFilters({ ...filters, guestRating: e.target.value })}
+            style={{ padding: "0.3rem 0.5rem" }}
+          >
+            <option value="">Guest Rating</option>
+            <option value="9">9+ Excellent</option>
+            <option value="8">8+ Very Good</option>
+            <option value="7">7+ Good</option>
+            <option value="6">6+ Okay</option>
+          </select>
+
+          {/* Min Price Input */}
+          <input
+            type="number"
+            min="0"
+            value={filters.minPrice || ""}
+            onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
+            placeholder="Min Price"
+            style={{
+              padding: "0.3rem 0.5rem",
+              width: "80px",
+              textAlign: "center",
+            }}
+          />
+
+          {/* Max Price Input */}
+          <input
+            type="number"
+            min="0"
+            value={filters.maxPrice || ""}
+            onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
+            placeholder="Max Price"
+            style={{
+              padding: "0.3rem 0.5rem",
+              width: "80px",
+              textAlign: "center",
+            }}
+          />
+
+        </div>
+      </div>
+
 
       <div style={{ display: "flex", gap: "2rem", marginLeft: "2rem" }}>
         {/* Left: Hotels grid */}
@@ -249,9 +364,9 @@ export default function Results() {
                       src={hotel.imageUrl}
                       alt={hotel.name}
                       style={{
-                        width: "30%", 
+                        width: "30%",
                         height: "100%",
-                        minWidth: "150px", 
+                        minWidth: "150px",
 
                         objectFit: "cover",
                         borderRadius: "4px",
