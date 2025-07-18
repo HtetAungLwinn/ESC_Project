@@ -228,11 +228,12 @@ export default function Results() {
                   borderRadius: "8px",
                   overflow: "hidden",
                   display: "flex",
-                  flexDirection: "row", 
-                  alignItems: "stretch", 
+                  flexDirection: "row",
+                  alignItems: "stretch",
                   gap: "1rem",
-                  height: "200px", //Later on, change the view so its relative
-                  width: "900px", //at the moment these sizes are hardcoded 
+                  height: "min(25vh, 250px)",
+                  width: "100%",
+                  maxWidth: "60rem",
                   boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
                   backgroundColor: "#fff",
                   padding: "1rem",
@@ -248,8 +249,10 @@ export default function Results() {
                       src={hotel.imageUrl}
                       alt={hotel.name}
                       style={{
-                        width: "200px", // wider image
-                        height: "100%", // match new card height
+                        width: "30%", 
+                        height: "100%",
+                        minWidth: "150px", 
+
                         objectFit: "cover",
                         borderRadius: "4px",
                       }}
