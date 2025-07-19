@@ -10,6 +10,8 @@ export default function Results() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const location = useLocation();
+  const navigate = useNavigate();
+
   const searchParams = new URLSearchParams(location.search);
   const destination = searchParams.get("destination") || "";
   const uid = searchParams.get("uid") || "";
@@ -35,6 +37,41 @@ export default function Results() {
   //   { name: "Bali Beach Resort", location: "Bali", price: 150, guestRating: 7.5, starRating: 3 },
   //   { name: "Bangkok Grand", location: "Bangkok", price: 100, guestRating: 6.8, starRating: 2 },
   // ];
+
+  const initialFilters = {
+    starRating: searchParams.get("starRating") || "",
+    guestRating: searchParams.get("guestRating") || "",
+    minPrice: searchParams.get("minPrice") || "",
+    maxPrice: searchParams.get("maxPrice") || "",
+  };
+
+  const [filters, setFilters] = useState(initialFilters);
+
+  useEffect(() => {
+    // Build new URLSearchParams based on current filters + other existing params
+    const params = new URLSearchParams(location.search);
+
+    if (filters.starRating) params.set("starRating", filters.starRating);
+    else params.delete("starRating");
+
+    if (filters.guestRating) params.set("guestRating", filters.guestRating);
+    else params.delete("guestRating");
+
+    if (filters.minPrice) params.set("minPrice", filters.minPrice);
+    else params.delete("minPrice");
+
+    if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
+    else params.delete("maxPrice");
+
+    // Preserve existing essential params (destination, uid, checkin, etc)
+    // You can do this by copying params from location.search as above.
+
+    // Update URL without reloading (push state)
+    navigate({
+      pathname: location.pathname,
+      search: params.toString(),
+    }, { replace: true });
+  }, [filters, navigate, location.pathname]);
 
   const getNights = () => {
     const { startDate, endDate } = dateRange;
