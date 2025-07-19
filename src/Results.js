@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
-import { Plane } from "lucide-react";
-import Fuse from "fuse.js";
-import DateRangePicker from "./ReactDatePicker";
 import "./Results.css";
 import SearchBanner from "./SearchBanner";
 
@@ -13,7 +10,6 @@ export default function Results() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const location = useLocation();
-  const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const destination = searchParams.get("destination") || "";
   const uid = searchParams.get("uid") || "";
@@ -23,11 +19,6 @@ export default function Results() {
   const adultsParam = parseInt(searchParams.get("adults") || "1", 10);
   const childrenParam = parseInt(searchParams.get("children") || "0", 10);
   const totalGuests = adultsParam + childrenParam;
-
-  const [destinationInput, setDestinationInput] = useState(destination);
-  const [allDestinations, setAllDestinations] = useState([]);
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
   const [rooms, setRooms] = useState(1);
@@ -45,80 +36,11 @@ export default function Results() {
   //   { name: "Bangkok Grand", location: "Bangkok", price: 100, guestRating: 6.8, starRating: 2 },
   // ];
 
-  const fuse = useMemo(
-    () => new Fuse(allDestinations, { threshold: 0.3, minMatchCharLength: 2 }),
-    [allDestinations]
-  );
-
-  useEffect(() => {
-    fetch("/api/destinations/all")
-      .then(res => res.json())
-      .then(data => {
-        const list = data.map(d => (typeof d === "string" ? d : d.destination)).filter(Boolean);
-        setAllDestinations(list);
-      });
-  }, []);
-
-  const handleDestinationChange = (e) => {
-    const v = e.target.value;
-    setDestinationInput(v);
-    if (v.length > 1) {
-      const results = fuse.search(v).slice(0, 8).map(r => r.item);
-      setSuggestions(results);
-      setShowSuggestions(true);
-    } else {
-      setShowSuggestions(false);
-    }
-  };
-
-  const handleSuggestionClick = (s) => {
-    setDestinationInput(s);
-    setShowSuggestions(false);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      if (showSuggestions && suggestions.length) {
-        setDestinationInput(suggestions[0]);
-        setShowSuggestions(false);
-      }
-      handleSearch();
-    }
-  };
-
   const getNights = () => {
     const { startDate, endDate } = dateRange;
     if (!startDate || !endDate) return 0;
     const diff = endDate.getTime() - startDate.getTime();
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
-  };
-
-  const inc = (fn, max) => () => fn((v) => Math.min(v + 1, max));
-  const dec = (fn, min) => () => fn((v) => Math.max(v - 1, min));
-
-  const handleSearch = () => {
-    if (!destinationInput.trim()) return;
-
-    const checkin = dateRange.startDate?.toLocaleDateString('en-CA');
-    const checkout = dateRange.endDate?.toLocaleDateString('en-CA');
-
-    fetch(`/api/destinations/uid?term=${encodeURIComponent(destinationInput)}`)
-      .then(res => res.json())
-      .then(data => {
-        const uid = data.uid;
-        const nights = getNights();
-
-        navigate(
-          `/results?destination=${encodeURIComponent(destinationInput)}` +
-          `&uid=${encodeURIComponent(uid)}` +
-          `&checkin=${checkin}` +
-          `&checkout=${checkout}` +
-          `&nights=${nights}` +
-          `&rooms=${rooms}` +
-          `&adults=${adults}` +
-          `&children=${children}`
-        );
-      });
   };
 
   useEffect(() => {
@@ -200,10 +122,7 @@ export default function Results() {
 
   return (
     <div>
-      {/* Header */}
-
-
-        {/* SearchBanner */}
+      {/* SearchBanner */}
       <SearchBanner />
 
       <h1 style={{ marginBottom: "1rem", marginLeft: "2rem" }}>Hotels in {destination}</h1>
