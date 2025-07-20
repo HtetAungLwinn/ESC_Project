@@ -320,7 +320,13 @@ export default function Results() {
                     </p>
                   </div>
                   <button
-                    onClick={() => alert(`Selected: ${hotel.name}`)}
+                    onClick={() => navigate(`/room?id=${hotel.id}`+ 
+                      `&destination=${uid}` + 
+                      `&checkin=${checkinParam}` + 
+                      `&checkout=${checkoutParam}` + 
+                      `&adults=${adultsParam}` + 
+                      `&children=${childrenParam}`
+                    )}
                     style={{
                       marginTop: "0.5rem",
                       padding: "0.4rem 1rem",

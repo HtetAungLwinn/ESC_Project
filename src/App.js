@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
+import 'leaflet/dist/leaflet.css';
 import Home from "./Home";
 import Login from "./Login";
 import Signup from "./Signup";

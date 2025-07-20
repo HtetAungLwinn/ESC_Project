@@ -1,89 +1,206 @@
-import React from 'react';
+import React,  { useState, useEffect, useRef, useMemo } from 'react';
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { FiMapPin, FiChevronDown } from 'react-icons/fi';
 import { AiFillStar } from 'react-icons/ai';
-import { useNavigate } from "react-router-dom";
 import { Plane } from "lucide-react";
-import { Link } from "react-router-dom";
 import './HotelDetailsPage.css';
 import SearchBanner from "./SearchBanner";
+import HotelMap from './HotelMap';
+import ImageBox from './ImageBox';
 
+// const amenities = [
+//   'Air Conditioning', 'Business Center', 'Clothing Iron', 'Data Ports',
+//   'Dry Cleaning', 'Hair Dryer', 'Meeting Rooms', 'Outdoor Pool',
+//   'Parking Garage', 'Safe', 'Room Service', 'TV in Room', 'Voicemail'
+// ];
 
+// const rooms = [
+//   { id: 1, title: 'King Deluxe Room', description: 'Spacious room with king bed, city views.', price: '$2,024', guests: '2 Adults', image: '/images/room1.jpg' },
+//   { id: 2, title: 'Queen Superior Room', description: 'Cozy room with queen bed and premium amenities.', price: '$2,024', guests: '2 Adults', image: '/images/room2.jpg' }
+// ];
 
-const amenities = [
-  'Air Conditioning', 'Business Center', 'Clothing Iron', 'Data Ports',
-  'Dry Cleaning', 'Hair Dryer', 'Meeting Rooms', 'Outdoor Pool',
-  'Parking Garage', 'Safe', 'Room Service', 'TV in Room', 'Voicemail'
-];
-
-const rooms = [
-  { id: 1, title: 'King Deluxe Room', description: 'Spacious room with king bed, city views.', price: '$2,024', guests: '2 Adults', image: '/images/room1.jpg' },
-  { id: 2, title: 'Queen Superior Room', description: 'Cozy room with queen bed and premium amenities.', price: '$2,024', guests: '2 Adults', image: '/images/room2.jpg' }
-];
-
-const reviews = [
-  { id: 1, rating: 5, text: 'Sleep deprived', reviewer: 'SUTD student' },
-  { id: 2, rating: 4, text: 'Great location but noisy at night', reviewer: 'John D.' },
-  { id: 3, rating: 5, text: 'Excellent service and amenities!', reviewer: 'Lisa W.' }
-];
+// const reviews = [
+//   { id: 1, rating: 5, text: 'Sleep deprived', reviewer: 'SUTD student' },
+//   { id: 2, rating: 4, text: 'Great location but noisy at night', reviewer: 'John D.' },
+//   { id: 3, rating: 5, text: 'Excellent service and amenities!', reviewer: 'Lisa W.' }
+// ];
 
 export default function HotelDetailsPage() {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const id = searchParams.get("id") || ""; // Hotel id
+  const destination = searchParams.get("destination") || ""; // Destination
+  const checkinParam = searchParams.get("checkin"); // check in date
+  const checkoutParam = searchParams.get("checkout"); // check out date
+  const adultsParam = parseInt(searchParams.get("adults") || "1", 10);
+  const childrenParam = parseInt(searchParams.get("children") || "0", 10);
+  const totalGuests = adultsParam + childrenParam; // total guests
+  const lang = searchParams.get("lang") || "en_US"; // language
+  const currency = searchParams.get("currency") || "SGD"; // currency
+  const countryCode = searchParams.get("country_code") || "SG"; // country code
+  const partnerId = searchParams.get("partner_id") || "1"; // partner id
+ 
+
+  const [hotel, setHotel] = useState(null);
+  const [roomList, setRoomList] = useState([]);
+  const [expanded, setExpanded] = useState(false);
+  const [hover, setHover] = useState(false);
+  const charLimit = 300;
+
+  useEffect(() => {
+    if (id) {
+      fetch(`/api/rooms/${id}`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Hotel not found");
+          }
+          return res.json();
+        })
+        .then((data) => {
+          console.log("Fetched hotel data:", data);
+          setHotel(data)
+        })
+        .catch((err) => console.error("Error fetching hotel room:", err));
+    }
+  }, [id]);
+
+  // Room Options
+  useEffect(() => {
+    if (!destination || !checkinParam || !checkoutParam || !totalGuests || !id) return;
+    
+    fetch(
+      `/api/hotels/${id}/price?destination_id=${destination}` +
+      `&checkin=${checkinParam}` +
+      `&checkout=${checkoutParam}` +
+      `&lang=en_US&currency=SGD&country_code=SG&guests=${totalGuests}&partner_id=1`
+    )
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to fetch room prices");
+      return res.json();
+    })
+    .then((data) => {
+      console.log("Fetched room prices data:", data);
+      // If your API returns array directly, do this:
+      setRoomList(data.rooms || []);
+    })
+    .catch((err) => console.error("Failed to fetch room prices:", err));
+    }, [destination, checkinParam, checkoutParam, totalGuests, id]);
+
+  if (!hotel) return <p>Loading hotel info...</p>;
+
+  // Overview
+  const fullDesc = hotel.description || "";
+  const shortDesc = fullDesc.slice(0, charLimit);
+  const toggleExpanded = () => setExpanded((prev) => !prev);
+
   return (
     <div>
       {/* SearchBanner */}
       <SearchBanner />
 
       <section className="gallery">
-        <div className="gallery-main">
+        {/* <div className="gallery-main">
           <img src="/images/main.jpg" alt="Main view" />
         </div>
         <div className="gallery-side">
           <img src="/images/side1.jpg" alt="Side view 1" />
           <img src="/images/side2.jpg" alt="Side view 2" />
           <img src="/images/side3.jpg" alt="Side view 3" />
-        </div>
+        </div> */}
+        {hotel && <ImageBox hotel={hotel} />}
       </section>
 
       <section className="content-section">
         <div className="overview">
-          <h1>The Fullerton Hotel Singapore</h1>
+          <h1>{hotel.name}</h1>
           <div className="stars">
-            {Array(5).fill(<AiFillStar />)}
+            {Array(5).fill(null).map((_, index) => (
+              <AiFillStar key={index} />
+            ))}
           </div>
           <p className="address">
-            <FiMapPin /> 1 Fullerton Square, 049178 Singapore — <a href="#">show map</a>
+            <FiMapPin /> {hotel.address} — <a href="#">show map</a>
           </p>
           <h2>Overview</h2>
-          <p>With a stay at The Fullerton Hotel Singapore, you’ll be centrally located in Singapore. 
-          </p>
-          <p>
-            thank you kenny for extending the deadline. this needs more yap. lets see how long this goes because i have no clue how this works
-          </p>
-          <p>
-            how does one limit width here
-          </p>
-          {/* Additional paragraphs here */}
+          <div style={{ display: "inline" }}>
+          <span
+            dangerouslySetInnerHTML={{
+              __html: expanded ? fullDesc : shortDesc + "...",
+            }}
+          />
+            <span
+              onClick={toggleExpanded}
+              onMouseEnter={() => setHover(true)}
+              onMouseLeave={() => setHover(false)}
+              style={{
+                cursor: "pointer",
+                textDecoration: hover ? "underline" : "none",
+                color: hover ? "blue" : "black",
+                display: "inline",
+                marginLeft: "4px",
+              }}
+            >
+              {expanded ? "Read less" : "Read more"}
+            </span>
+          </div>
         </div>
         <aside className="highlights">
           <h3>Highlights</h3>
           <ul>
-            <li>Location rating: 96%</li>
-            <li>Wellness rating: 95%</li>
-            <li>WiFi rating: 87%</li>
-            <li>Staff service: 91%</li>
+            <li style={{ marginBottom: '10px' }}>
+              Rating: 
+              <span style={{ fontStyle: 'italic', color: '#555' }}>
+                {hotel.rating >= 4.5 ? ' "Excellent" '
+                  : hotel.rating >= 4.0 ? ' "Very Good" '
+                  : hotel.rating >= 3.0 ? ' "Good" '
+                  : ''}
+              </span>
+            </li>
+            <li style={{ marginBottom: '20px' }}>{hotel.rating.toFixed(1)} / 5.0 {' '}</li>
+            {hotel.amenities_ratings.map((item) => (
+              <li key={item.name} style={{ marginBottom: '10px' }}>
+                <div>{item.name}</div>
+                <div 
+                  style={{
+                    backgroundColor: '#e0e0e0',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    height: '12px',
+                    width: '200px',
+                    marginTop: '4px'
+                  }}
+                >
+                  <div 
+                    style={{
+                      width: `${item.score}%`,
+                      backgroundColor: '#4caf50',
+                      height: '100%',
+                      transition: 'width 0.5s ease-in-out'
+                    }}
+                  />
+                </div>
+              </li>
+            ))}
           </ul>
         </aside>
       </section>
 
-      <section className="amenities">
-        <h3>Amenities</h3>
-        <div className="amenities-grid">
-          {amenities.map((item) => (
-            <div key={item} className="amenity-item">{item}</div>
-          ))}
-        </div>
-      </section>
+      {hotel.amenities && Object.values(hotel.amenities).some(value => value) && (
+        <section className="amenities">
+          <h2>Amenities</h2>
+          <div className="amenities-grid">
+            {Object.entries(hotel.amenities)
+              .filter(([_, value]) => value)
+              .map(([key]) => (
+                <div key={key} className="amenity-item">
+                  {formatAmenityName(key)}
+                </div>
+              ))}
+          </div>
+        </section>
+      )}
 
-      <section className="reviews">
+      {/* <section className="reviews">
         <h2>Reviews</h2>
         <div className="review-list">
           {reviews.map((review) => (
@@ -98,42 +215,77 @@ export default function HotelDetailsPage() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       <section className="rooms">
         <h2>Room Options</h2>
-        {rooms.map((room) => (
-          <div key={room.id} className="room-card">
-            <img src={room.image} alt={room.title} />
-            <div className="room-info">
-              <h3>{room.title}</h3>
-              <p>{room.description}</p>
-              <div className="room-footer">
-                <span>{room.guests}</span>
-                <button className="btn-select">Select</button>
-                <span className="price">{room.price}</span>
+        {roomList.length > 0 ? (
+          roomList.map((room) => (
+            <div key={room.key} style={{ marginBottom: "20px" }}>
+              <h3>{room.roomDescription}</h3>
+              <p>Free cancellation: {room.free_cancellation ? "Yes" : "No"}</p>
+              <h2>Description</h2>
+              <div style={{ display: "inline" }}>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: expanded ? fullDesc : shortDesc + "...",
+                }}
+              />
+                <span
+                  onClick={toggleExpanded}
+                  onMouseEnter={() => setHover(true)}
+                  onMouseLeave={() => setHover(false)}
+                  style={{
+                    cursor: "pointer",
+                    textDecoration: hover ? "underline" : "none",
+                    color: hover ? "blue" : "black",
+                    display: "inline",
+                    marginLeft: "4px",
+                  }}
+                >
+                  {expanded ? "Read less" : "Read more"}
+                </span>
+              </div>
+              <div>
+                <h2>Additional Information</h2>
+                {Object.entries(room.roomAdditionalInfo.displayFields).map(([key, html]) => (
+                  <div key={key} style={{ marginBottom: "1rem" }}>
+                    <strong>{formatAmenityName(key)}</strong>
+                    <div dangerouslySetInnerHTML={{ __html: html }} />
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p>No rooms available or still loading...</p>
+        )}
         <div className="see-more">
           <FiChevronDown /> See More Rooms
         </div>
       </section>
 
-      <section className="location-map">
-        <h2>Location</h2>
-        <iframe
-          title="hotel location"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1994.4076528032153!2d103.85195688857208!3d1.2847653812127817!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da19090f9c176f%3A0x41c12c50babf70d0!2sThe%20Fullerton%20Hotel%20Singapore!5e0!3m2!1sen!2ssg!4v1751441283664!5m2!1sen!2ssg" 
-          width="100%" 
-          height="400" 
-          style={{ border: 0 }} 
-          allowfullscreen
-          loading="lazy" 
-          // referrerpolicy="no-referrer-when-downgrade"
-        ></iframe>
-      </section>
+      {hotel.latitude && hotel.longitude && (
+        <section className="location-map">
+          <h2>Location</h2>
+          <HotelMap latitude={hotel.latitude} longitude={hotel.longitude} name={hotel.name}/>
+        </section>
+      )}
     </div>
   );
+}
+
+function formatAmenityName(key) {
+  // Handle known acronyms first
+  const acronyms = ['TV', 'AC', 'WiFi', 'Wi-Fi'];
+  key = key.replace(/tV/, 'TV ');
+  let spaced = key.replace(/([a-z])([A-Z])/g, '$1 $2'); // Insert space before capital letters
+  let words = spaced.split(' ').map(word => { // Capitalise words & fix acronyms:
+    const upper = word.toUpperCase();
+    if (acronyms.some(a => a.toUpperCase() === upper)) {
+      return acronyms.find(a => a.toUpperCase() === upper);
+    }
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  });
+  return words.join(' ');
 }
