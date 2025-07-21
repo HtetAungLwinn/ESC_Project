@@ -2,6 +2,21 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import "./Results.css";
 import SearchBanner from "./SearchBanner";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+
+// Fix Leaflet's default icon issue
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 const HOTELS_PER_PAGE = 18;
 
@@ -47,6 +62,15 @@ export default function Results() {
 
   const [filters, setFilters] = useState(initialFilters);
 
+  // SortBy state (default "rating" or from URL)
+  const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "rating");
+
+  // Data state
+  const [totalHotels, setTotalHotels] = useState(0);
+  const totalPages = Math.ceil(totalHotels / HOTELS_PER_PAGE);
+
+  const [pagesCache, setPagesCache] = useState({});
+
   useEffect(() => {
     // Build new URLSearchParams based on current filters + other existing params
     const params = new URLSearchParams(location.search);
@@ -63,98 +87,125 @@ export default function Results() {
     if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
     else params.delete("maxPrice");
 
+    // Update sortBy
+    if (sortBy) params.set("sortBy", sortBy);
+    else params.delete("sortBy");
+
     // Preserve existing essential params (destination, uid, checkin, etc)
     // You can do this by copying params from location.search as above.
+
+    // Reset back to page 1 whenever filter changes
+    setCurrentPage(1);
 
     // Update URL without reloading (push state)
     navigate({
       pathname: location.pathname,
       search: params.toString(),
     }, { replace: true });
-  }, [filters, navigate, location.pathname]);
+  }, [filters, sortBy, navigate, location.pathname]);
+
+  const fetchPage = async (pageNum) => {
+    if (!uid || !checkinParam || !checkoutParam || !totalGuests) return;
+
+    try {
+      const params = new URLSearchParams();
+
+      params.set("uid", uid);
+      params.set("checkin", checkinParam);
+      params.set("checkout", checkoutParam);
+      params.set("adults", adultsParam.toString());
+      params.set("children", childrenParam.toString());
+      params.set("page", pageNum);
+      params.set("limit", HOTELS_PER_PAGE);
+
+      if (filters.starRating) params.set("starRating", filters.starRating);
+      if (filters.guestRating) params.set("guestRating", filters.guestRating);
+      if (filters.minPrice) params.set("minPrice", filters.minPrice);
+      if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
+      if (sortBy) params.set("sortBy", sortBy);
+
+      const url = `/api/hotels?${params.toString()}`;
+
+      const hotelRes = await fetch(url);
+      if (!hotelRes.ok) throw new Error("Failed to fetch hotels");
+
+      const hotelData = await hotelRes.json();
+
+      const formattedHotels = hotelData.hotels.map((h) => ({
+        id: h.id,
+        name: h.name,
+        price: h.price || 0,
+        rating: h.rating,
+        guestRating: h.trustyou?.score?.overall || 0,
+        imageUrl:
+          h.image_details && h.image_details.prefix && h.image_details.suffix
+            ? `${h.image_details.prefix}${h.default_image_index ?? 0}${h.image_details.suffix}`
+            : null,
+        latitude: h.latitude ?? null,
+        longitude: h.longitude ?? null,
+      }));
+
+      setPagesCache((prevCache) => ({
+        ...prevCache,
+        [pageNum]: {
+          hotels: formattedHotels,
+          total: hotelData.total,
+        },
+      }));
+
+      if (pageNum === 1 || hotelData.total !== totalHotels) {
+        setTotalHotels(hotelData.total);
+      }
+    } catch (err) {
+      console.error("Error fetching hotels:", err);
+      setPagesCache((prevCache) => ({
+        ...prevCache,
+        [pageNum]: { hotels: [], total: 0 },
+      }));
+    }
+  };
+
+  // auto fetch whenever params change
+  useEffect(() => {
+    setPagesCache({});
+    setCurrentPage(1);
+    fetchPage(1);
+  }, [uid, checkinParam, checkoutParam, adultsParam, childrenParam, filters, sortBy]);
+
+  // Prefetch pages 2..totalPages with staggered delay
+  useEffect(() => {
+    if (totalPages <= 1) return;
+    if (!pagesCache[1]) return; // wait for page 1 load
+
+    const timers = [];
+
+    for (let p = 2; p <= totalPages; p++) {
+      if (!pagesCache[p]) {
+        const timer = setTimeout(() => fetchPage(p), (p - 1) * 1500);
+        timers.push(timer);
+      }
+    }
+
+    return () => timers.forEach(clearTimeout);
+  }, [totalPages, pagesCache]);
+
+  // Handler for pagination button click, fetch if page not cached
+  const goToPage = (pageNum) => {
+    if (pageNum < 1 || pageNum > totalPages) return;
+    setCurrentPage(pageNum);
+    if (!pagesCache[pageNum]) {
+      fetchPage(pageNum);
+    }
+  };
+
+  // Use cached hotels for current page or empty while loading
+  const hotelsToShow = pagesCache[currentPage]?.hotels || [];
 
   const getNights = () => {
     const { startDate, endDate } = dateRange;
     if (!startDate || !endDate) return 0;
     const diff = endDate.getTime() - startDate.getTime();
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
-  };
-
-  useEffect(() => {
-    if (!uid || !checkinParam || !checkoutParam || !totalGuests) return;
-
-    const fetchHotelPrices = async (hotelList) => {
-      try {
-        const res = await fetch(
-          `/api/hotels/prices?destination_id=${uid}` +
-          `&checkin=${checkinParam}` +
-          `&checkout=${checkoutParam}` +
-          `&lang=en_US&currency=SGD&country_code=SG&guests=${totalGuests}&partner_id=1`
-        );
-
-        if (!res.ok) throw new Error("Failed to fetch bulk prices");
-
-        const priceData = await res.json();
-
-        const priceMap = {};
-        priceData.hotels?.forEach(h => {
-          priceMap[h.id] = h.price;
-        });
-
-        return hotelList.map(hotel => ({
-          ...hotel,
-          price: priceMap[hotel.id] || hotel.price || 0,
-        }));
-      } catch (err) {
-        console.error("Failed to fetch bulk prices:", err);
-        return hotelList;
-      }
-    };
-
-    const fetchHotels = async () => {
-      try {
-        const hotelRes = await fetch(`/api/hotels?destination_id=${uid}`);
-        if (!hotelRes.ok) throw new Error("Failed to fetch hotels");
-
-        const hotelData = await hotelRes.json();
-        console.log("Fetched hotels data:", hotelData);
-
-        const formattedHotels = hotelData.map((h) => ({
-          id: h.id,
-          name: h.name,
-          price: h.price || 0,
-          imageUrl:
-            h.image_details && h.image_details.prefix && h.image_details.suffix
-              ? `${h.image_details.prefix}${h.default_image_index ?? 0}${h.image_details.suffix}`
-              : null,
-        }));
-
-        const hotelsWithPrices = await fetchHotelPrices(formattedHotels);
-        // Filter out hotels with null, undefined, or 0 price
-        const validHotels = hotelsWithPrices.filter(h => h.price);
-
-        setHotels(validHotels);
-
-        setCurrentPage(1);
-      } catch (err) {
-        console.error("Error fetching hotels:", err);
-        setHotels([]);
-      }
-    };
-
-    fetchHotels();
-  }, [uid, checkinParam, checkoutParam, totalGuests]);
-
-  const totalPages = Math.ceil(hotels.length / HOTELS_PER_PAGE);
-
-  const hotelsToShow = hotels.slice(
-    (currentPage - 1) * HOTELS_PER_PAGE,
-    currentPage * HOTELS_PER_PAGE
-  );
-
-  const goToPage = (pageNum) => {
-    if (pageNum < 1 || pageNum > totalPages) return;
-    setCurrentPage(pageNum);
   };
 
   return (
@@ -237,6 +288,31 @@ export default function Results() {
             }}
           />
 
+          {/* Sort By */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            style={{ padding: "0.3rem 0.5rem" }}
+          >
+            <option value="rating">Sort by Rating</option>
+            <option value="price">Sort by Price</option>
+            <option value="guestRating">Sort by Guest Rating</option>
+          </select>
+
+          <button
+            style={{
+              marginLeft: "1rem",
+              padding: "0.4rem 0.8rem",
+              backgroundColor: "#f08e8e",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            Filter
+          </button>
+
         </div>
       </div>
 
@@ -318,6 +394,10 @@ export default function Results() {
                     <p style={{ margin: "0.3rem 0", fontWeight: "bold", color: "#007bff" }}>
                       ${hotel.price.toLocaleString()}
                     </p>
+                    <p style={{ margin: "0.2rem 0", fontSize: "0.9rem", color: "#555" }}>
+                      ⭐ Star Rating: {hotel.rating ?? "N/A"} <br />
+                      👤 Guest Rating: {hotel.guestRating ?? "N/A"}
+                    </p>
                   </div>
                   <button
                     onClick={() => navigate(`/room?id=${hotel.id}`+ 
@@ -359,11 +439,37 @@ export default function Results() {
           overflow: "hidden",
           backgroundColor: "#fff",
         }}>
-          <img
-            src="https://via.placeholder.com/400x1700?text=Map+Placeholder"
-            alt="Map Placeholder"
-            style={{ width: "75%", height: "100%", objectFit: "cover" }}
-          />
+          <MapContainer
+            center={[1.3521, 103.8198]} // Singapore default center
+            zoom={12}
+            scrollWheelZoom={false}
+            style={{ height: "100%", width: "100%" }}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            />
+            {hotelsToShow.map(
+              (hotel) =>
+                hotel.latitude &&
+                hotel.longitude && (
+                  <Marker
+                    key={hotel.id}
+                    position={[hotel.latitude, hotel.longitude]}
+                  >
+                    <Popup>
+                      <strong>{hotel.name}</strong>
+                      <br />
+                      ⭐ {hotel.rating ?? "N/A"}
+                      <br />
+                      👤 {hotel.guestRating ?? "N/A"}
+                      <br />
+                      💰 ${hotel.price.toLocaleString()}
+                    </Popup>
+                  </Marker>
+                )
+            )}
+          </MapContainer>
         </div>
       </div>
 
