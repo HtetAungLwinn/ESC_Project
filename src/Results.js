@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import "./Results.css";
 import SearchBanner from "./SearchBanner";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Tooltip  } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -457,18 +457,51 @@ export default function Results() {
                     key={hotel.id}
                     position={[hotel.latitude, hotel.longitude]}
                   >
-                    <Popup>
-                      <strong>{hotel.name}</strong>
-                      <br />
-                      ⭐ {hotel.rating ?? "N/A"}
-                      <br />
-                      👤 {hotel.guestRating ?? "N/A"}
-                      <br />
-                      💰 ${hotel.price.toLocaleString()}
-                    </Popup>
+                    <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
+                      <div style={{ minWidth: "150px", maxWidth: "200px" }}>
+                        {hotel.imageUrl ? (
+                          <img
+                            src={hotel.imageUrl}
+                            alt={hotel.name}
+                            style={{
+                              width: "100%",
+                              maxHeight: "100px",
+                              objectFit: "cover",
+                              marginTop: "0.3rem",
+                              borderRadius: "4px"
+                            }}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width: "100%",
+                              height: "80px",
+                              backgroundColor: "#ccc",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              marginTop: "0.3rem",
+                              fontSize: "0.75rem"
+                            }}
+                          >
+                            No Image
+                          </div>
+                        )}
+                        <br />
+                        💰 Price: ${hotel.price.toLocaleString()}
+                        <br />
+                        <strong>{hotel.name}</strong>
+                        <br />
+                        ⭐ Star Rating: {hotel.rating ?? "N/A"}
+                        <br />
+                        👤 Guest Rating: {hotel.guestRating ?? "N/A"}
+                        <br />                        
+                      </div>
+                    </Tooltip>
                   </Marker>
                 )
             )}
+
           </MapContainer>
         </div>
       </div>
