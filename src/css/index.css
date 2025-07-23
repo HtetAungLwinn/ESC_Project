@@ -461,9 +461,26 @@ html.bw {
   filter: invert(100%) !important;
 }
 
-html.bw img,
-html.bw .leaflet-container {
+html.bw img{
   filter: invert(100%) !important;
+}
+/* Dark mode for everything EXCEPT the map */
+html.bw {
+  filter: invert(100%) !important;
+}
+
+html.bw img:not(.leaflet-tile) {
+  filter: invert(100%) !important;
+}
+
+/* Force map elements to stay normal */
+.leaflet-container,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-control-container,
+.leaflet-popup-content {
+  filter: none !important;
 }
 
 
@@ -508,12 +525,5 @@ html.bw .leaflet-container {
 
   .dark-toggle-btn:focus {
     outline: none;
-  }
-  
-  /* Dark‑mode overrides */
-  body.dark .dark-toggle-btn {
-    background: rgba(0,0,0,0.25);
-    box-shadow: 0 2px 6px rgba(255,255,255,0.15);
-    color: #f5f5f5; /* icon color in dark mode */
   }
   
