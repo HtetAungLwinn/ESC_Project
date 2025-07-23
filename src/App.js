@@ -1,8 +1,8 @@
 // src/App.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
-import 'leaflet/dist/leaflet.css';
-import "./index.css";                // your global styles
+import "leaflet/dist/leaflet.css";
+import "./index.css";
 
 import HeaderBanner from "./HeaderBanner";
 import BottomBar    from "./BottomBar";
@@ -17,21 +17,32 @@ import Confirmation     from "./Confirmation";
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [darkMode, setDarkMode] = useState(
+    () => JSON.parse(localStorage.getItem("ocbcDarkMode")) || false
+  );
+
+  useEffect(() => {
+    localStorage.setItem("ocbcDarkMode", JSON.stringify(darkMode));
+    // toggle dark-theme on <body>
+    document.body.classList.toggle("dark", darkMode);
+    // toggle B&W filter on <html>
+    document.documentElement.classList.toggle("bw", darkMode);
+  }, [darkMode]);
 
   return (
     <div className="App">
-      <HeaderBanner loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+      <HeaderBanner
+        loggedIn={loggedIn}
+        setLoggedIn={setLoggedIn}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
 
       <main className="App__content">
         <Routes>
           <Route
             path="/"
-            element={
-              <Home
-                loggedIn={loggedIn}
-                setLoggedIn={setLoggedIn}
-              />
-            }
+            element={<Home loggedIn={loggedIn} setLoggedIn={setLoggedIn} />}
           />
           <Route
             path="/login"

@@ -455,3 +455,10 @@ button[type="submit"]:hover {
 .bottom-box a:hover {
   color: #b85252;
 }
+
+
+/* only when <html> has class="bw" */
+html.bw {
+  /* 100% grayscale + boosted contrast for crisp blacks & whites */
+  filter: invert(100%) !important;
+}
