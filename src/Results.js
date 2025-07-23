@@ -314,19 +314,11 @@ export default function Results() {
             <option value="guestRating">Sort by Guest Rating</option>
           </select>
 
-          <button
-            style={{
-              marginLeft: "1rem",
-              padding: "0.4rem 0.8rem",
-              backgroundColor: "#f08e8e",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            Filter
+       {/* after */}
+          <button className="search-btn" style={{ marginLeft: "1rem" }}>
+              Filter
           </button>
+
 
         </div>
       </div>
@@ -430,7 +422,7 @@ export default function Results() {
                     style={{
                       marginTop: "0.5rem",
                       padding: "0.4rem 1rem",
-                      backgroundColor: "#007bff",
+                      backgroundColor: "#d66a6a",
                       color: "white",
                       border: "none",
                       borderRadius: "4px",
