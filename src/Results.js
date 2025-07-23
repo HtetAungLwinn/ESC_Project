@@ -403,7 +403,7 @@ export default function Results() {
                   <div>
                     <h3 style={{ fontSize: "1.1rem", margin: "0 0 0.2rem" }}>{hotel.name}</h3>
                     <p style={{ margin: 0, color: "#777" }}>{destination}</p>
-                    <p style={{ margin: "0.3rem 0", fontWeight: "bold", color: "#007bff" }}>
+                    <p style={{ margin: "0.3rem 0", fontWeight: "bold", color: "#d66a6a" }}>
                       ${hotel.price.toLocaleString()}
                     </p>
                     <p style={{ margin: "0.2rem 0", fontSize: "0.9rem", color: "#555" }}>
