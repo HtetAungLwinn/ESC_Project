@@ -104,21 +104,26 @@ async function getFilteredHotels(req, res) {
     console.timeEnd("🔍 Filter by rating");
 
     // Step 5: Filter by price
-    console.time("💰 Filter by price");
-    const priceMap = new Map();
-    priceData.hotels.forEach(({ id, price }) => {
-      if (typeof price === "number" && price >= minPriceNum && price <= maxPriceNum) {
-        priceMap.set(id, price);
-      }
-    });
+    let merged = hotels;
 
-    const merged = hotels
-      .filter(h => priceMap.has(h.id))
-      .map(h => ({
-        ...h,
-        price: priceMap.get(h.id),
-      }));
-    console.timeEnd("💰 Filter by price");
+    if (priceData.hotels && priceData.hotels.length > 0) {
+      const priceMap = new Map();
+      priceData.hotels.forEach(({ id, price }) => {
+        if (typeof price === "number" && price >= minPriceNum && price <= maxPriceNum) {
+          priceMap.set(id, price);
+        }
+      });
+
+      merged = hotels
+        .filter(h => priceMap.has(h.id))
+        .map(h => ({
+          ...h,
+          price: priceMap.get(h.id),
+        }));
+    } else {
+      // No prices data, keep hotels as is but price = null
+      merged = hotels.map(h => ({ ...h, price: null }));
+    }
 
     // Step 6: Sort
     console.time("🔢 Sorting");

@@ -45,6 +45,8 @@ export default function Results() {
   const searchRef = useRef(null);
   const rgRef = useRef(null);
   const [rgOpen, setRgOpen] = useState(false);
+  const [center, setCenter] = useState([1.3521, 103.8198]); // default singapore
+  const HOTEL_PLACEHOLDER = "/photos/hotelplaceholder.png"
 
   // const hotels = [
   //   { name: "Marina Bay Sands", location: "Singapore", price: 500, guestRating: 9.1, starRating: 5 },
@@ -70,6 +72,7 @@ export default function Results() {
   const totalPages = Math.ceil(totalHotels / HOTELS_PER_PAGE);
 
   const [pagesCache, setPagesCache] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Build new URLSearchParams based on current filters + other existing params
@@ -104,9 +107,10 @@ export default function Results() {
     }, { replace: true });
   }, [filters, sortBy, navigate, location.pathname]);
 
-  const fetchPage = async (pageNum) => {
+  const fetchPage = async (pageNum, isPrefetch = false) => { // prevent interruption to map as future pages load
     if (!uid || !checkinParam || !checkoutParam || !totalGuests) return;
 
+    if (!isPrefetch) setIsLoading(true);
     try {
       const params = new URLSearchParams();
 
@@ -162,6 +166,8 @@ export default function Results() {
         ...prevCache,
         [pageNum]: { hotels: [], total: 0 },
       }));
+    } finally {
+      if (!isPrefetch) setIsLoading(false); // ✅ This ensures the map & page know when to render
     }
   };
 
@@ -181,7 +187,7 @@ export default function Results() {
 
     for (let p = 2; p <= totalPages; p++) {
       if (!pagesCache[p]) {
-        const timer = setTimeout(() => fetchPage(p), (p - 1) * 1500);
+        const timer = setTimeout(() => fetchPage(p, true), (p - 1) * 1500);
         timers.push(timer);
       }
     }
@@ -200,6 +206,15 @@ export default function Results() {
 
   // Use cached hotels for current page or empty while loading
   const hotelsToShow = pagesCache[currentPage]?.hotels || [];
+
+  useEffect(() => {
+    if (hotelsToShow.length > 0) {
+      const { latitude, longitude } = hotelsToShow[0];
+      setCenter([latitude, longitude]);
+    }
+  }, [hotelsToShow]);
+
+
 
   const getNights = () => {
     const { startDate, endDate } = dateRange;
@@ -355,7 +370,7 @@ export default function Results() {
                 {
                   hotel.imageUrl ? (
                     <img
-                      src={hotel.imageUrl}
+                      src={hotel.imageUrl || HOTEL_PLACEHOLDER}
                       alt={hotel.name}
                       style={{
                         width: "30%",
@@ -366,6 +381,11 @@ export default function Results() {
                         borderRadius: "4px",
                       }}
                       loading="lazy"
+                      onError={(e) => {
+                        // if the URL 404s at runtime, swap in the placeholder
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = HOTEL_PLACEHOLDER;
+                      }}
                     />
 
                   ) : (
@@ -432,18 +452,26 @@ export default function Results() {
           position: "sticky",
           top: "6rem", // adjust this to match your header height
           alignSelf: "flex-start", // ensure it sticks to the top of its column
-          width: "300px",
+          marginLeft: "1rem",
+          width: "40rem",
           height: "calc(100vh - 7rem)", // prevent going off screen
           border: "1px solid #ddd",
           borderRadius: "8px",
           overflow: "hidden",
           backgroundColor: "#fff",
         }}>
+          {isLoading ? (
+            <p style={{ fontSize: "1rem", color: "#888" }}>Loading map...</p>
+          ) : (
           <MapContainer
-            center={[1.3521, 103.8198]} // Singapore default center
+            key={center.join(",")}
+            center={center} // Singapore default center
             zoom={12}
-            scrollWheelZoom={false}
+            scrollWheelZoom={true}
             style={{ height: "100%", width: "100%" }}
+            whenCreated={map => {
+              setMapInstance(map)
+            }}
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -503,6 +531,7 @@ export default function Results() {
             )}
 
           </MapContainer>
+          )}
         </div>
       </div>
 
