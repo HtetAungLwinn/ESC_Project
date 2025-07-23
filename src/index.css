@@ -457,8 +457,11 @@ button[type="submit"]:hover {
 }
 
 
-/* only when <html> has class="bw" */
 html.bw {
-  /* 100% grayscale + boosted contrast for crisp blacks & whites */
+  filter: invert(100%) !important;
+}
+
+html.bw img,
+html.bw .leaflet-container {
   filter: invert(100%) !important;
 }
