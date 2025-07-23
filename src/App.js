@@ -23,9 +23,7 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem("ocbcDarkMode", JSON.stringify(darkMode));
-    // toggle dark-theme on <body>
     document.body.classList.toggle("dark", darkMode);
-    // toggle B&W filter on <html>
     document.documentElement.classList.toggle("bw", darkMode);
   }, [darkMode]);
 
