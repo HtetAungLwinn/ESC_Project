@@ -1,100 +1,88 @@
 import React, { useState } from "react";
+import '../css/ImageBox.css';
 
 const ImageBox = ({ hotel }) => {
   const prefix = hotel.image_details.prefix;
   const suffix = hotel.image_details.suffix;
-  const imageIndexes = hotel.hires_image_index.split(',').slice(0, hotel.image_details.count).map(Number);
-  const [currentIndex, setCurrentIndex] = useState(hotel.image_details.default_image_index || 0);
+  const imageIndexes = hotel.hires_image_index
+    .split(',')
+    .slice(0, hotel.image_details.count)
+    .map(Number);
 
-  const total = imageIndexes.length;
+  const images = imageIndexes.map(index => `${prefix}${index}${suffix}`);
+  const total = images.length;
+
+  const visibleCount = 5;
+  const imageWidth = 180;
+  const imageGap = 10;
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const maxScrollIndex = Math.max(total - visibleCount, 0);
 
   const goPrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? total - 1 : prev - 1));
+    setCurrentIndex(prev => Math.max(prev - 1, 0));
   };
 
   const goNext = () => {
-    setCurrentIndex((prev) => (prev === total - 1 ? 0 : prev + 1));
+    setCurrentIndex(prev => Math.min(prev + 1, maxScrollIndex));
+  };
+
+  const openModal = (index) => {
+    setActiveIndex(index);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => setModalOpen(false);
+
+  const nextModal = () => {
+    setActiveIndex(prev => (prev + 1) % total);
+  };
+
+  const prevModal = () => {
+    setActiveIndex(prev => (prev - 1 + total) % total);
   };
 
   return (
-    <section className="gallery" style={{ maxWidth: 400, margin: "auto", position: "relative" }}>
-      <div
-        style={{
-          position: "relative",
-          border: "1px solid #ccc",
-          borderRadius: 8,
-          overflow: "hidden",
-          backgroundColor: "#f9f9f9",
-          height: 300,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        {/* Image */}
-        <img
-          src={`${prefix}${imageIndexes[currentIndex]}${suffix}`}
-          alt={`Hotel image ${currentIndex}`}
-          style={{ maxWidth: "100%", maxHeight: "100%" }}
-        />
+    <div className="square-carousel-container">
+      <button className="nav-button left" onClick={goPrev} disabled={currentIndex === 0}>◀</button>
 
-        {/* Left arrow */}
-        <button
-          onClick={goPrev}
-          style={{
-            position: "absolute",
-            left: 10,
-            top: "50%",
-            transform: "translateY(-50%)",
-            background: "rgba(0,0,0,0.4)",
-            color: "#fff",
-            border: "none",
-            borderRadius: "50%",
-            width: 30,
-            height: 30,
-            cursor: "pointer",
-          }}
-        >
-          ◀
-        </button>
-
-        {/* Right arrow */}
-        <button
-          onClick={goNext}
-          style={{
-            position: "absolute",
-            right: 10,
-            top: "50%",
-            transform: "translateY(-50%)",
-            background: "rgba(0,0,0,0.4)",
-            color: "#fff",
-            border: "none",
-            borderRadius: "50%",
-            width: 30,
-            height: 30,
-            cursor: "pointer",
-          }}
-        >
-          ▶
-        </button>
-
-        {/* Image index (bottom left) */}
+      <div className="square-carousel-view">
         <div
+          className="square-slider-track"
           style={{
-            position: "absolute",
-            bottom: 8,
-            left: 10,
-            background: "rgba(0,0,0,0.5)",
-            color: "#fff",
-            padding: "2px 6px",
-            borderRadius: 4,
-            fontSize: 12,
+            transform: `translateX(-${(imageWidth + imageGap) * currentIndex}px)`
           }}
         >
-          {currentIndex + 1} / {total}
+          {images.map((img, i) => (
+            <div className="square-image" key={i} onClick={() => openModal(i)}>
+              <img src={img} alt={`Hotel ${i + 1}`} />
+            </div>
+          ))}
         </div>
       </div>
-    </section>
+
+      <button
+        className="nav-button right"
+        onClick={goNext}
+        disabled={currentIndex >= maxScrollIndex}
+      >
+        ▶
+      </button>
+
+      {modalOpen && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeModal}>✕</button>
+            <button className="modal-nav left" onClick={prevModal}>◀</button>
+            <img src={images[activeIndex]} alt={`Modal ${activeIndex + 1}`} className="modal-img" />
+            <button className="modal-nav right" onClick={nextModal}>▶</button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
