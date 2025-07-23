@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
-import "./Results.css";
-import SearchBanner from "./SearchBanner";
+import "./css/Results.css";
+import SearchBanner from "./component/SearchBanner";
 import { MapContainer, TileLayer, Marker, Tooltip  } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";

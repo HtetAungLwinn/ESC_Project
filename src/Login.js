@@ -11,7 +11,7 @@ export default function Login({ setLoggedIn }) {
   const [errorMessage, setErrorMessage]   = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [userInfo, setUserInfo]     = useState(null);
-  const navigate = useNavigate();  // ← hook for navigation
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();

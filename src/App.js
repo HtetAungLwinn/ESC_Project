@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
-import "./index.css";
+import "./css/index.css";
 
-import HeaderBanner from "./HeaderBanner";
-import BottomBar    from "./BottomBar";
+import HeaderBanner from "./component/HeaderBanner";
+import BottomBar    from "./component/BottomBar";
 
 import Home             from "./Home";
 import Login            from "./Login";
@@ -13,7 +13,7 @@ import Signup           from "./Signup";
 import Results          from "./Results";
 import HotelDetailsPage from "./HotelDetailsPage";
 import Payment          from "./Payment";
-import Confirmation     from "./Confirmation";
+import Confirmation     from "./component/Confirmation";
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);

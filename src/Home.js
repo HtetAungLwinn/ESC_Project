@@ -1,7 +1,7 @@
 // src/Home.js
 import React from "react";
-import HeaderBanner from "./HeaderBanner";
-import SearchBanner  from "./SearchBanner";
+import HeaderBanner from "./component/HeaderBanner";
+import SearchBanner  from "./component/SearchBanner";
 
 export default function Home({ loggedIn, setLoggedIn }) {
   return (

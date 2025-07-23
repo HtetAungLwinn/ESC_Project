@@ -3,10 +3,10 @@ import { useLocation, Link, useNavigate } from "react-router-dom";
 import { FiMapPin, FiChevronDown } from 'react-icons/fi';
 import { AiFillStar } from 'react-icons/ai';
 import { Plane } from "lucide-react";
-import './HotelDetailsPage.css';
-import SearchBanner from "./SearchBanner";
-import HotelMap from './HotelMap';
-import ImageBox from './ImageBox';
+import './css/HotelDetailsPage.css';
+import SearchBanner from "./component/SearchBanner";
+import HotelMap from './component/HotelMap';
+import ImageBox from './component/ImageBox';
 
 // const amenities = [
 //   'Air Conditioning', 'Business Center', 'Clothing Iron', 'Data Ports',
