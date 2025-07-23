@@ -1,32 +1,51 @@
-lwin (FRONTEND STUFF features
-pages
+(FRONTEND and BACKEND features summary)
+
+
+Sustainability:
+
+Our application’s adaptive light and dark modes deliver tangible environmental benefits by reducing energy consumption on OLED and AMOLED devices, where darker pixels require less power. Automatic switching based on a user’s system preferences or local time of day minimizes glare and eye strain, which in turn lowers the rate of abandoned sessions and support requests. These efficiencies help us contribute to United Nations Sustainable Development Goal 7 Affordable and Clean Energy through reduced power demand and to SDG 12 Responsible Consumption and Production by curbing digital waste and promoting more efficient use of device resources.
+
+Inclusive and Diversity:
+
+By collecting guests’ religious preferences at sign‑up, our platform equips hotel staff with the information they need to respectfully tailor each stay for the customer whether that means arranging appropriate meal options, preparing quiet prayer spaces, or offering relevant local guidance to ensure every visitor feels valued and understood.
+
+
+
+
+Project workload distribution:
+
+Lwin, Selena, Wenxin
 Log in, sign up page
 Home page
 Destination, check in dates, check out dates, number of guests, number of rooms
 
+
+Elisha, Dhruv
 Payment page
 User details
 Name, contact, account
 Payment options
-Booking confirmation page)
+Booking confirmation page
 
 
 
-thoai (Hotel search results page 
+Thoai, Hon
+Hotel search results page:
 Shows results
 Add in filter
 Filter guest rating, star rating, price range
-Sort by price and star rating)
+Sort by price and star rating
 
 
 
-zy (Hotel rooms details page
+Zhong Yi, Selena
+Hotel rooms details page
 Room options
 Map
 Photos
 Reviews
 Description
-Available dates)
+Available dates
 
 
 
