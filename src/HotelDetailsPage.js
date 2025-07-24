@@ -8,9 +8,11 @@ import {
   FaUsers,
   FaStar,
   FaStarHalfAlt,
-  FaRegStar
+  FaRegStar,
+  FaCoffee
 } from 'react-icons/fa';
 import './css/HotelDetailsPage.css';
+import { GiKnifeFork } from 'react-icons/gi';
 import SearchBanner from "./component/SearchBanner";
 import HotelMap from './component/HotelMap';
 import ImageBox from './component/ImageBox';
@@ -67,10 +69,17 @@ export default function HotelDetailsPage() {
   const partnerId = searchParams.get("partner_id") || "1";
 
   const [hotel, setHotel] = useState(null);
+
   const [roomList, setRoomList] = useState([]);
+  const [roomsLoading, setRoomsLoading] = useState(false);
+  const [roomsError, setRoomsError] = useState(false);
+  const [showAllRooms, setShowAllRooms] = useState(false);
+  const initialVisible = 2; // set rooms to show
+
   const [expanded, setExpanded] = useState(false);
   const [hover, setHover] = useState(false);
   const charLimit = 1200;
+
 
   useEffect(() => {
     if (!id) return;
@@ -85,6 +94,11 @@ export default function HotelDetailsPage() {
 
   useEffect(() => {
     if (!destination || !checkinParam || !checkoutParam || !totalGuests || !id) return;
+
+    setRoomsLoading(true);
+    setRoomsError(false);
+
+
     fetch(
       `/api/rooms/${id}/price?destination_id=${destination}` +
       `&checkin=${checkinParam}` +
@@ -99,6 +113,10 @@ export default function HotelDetailsPage() {
     .then(data => setRoomList(data.rooms || []))
     .catch(err => console.error(err));
   }, [destination, checkinParam, checkoutParam, totalGuests, id]);
+
+  const visibleRooms = showAllRooms
+  ? roomList
+  : roomList.slice(0, initialVisible);
 
   if (!hotel) return <p>Loading hotel info...</p>;
 
@@ -218,52 +236,75 @@ export default function HotelDetailsPage() {
 
       <section className="rooms">
         <h2>Room Options</h2>
-        {roomList.length > 0 ? (
-          roomList.map((room) => (
-            // <div key={room.key} style={{ marginBottom: "20px" }}>
-            <div key={room.key} className='room-card'>
-              <h3>{room.roomDescription}</h3>
-              <p>Free cancellation: {room.free_cancellation ? "Yes" : "No"}</p>
-              <h2>Description</h2>
-              <div style={{ display: "inline" }}>
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: expanded ? fullDesc : shortDesc + "...",
-                  }}
-                />
-                <span
-                  onClick={toggleExpanded}
-                  onMouseEnter={() => setHover(true)}
-                  onMouseLeave={() => setHover(false)}
-                  style={{
-                    cursor: "pointer",
-                    textDecoration: hover ? "underline" : "none",
-                    color: hover ? "blue" : "black",
-                    display: "inline",
-                    marginLeft: "4px",
-                  }}
-                >
-                  {expanded ? "Read less" : "Read more"}
-                </span>
+
+        {visibleRooms.map((room) => {
+          const thumb = room.images?.[0]?.high_resolution_url
+            || '/images/room-placeholder.jpg';
+          const isBreakfast = room.roomAdditionalInfo?.breakfastInfo
+            ?.toLowerCase().includes('breakfast');
+
+          // calculate nights
+          let nights = '';
+          if (checkinParam && checkoutParam) {
+            const inD = new Date(checkinParam);
+            const outD = new Date(checkoutParam);
+            nights = Math.round((outD - inD) / (1000*60*60*24));
+          }
+
+          return (
+            <div className="room-card" key={room.key}>
+              {/* Left: thumbnail */}
+              <img
+                src={thumb}
+                alt={room.roomDescription}
+                className="room-card__img"
+              />
+
+              {/* Middle: details */}
+              <div className="room-card__details">
+                <h3 className="room-card__title">{room.roomDescription}</h3>
+                <p className="room-card__line">
+                  {isBreakfast ? '☕ Breakfast Included' : 'Room Only'}
+                </p>
+                <p className="room-card__sub">
+                  {room.free_cancellation ? 'Free cancellation' : 'Non-refundable'}
+                </p>
+                <p className="room-card__price">
+                  SGD {room.converted_price.toFixed(0)}
+                </p>
+                <p className="room-card__duration">
+                  1 room • {nights} night{nights > 1 ? 's' : ''}
+                </p>
               </div>
-              <div>
-                <h2>Additional Information</h2>
-                {Object.entries(room.roomAdditionalInfo.displayFields).map(([key, html]) => (
-                  <div key={key} style={{ marginBottom: "1rem" }}>
-                    <strong>{formatAmenityName(key)}</strong>
-                    <div dangerouslySetInnerHTML={{ __html: html }} />
-                  </div>
-                ))}
-              </div>
+
+              {/* Right: select button */}
+              <button
+                className="room-card__btn"
+                onClick={() => console.log('Select', room.key)}
+              >
+                Select
+              </button>
             </div>
-          ))
-        ) : (
-          <p>No rooms available or still loading...</p>
+          );
+        })}
+
+        {roomList.length > initialVisible && (
+          <button
+            className="see-more-rooms"
+            onClick={() => setShowAllRooms(prev => !prev)}
+          >
+            {!showAllRooms ? (
+              <>
+                <FiChevronDown size={20} style={{ verticalAlign: 'middle' }} />
+                <span style={{ marginLeft: 8 }}>More Rooms</span>
+              </>
+            ) : (
+              'Show Less'
+            )}
+          </button>
         )}
-        <div className="see-more">
-          <FiChevronDown /> See More Rooms
-        </div>
       </section>
+
 
       {hotel.latitude && hotel.longitude && (
         <section className="location-map">
