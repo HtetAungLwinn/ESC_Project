@@ -14,7 +14,7 @@ import Results          from "./Results";
 import HotelDetailsPage from "./HotelDetailsPage";
 import Payment          from "./Payment";
 import PaymentStripe   from "./PaymentStripe";
-import Confirmation     from "./Confirmation";
+import Confirmation     from "./component/Confirmation";
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
