@@ -168,12 +168,13 @@
 }
 
 .room-card {
-  display: flex;
+  /* display: flex; */
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  margin-bottom: 1rem;
+  margin-bottom: 20px;
   overflow: hidden;
+  padding: 4px;
 }
 
 .room-card img {

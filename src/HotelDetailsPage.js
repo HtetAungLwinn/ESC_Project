@@ -70,7 +70,7 @@ export default function HotelDetailsPage() {
   const [roomList, setRoomList] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const [hover, setHover] = useState(false);
-  const charLimit = 300;
+  const charLimit = 1200;
 
   useEffect(() => {
     if (!id) return;
@@ -86,7 +86,7 @@ export default function HotelDetailsPage() {
   useEffect(() => {
     if (!destination || !checkinParam || !checkoutParam || !totalGuests || !id) return;
     fetch(
-      `/api/hotels/${id}/price?destination_id=${destination}` +
+      `/api/rooms/${id}/price?destination_id=${destination}` +
       `&checkin=${checkinParam}` +
       `&checkout=${checkoutParam}` +
       `&lang=${lang}&currency=${currency}&country_code=${countryCode}` +
@@ -108,8 +108,6 @@ export default function HotelDetailsPage() {
 
   return (
     <div>
-      <SearchBanner />
-
       <section className="gallery">
         <ImageBox hotel={hotel} />
       </section>
@@ -222,7 +220,8 @@ export default function HotelDetailsPage() {
         <h2>Room Options</h2>
         {roomList.length > 0 ? (
           roomList.map((room) => (
-            <div key={room.key} style={{ marginBottom: "20px" }}>
+            // <div key={room.key} style={{ marginBottom: "20px" }}>
+            <div key={room.key} className='room-card'>
               <h3>{room.roomDescription}</h3>
               <p>Free cancellation: {room.free_cancellation ? "Yes" : "No"}</p>
               <h2>Description</h2>
