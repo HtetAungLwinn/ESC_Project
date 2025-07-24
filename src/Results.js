@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import "./css/Results.css";
 import SearchBanner from "./component/SearchBanner";
-import { MapContainer, TileLayer, Marker, Tooltip  } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -62,7 +62,9 @@ export default function Results() {
     maxPrice: searchParams.get("maxPrice") || "",
   };
 
+  const [filterInputs, setFilterInputs] = useState(initialFilters);
   const [filters, setFilters] = useState(initialFilters);
+
 
   // SortBy state (default "rating" or from URL)
   const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "rating");
@@ -243,84 +245,90 @@ export default function Results() {
         <div
           style={{
             display: "flex",
-            gap: "0.75rem",
-            alignItems: "center",
+            gap: "1.5rem",
+            alignItems: "flex-start",
             flexWrap: "wrap"
           }}
         >
-          {/* Star Rating Dropdown */}
-          <select
-            value={filters.starRating}
-            onChange={(e) => setFilters({ ...filters, starRating: e.target.value })}
-            style={{ padding: "0.3rem 0.5rem" }}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="star-rating">Star Rating</label>
+            <select
+              id="star-rating"
+              value={filterInputs.starRating}
+              onChange={(e) => setFilterInputs({ ...filterInputs, starRating: e.target.value })}
+              style={{ padding: "0.3rem 0.5rem" }}
+            >
+              <option value="">Any</option>
+              <option value="5">5 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="2">2 Stars</option>
+              <option value="1">1 Star</option>
+            </select>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="guest-rating">Guest Rating (0–100)</label>
+            <input
+              id="guest-rating"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value={filterInputs.guestRating}
+              onChange={(e) => setFilterInputs({ ...filterInputs, guestRating: e.target.value })}
+              style={{ padding: "0.3rem 0.5rem", width: "140px", textAlign: "center" }}
+            />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="min-price">Min Price</label>
+            <input
+              id="min-price"
+              type="number"
+              min="0"
+              value={filterInputs.minPrice}
+              onChange={(e) => setFilterInputs({ ...filterInputs, minPrice: e.target.value })}
+              style={{ padding: "0.3rem 0.5rem", width: "80px", textAlign: "center" }}
+            />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="max-price">Max Price</label>
+            <input
+              id="max-price"
+              type="number"
+              min="0"
+              value={filterInputs.maxPrice}
+              onChange={(e) => setFilterInputs({ ...filterInputs, maxPrice: e.target.value })}
+              style={{ padding: "0.3rem 0.5rem", width: "80px", textAlign: "center" }}
+            />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="sort-by">Sort By</label>
+            <select
+              id="sort-by"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              style={{ padding: "0.3rem 0.5rem" }}
+            >
+              <option value="rating">Rating</option>
+              <option value="price">Price</option>
+              <option value="guestRating">Guest Rating</option>
+            </select>
+          </div>
+
+          <button
+            className="search-btn"
+            style={{ alignSelf: "flex-end", marginLeft: "1rem" }}
+            onClick={() => setFilters(filterInputs)}
           >
-            <option value="">Star Rating</option>
-            <option value="5">5 Stars</option>
-            <option value="4">4 Stars</option>
-            <option value="3">3 Stars</option>
-            <option value="2">2 Stars</option>
-            <option value="1">1 Star</option>
-          </select>
-
-          {/* Guest Rating Dropdown */}
-          <select
-            value={filters.guestRating}
-            onChange={(e) => setFilters({ ...filters, guestRating: e.target.value })}
-            style={{ padding: "0.3rem 0.5rem" }}
-          >
-            <option value="">Guest Rating</option>
-            <option value="9">9+ Excellent</option>
-            <option value="8">8+ Very Good</option>
-            <option value="7">7+ Good</option>
-            <option value="6">6+ Okay</option>
-          </select>
-
-          {/* Min Price Input */}
-          <input
-            type="number"
-            min="0"
-            value={filters.minPrice || ""}
-            onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
-            placeholder="Min Price"
-            style={{
-              padding: "0.3rem 0.5rem",
-              width: "80px",
-              textAlign: "center",
-            }}
-          />
-
-          {/* Max Price Input */}
-          <input
-            type="number"
-            min="0"
-            value={filters.maxPrice || ""}
-            onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-            placeholder="Max Price"
-            style={{
-              padding: "0.3rem 0.5rem",
-              width: "80px",
-              textAlign: "center",
-            }}
-          />
-
-          {/* Sort By */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            style={{ padding: "0.3rem 0.5rem" }}
-          >
-            <option value="rating">Sort by Rating</option>
-            <option value="price">Sort by Price</option>
-            <option value="guestRating">Sort by Guest Rating</option>
-          </select>
-
-       {/* after */}
-          <button className="search-btn" style={{ marginLeft: "1rem" }}>
-              Filter
+            Filter
           </button>
 
-
         </div>
+
       </div>
 
 
@@ -412,11 +420,11 @@ export default function Results() {
                     </p>
                   </div>
                   <button
-                    onClick={() => navigate(`/room?id=${hotel.id}`+ 
-                      `&destination=${uid}` + 
-                      `&checkin=${checkinParam}` + 
-                      `&checkout=${checkoutParam}` + 
-                      `&adults=${adultsParam}` + 
+                    onClick={() => navigate(`/room?id=${hotel.id}` +
+                      `&destination=${uid}` +
+                      `&checkin=${checkinParam}` +
+                      `&checkout=${checkoutParam}` +
+                      `&adults=${adultsParam}` +
                       `&children=${childrenParam}`
                     )}
                     style={{
@@ -455,167 +463,167 @@ export default function Results() {
           {isLoading ? (
             <p style={{ fontSize: "1rem", color: "#888" }}>Loading map...</p>
           ) : (
-          <MapContainer
-            key={center.join(",")}
-            center={center} // Singapore default center
-            zoom={12}
-            scrollWheelZoom={true}
-            style={{ height: "100%", width: "100%" }}
-            whenCreated={map => {
-              setMapInstance(map)
-            }}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {hotelsToShow.map(
-              (hotel) =>
-                hotel.latitude &&
-                hotel.longitude && (
-                  <Marker
-                    key={hotel.id}
-                    position={[hotel.latitude, hotel.longitude]}
-                  >
-                    <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
-                      <div style={{ minWidth: "150px", maxWidth: "200px" }}>
-                        {hotel.imageUrl ? (
-                          <img
-                            src={hotel.imageUrl}
-                            alt={hotel.name}
-                            style={{
-                              width: "100%",
-                              maxHeight: "100px",
-                              objectFit: "cover",
-                              marginTop: "0.3rem",
-                              borderRadius: "4px"
-                            }}
-                          />
-                        ) : (
-                          <div
-                            style={{
-                              width: "100%",
-                              height: "80px",
-                              backgroundColor: "#ccc",
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              marginTop: "0.3rem",
-                              fontSize: "0.75rem"
-                            }}
-                          >
-                            No Image
-                          </div>
-                        )}
-                        <br />
-                        💰 Price: ${hotel.price.toLocaleString()}
-                        <br />
-                        <strong>{hotel.name}</strong>
-                        <br />
-                        ⭐ Star Rating: {hotel.rating ?? "N/A"}
-                        <br />
-                        👤 Guest Rating: {hotel.guestRating ?? "N/A"}
-                        <br />                        
-                      </div>
-                    </Tooltip>
-                  </Marker>
-                )
-            )}
+            <MapContainer
+              key={center.join(",")}
+              center={center} // Singapore default center
+              zoom={12}
+              scrollWheelZoom={true}
+              style={{ height: "100%", width: "100%" }}
+              whenCreated={map => {
+                setMapInstance(map)
+              }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              />
+              {hotelsToShow.map(
+                (hotel) =>
+                  hotel.latitude &&
+                  hotel.longitude && (
+                    <Marker
+                      key={hotel.id}
+                      position={[hotel.latitude, hotel.longitude]}
+                    >
+                      <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
+                        <div style={{ minWidth: "150px", maxWidth: "200px" }}>
+                          {hotel.imageUrl ? (
+                            <img
+                              src={hotel.imageUrl}
+                              alt={hotel.name}
+                              style={{
+                                width: "100%",
+                                maxHeight: "100px",
+                                objectFit: "cover",
+                                marginTop: "0.3rem",
+                                borderRadius: "4px"
+                              }}
+                            />
+                          ) : (
+                            <div
+                              style={{
+                                width: "100%",
+                                height: "80px",
+                                backgroundColor: "#ccc",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                marginTop: "0.3rem",
+                                fontSize: "0.75rem"
+                              }}
+                            >
+                              No Image
+                            </div>
+                          )}
+                          <br />
+                          💰 Price: ${hotel.price.toLocaleString()}
+                          <br />
+                          <strong>{hotel.name}</strong>
+                          <br />
+                          ⭐ Star Rating: {hotel.rating ?? "N/A"}
+                          <br />
+                          👤 Guest Rating: {hotel.guestRating ?? "N/A"}
+                          <br />
+                        </div>
+                      </Tooltip>
+                    </Marker>
+                  )
+              )}
 
-          </MapContainer>
+            </MapContainer>
           )}
         </div>
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-          <div
+        <div
+          style={{
+            marginTop: "1.5rem",
+            display: "flex",
+            justifyContent: "center",
+            gap: "0.5rem",
+            flexWrap: "wrap",
+          }}
+        >
+          {/* Prev button */}
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
             style={{
-              marginTop: "1.5rem",
-              display: "flex",
-              justifyContent: "center",
-              gap: "0.5rem",
-              flexWrap: "wrap",
+              padding: "0.4rem 0.8rem",
+              cursor: currentPage === 1 ? "not-allowed" : "pointer",
             }}
           >
-            {/* Prev button */}
-            <button
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              style={{
-                padding: "0.4rem 0.8rem",
-                cursor: currentPage === 1 ? "not-allowed" : "pointer",
-              }}
-            >
-              Prev
-            </button>
+            Prev
+          </button>
 
-            {/* Dynamic sliding pagination */}
-            {(() => {
-              const visiblePages = 3;
-              let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
-              let endPage = startPage + visiblePages - 1;
+          {/* Dynamic sliding pagination */}
+          {(() => {
+            const visiblePages = 3;
+            let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
+            let endPage = startPage + visiblePages - 1;
 
-              if (endPage > totalPages) {
-                endPage = totalPages;
-                startPage = Math.max(1, endPage - visiblePages + 1);
-              }
+            if (endPage > totalPages) {
+              endPage = totalPages;
+              startPage = Math.max(1, endPage - visiblePages + 1);
+            }
 
-              const pageButtons = [];
+            const pageButtons = [];
 
-              for (let i = startPage; i <= endPage; i++) {
-                pageButtons.push(
-                  <button
-                    key={i}
-                    onClick={() => goToPage(i)}
-                    style={{
-                      padding: "0.4rem 0.8rem",
-                      fontWeight: currentPage === i ? "bold" : "normal",
-                      textDecoration: currentPage === i ? "underline" : "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {i}
-                  </button>
-                );
-              }
+            for (let i = startPage; i <= endPage; i++) {
+              pageButtons.push(
+                <button
+                  key={i}
+                  onClick={() => goToPage(i)}
+                  style={{
+                    padding: "0.4rem 0.8rem",
+                    fontWeight: currentPage === i ? "bold" : "normal",
+                    textDecoration: currentPage === i ? "underline" : "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  {i}
+                </button>
+              );
+            }
 
-              // Show first page and ellipsis if startPage > 1
-              if (startPage > 1) {
-                pageButtons.unshift(
-                  <button key={1} onClick={() => goToPage(1)} style={{ padding: "0.4rem 0.8rem" }}>
-                    1
-                  </button>,
-                  <span key="start-ellipsis" style={{ padding: "0.4rem 0.8rem" }}>...</span>
-                );
-              }
+            // Show first page and ellipsis if startPage > 1
+            if (startPage > 1) {
+              pageButtons.unshift(
+                <button key={1} onClick={() => goToPage(1)} style={{ padding: "0.4rem 0.8rem" }}>
+                  1
+                </button>,
+                <span key="start-ellipsis" style={{ padding: "0.4rem 0.8rem" }}>...</span>
+              );
+            }
 
-              // Show ellipsis and last page if endPage < totalPages
-              if (endPage < totalPages) {
-                pageButtons.push(
-                  <span key="end-ellipsis" style={{ padding: "0.4rem 0.8rem" }}>...</span>,
-                  <button key={totalPages} onClick={() => goToPage(totalPages)} style={{ padding: "0.4rem 0.8rem" }}>
-                    {totalPages}
-                  </button>
-                );
-              }
+            // Show ellipsis and last page if endPage < totalPages
+            if (endPage < totalPages) {
+              pageButtons.push(
+                <span key="end-ellipsis" style={{ padding: "0.4rem 0.8rem" }}>...</span>,
+                <button key={totalPages} onClick={() => goToPage(totalPages)} style={{ padding: "0.4rem 0.8rem" }}>
+                  {totalPages}
+                </button>
+              );
+            }
 
-              return pageButtons;
-            })()}
+            return pageButtons;
+          })()}
 
-            {/* Next button */}
-            <button
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              style={{
-                padding: "0.4rem 0.8rem",
-                cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-              }}
-            >
-              Next
-            </button>
-          </div>
-        )
+          {/* Next button */}
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            style={{
+              padding: "0.4rem 0.8rem",
+              cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+            }}
+          >
+            Next
+          </button>
+        </div>
+      )
       }
     </div >
   );
