@@ -41,6 +41,8 @@ async function getFilteredHotels(req, res) {
     pricesUrl.searchParams.set("country_code", "SG");
     pricesUrl.searchParams.set("partner_id", "1");
 
+    console.log("🔗 Full Price URL:", pricesUrl.toString());
+
     // Step 2: Fetch hotel & price data
     console.time("🌐 Fetch APIs");
     const [hotelResp, priceResp] = await Promise.all([
