@@ -475,7 +475,19 @@ export default function Results() {
                 hotel.longitude && (
                   <Marker
                     key={hotel.id}
-                    position={[hotel.latitude, hotel.longitude]}
+                    position={[hotel.latitude, hotel.longitude]}  
+                    eventHandlers={{
+                      click: () => {
+                        navigate(
+                          `/room?id=${hotel.id}` + 
+                          `&destination=${uid}` + 
+                          `&checkin=${checkinParam}` + 
+                          `&checkout=${checkoutParam}` + 
+                          `&adults=${adultsParam}` + 
+                          `&children=${childrenParam}`
+                        );
+                      },
+                    }}
                   >
                     <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
                       <div style={{ minWidth: "150px", maxWidth: "200px" }}>
