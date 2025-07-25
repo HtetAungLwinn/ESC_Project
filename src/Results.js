@@ -62,6 +62,7 @@ export default function Results() {
     maxPrice: searchParams.get("maxPrice") || "",
   };
 
+  const [filterInputs, setFilterInputs] = useState(initialFilters);
   const [filters, setFilters] = useState(initialFilters);
 
   // SortBy state (default "rating" or from URL)
@@ -240,85 +241,90 @@ export default function Results() {
       >
         <h1 style={{ margin: 0 }}>Hotels in {destination}</h1>
 
-        <div
+                <div
           style={{
             display: "flex",
-            gap: "0.75rem",
-            alignItems: "center",
+            gap: "1.5rem",
+            alignItems: "flex-start",
             flexWrap: "wrap"
           }}
         >
-          {/* Star Rating Dropdown */}
-          <select
-            value={filters.starRating}
-            onChange={(e) => setFilters({ ...filters, starRating: e.target.value })}
-            style={{ padding: "0.3rem 0.5rem" }}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="star-rating">Star Rating</label>
+            <select
+              id="star-rating"
+              value={filterInputs.starRating}
+              onChange={(e) => setFilterInputs({ ...filterInputs, starRating: e.target.value })}
+              style={{ padding: "0.3rem 0.5rem" }}
+            >
+              <option value="">Any</option>
+              <option value="5">5 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="2">2 Stars</option>
+              <option value="1">1 Star</option>
+            </select>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="guest-rating">Guest Rating (0–100)</label>
+            <input
+              id="guest-rating"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value={filterInputs.guestRating}
+              onChange={(e) => setFilterInputs({ ...filterInputs, guestRating: e.target.value })}
+              style={{ padding: "0.3rem 0.5rem", width: "140px", textAlign: "center" }}
+            />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="min-price">Min Price</label>
+            <input
+              id="min-price"
+              type="number"
+              min="0"
+              value={filterInputs.minPrice}
+              onChange={(e) => setFilterInputs({ ...filterInputs, minPrice: e.target.value })}
+              style={{ padding: "0.3rem 0.5rem", width: "80px", textAlign: "center" }}
+            />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="max-price">Max Price</label>
+            <input
+              id="max-price"
+              type="number"
+              min="0"
+              value={filterInputs.maxPrice}
+              onChange={(e) => setFilterInputs({ ...filterInputs, maxPrice: e.target.value })}
+              style={{ padding: "0.3rem 0.5rem", width: "80px", textAlign: "center" }}
+            />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="sort-by">Sort By</label>
+            <select
+              id="sort-by"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              style={{ padding: "0.3rem 0.5rem" }}
+            >
+              <option value="rating">Rating</option>
+              <option value="price">Price</option>
+              <option value="guestRating">Guest Rating</option>
+            </select>
+          </div>
+
+          <button
+            className="search-btn"
+            style={{ alignSelf: "flex-end", marginLeft: "1rem" }}
+            onClick={() => setFilters(filterInputs)}
           >
-            <option value="">Star Rating</option>
-            <option value="5">5 Stars</option>
-            <option value="4">4 Stars</option>
-            <option value="3">3 Stars</option>
-            <option value="2">2 Stars</option>
-            <option value="1">1 Star</option>
-          </select>
-
-          {/* Guest Rating Dropdown */}
-          <select
-            value={filters.guestRating}
-            onChange={(e) => setFilters({ ...filters, guestRating: e.target.value })}
-            style={{ padding: "0.3rem 0.5rem" }}
-          >
-            <option value="">Guest Rating</option>
-            <option value="9">9+ Excellent</option>
-            <option value="8">8+ Very Good</option>
-            <option value="7">7+ Good</option>
-            <option value="6">6+ Okay</option>
-          </select>
-
-          {/* Min Price Input */}
-          <input
-            type="number"
-            min="0"
-            value={filters.minPrice || ""}
-            onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
-            placeholder="Min Price"
-            style={{
-              padding: "0.3rem 0.5rem",
-              width: "80px",
-              textAlign: "center",
-            }}
-          />
-
-          {/* Max Price Input */}
-          <input
-            type="number"
-            min="0"
-            value={filters.maxPrice || ""}
-            onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-            placeholder="Max Price"
-            style={{
-              padding: "0.3rem 0.5rem",
-              width: "80px",
-              textAlign: "center",
-            }}
-          />
-
-          {/* Sort By */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            style={{ padding: "0.3rem 0.5rem" }}
-          >
-            <option value="rating">Sort by Rating</option>
-            <option value="price">Sort by Price</option>
-            <option value="guestRating">Sort by Guest Rating</option>
-          </select>
-
-       {/* after */}
-          <button className="search-btn" style={{ marginLeft: "1rem" }}>
-              Filter
+            Filter
           </button>
-
 
         </div>
       </div>
