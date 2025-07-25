@@ -2,9 +2,11 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import "./css/Results.css";
 import SearchBanner from "./component/SearchBanner";
-import { MapContainer, TileLayer, Marker, Tooltip  } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+
+
 
 // Fix Leaflet's default icon issue
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -57,16 +59,16 @@ export default function Results() {
 
   const initialFilters = {
     starRating: searchParams.get("starRating") || "",
-    guestRating: searchParams.get("guestRating") || "",
+    guestRating: searchParams.get("guestRating") || "0",
     minPrice: searchParams.get("minPrice") || "",
     maxPrice: searchParams.get("maxPrice") || "",
+    sortBy: searchParams.get("sortBy") || "rating",
   };
+
 
   const [filterInputs, setFilterInputs] = useState(initialFilters);
   const [filters, setFilters] = useState(initialFilters);
 
-  // SortBy state (default "rating" or from URL)
-  const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "rating");
 
   // Data state
   const [totalHotels, setTotalHotels] = useState(0);
@@ -85,14 +87,24 @@ export default function Results() {
     if (filters.guestRating) params.set("guestRating", filters.guestRating);
     else params.delete("guestRating");
 
-    if (filters.minPrice) params.set("minPrice", filters.minPrice);
-    else params.delete("minPrice");
+    const min = parseFloat(filters.minPrice);
+    const max = parseFloat(filters.maxPrice);
 
-    if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
-    else params.delete("maxPrice");
+    if (!isNaN(min)) {
+      params.set("minPrice", min.toString());
+      if (!isNaN(max) && min <= max) {
+        params.set("maxPrice", max.toString());
+      } else {
+        params.delete("maxPrice"); // treat as min and above
+      }
+    } else {
+      params.delete("minPrice");
+      params.delete("maxPrice");
+    }
+
 
     // Update sortBy
-    if (sortBy) params.set("sortBy", sortBy);
+    if (filters.sortBy) params.set("sortBy", filters.sortBy);
     else params.delete("sortBy");
 
     // Preserve existing essential params (destination, uid, checkin, etc)
@@ -106,7 +118,7 @@ export default function Results() {
       pathname: location.pathname,
       search: params.toString(),
     }, { replace: true });
-  }, [filters, sortBy, navigate, location.pathname]);
+  }, [filters, navigate, location.pathname]);
 
   const fetchPage = async (pageNum, isPrefetch = false) => { // prevent interruption to map as future pages load
     if (!uid || !checkinParam || !checkoutParam || !totalGuests) return;
@@ -127,7 +139,8 @@ export default function Results() {
       if (filters.guestRating) params.set("guestRating", filters.guestRating);
       if (filters.minPrice) params.set("minPrice", filters.minPrice);
       if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
-      if (sortBy) params.set("sortBy", sortBy);
+      if (filters.sortBy) params.set("sortBy", filters.sortBy);
+
 
       const url = `/api/hotels?${params.toString()}`;
 
@@ -177,7 +190,7 @@ export default function Results() {
     setPagesCache({});
     setCurrentPage(1);
     fetchPage(1);
-  }, [uid, checkinParam, checkoutParam, adultsParam, childrenParam, filters, sortBy]);
+  }, [uid, checkinParam, checkoutParam, adultsParam, childrenParam, filters]);
 
   // Prefetch pages 2..totalPages with staggered delay
   useEffect(() => {
@@ -241,7 +254,7 @@ export default function Results() {
       >
         <h1 style={{ margin: 0 }}>Hotels in {destination}</h1>
 
-                <div
+        <div
           style={{
             display: "flex",
             gap: "1.5rem",
@@ -249,8 +262,8 @@ export default function Results() {
             flexWrap: "wrap"
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <label htmlFor="star-rating">Star Rating</label>
+          <div style={{ display: "flex", flexDirection: "column", minWidth: "150px" }}>
+            <label htmlFor="star-rating">Star Rating (and up)</label>
             <select
               id="star-rating"
               value={filterInputs.starRating}
@@ -258,73 +271,107 @@ export default function Results() {
               style={{ padding: "0.3rem 0.5rem" }}
             >
               <option value="">Any</option>
-              <option value="5">5 Stars</option>
-              <option value="4">4 Stars</option>
-              <option value="3">3 Stars</option>
-              <option value="2">2 Stars</option>
-              <option value="1">1 Star</option>
+              <option value="5">5 stars only</option>
+              <option value="4">4 stars and up</option>
+              <option value="3">3 stars and up</option>
+              <option value="2">2 stars and up</option>
+              <option value="1">1 star and up</option>
             </select>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <label htmlFor="guest-rating">Guest Rating (0–100)</label>
-            <input
-              id="guest-rating"
-              type="number"
-              min="0"
-              max="100"
-              step="1"
-              value={filterInputs.guestRating}
-              onChange={(e) => setFilterInputs({ ...filterInputs, guestRating: e.target.value })}
-              style={{ padding: "0.3rem 0.5rem", width: "140px", textAlign: "center" }}
-            />
+          <div style={{ display: "flex", flexDirection: "column", minWidth: "150px" }}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <label htmlFor="guest-rating">Guest Rating: ≥ {filterInputs.guestRating}</label>
+              <input
+                id="guest-rating"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value={filterInputs.guestRating}
+                onChange={(e) => setFilterInputs({ ...filterInputs, guestRating: e.target.value })}
+              />
+            </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <label htmlFor="min-price">Min Price</label>
+
+          {/* Price range number inputs */}
+          <div style={{ display: "flex", flexDirection: "column", width: "150px" }}>
+            <label>Price Range:</label>
             <input
-              id="min-price"
               type="number"
-              min="0"
+              min={0}
+              step={10}
               value={filterInputs.minPrice}
-              onChange={(e) => setFilterInputs({ ...filterInputs, minPrice: e.target.value })}
-              style={{ padding: "0.3rem 0.5rem", width: "80px", textAlign: "center" }}
+              onChange={(e) =>
+                setFilterInputs({ ...filterInputs, minPrice: e.target.value })
+              }
+              placeholder="Min Price"
+              style={{ marginBottom: "0.5rem" }}
             />
-          </div>
 
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <label htmlFor="max-price">Max Price</label>
             <input
-              id="max-price"
               type="number"
-              min="0"
+              min={0}
+              step={10}
               value={filterInputs.maxPrice}
-              onChange={(e) => setFilterInputs({ ...filterInputs, maxPrice: e.target.value })}
-              style={{ padding: "0.3rem 0.5rem", width: "80px", textAlign: "center" }}
+              onChange={(e) =>
+                setFilterInputs({ ...filterInputs, maxPrice: e.target.value })
+              }
+              placeholder="Max Price"
             />
+
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <label htmlFor="sort-by">Sort By</label>
-            <select
-              id="sort-by"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              style={{ padding: "0.3rem 0.5rem" }}
+
+          <div style={{ display: "flex", flexDirection: "column", width: "150px" }}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <label htmlFor="sort-by">Sort By</label>
+              <select
+                id="sort-by"
+                value={filterInputs.sortBy}
+                onChange={(e) =>
+                  setFilterInputs({ ...filterInputs, sortBy: e.target.value })
+                }
+
+              >
+                <option value="rating">Rating</option>
+                <option value="price">Price</option>
+                <option value="guestRating">Guest Rating</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", width: "75px" }}>
+            <button
+              className="search-btn"
+              style={{ alignSelf: "flex-end", marginLeft: "1rem" }}
+              onClick={() => {
+                const min = parseFloat(filterInputs.minPrice);
+                const max = parseFloat(filterInputs.maxPrice);
+
+                if (!isNaN(min) && isNaN(max)) {
+                  setFilters({ ...filterInputs, minPrice: min, maxPrice: "" }); // min and above
+                } else if (isNaN(min) && !isNaN(max)) {
+                  setFilters({ ...filterInputs, minPrice: "", maxPrice: max }); // max and below
+                } else if (!isNaN(min) && !isNaN(max)) {
+                  if (min <= max) {
+                    setFilters({ ...filterInputs, minPrice: min, maxPrice: max }); // in range
+                  } else {
+                    setFilters({ ...filterInputs, minPrice: min, maxPrice: "" }); // fallback to min and above
+                  }
+                } else {
+                  setFilters({ ...filterInputs, minPrice: "", maxPrice: "" }); // no filter
+                }
+
+
+
+              }}
+
             >
-              <option value="rating">Rating</option>
-              <option value="price">Price</option>
-              <option value="guestRating">Guest Rating</option>
-            </select>
+              Filter
+            </button>
           </div>
-
-          <button
-            className="search-btn"
-            style={{ alignSelf: "flex-end", marginLeft: "1rem" }}
-            onClick={() => setFilters(filterInputs)}
-          >
-            Filter
-          </button>
 
         </div>
       </div>
@@ -418,11 +465,11 @@ export default function Results() {
                     </p>
                   </div>
                   <button
-                    onClick={() => navigate(`/room?id=${hotel.id}`+ 
-                      `&destination=${uid}` + 
-                      `&checkin=${checkinParam}` + 
-                      `&checkout=${checkoutParam}` + 
-                      `&adults=${adultsParam}` + 
+                    onClick={() => navigate(`/room?id=${hotel.id}` +
+                      `&destination=${uid}` +
+                      `&checkin=${checkinParam}` +
+                      `&checkout=${checkoutParam}` +
+                      `&adults=${adultsParam}` +
                       `&children=${childrenParam}`
                     )}
                     style={{
@@ -461,179 +508,179 @@ export default function Results() {
           {isLoading ? (
             <p style={{ fontSize: "1rem", color: "#888" }}>Loading map...</p>
           ) : (
-          <MapContainer
-            key={center.join(",")}
-            center={center} // Singapore default center
-            zoom={12}
-            scrollWheelZoom={true}
-            style={{ height: "100%", width: "100%" }}
-            whenCreated={map => {
-              setMapInstance(map)
-            }}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {hotelsToShow.map(
-              (hotel) =>
-                hotel.latitude &&
-                hotel.longitude && (
-                  <Marker
-                    key={hotel.id}
-                    position={[hotel.latitude, hotel.longitude]}  
-                    eventHandlers={{
-                      click: () => {
-                        navigate(
-                          `/room?id=${hotel.id}` + 
-                          `&destination=${uid}` + 
-                          `&checkin=${checkinParam}` + 
-                          `&checkout=${checkoutParam}` + 
-                          `&adults=${adultsParam}` + 
-                          `&children=${childrenParam}`
-                        );
-                      },
-                    }}
-                  >
-                    <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
-                      <div style={{ minWidth: "150px", maxWidth: "200px" }}>
-                        {hotel.imageUrl ? (
-                          <img
-                            src={hotel.imageUrl}
-                            alt={hotel.name}
-                            style={{
-                              width: "100%",
-                              maxHeight: "100px",
-                              objectFit: "cover",
-                              marginTop: "0.3rem",
-                              borderRadius: "4px"
-                            }}
-                          />
-                        ) : (
-                          <div
-                            style={{
-                              width: "100%",
-                              height: "80px",
-                              backgroundColor: "#ccc",
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              marginTop: "0.3rem",
-                              fontSize: "0.75rem"
-                            }}
-                          >
-                            No Image
-                          </div>
-                        )}
-                        <br />
-                        💰 Price: ${hotel.price.toLocaleString()}
-                        <br />
-                        <strong>{hotel.name}</strong>
-                        <br />
-                        ⭐ Star Rating: {hotel.rating ?? "N/A"}
-                        <br />
-                        👤 Guest Rating: {hotel.guestRating ?? "N/A"}
-                        <br />                        
-                      </div>
-                    </Tooltip>
-                  </Marker>
-                )
-            )}
+            <MapContainer
+              key={center.join(",")}
+              center={center} // Singapore default center
+              zoom={12}
+              scrollWheelZoom={true}
+              style={{ height: "100%", width: "100%" }}
+              whenCreated={map => {
+                setMapInstance(map)
+              }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              />
+              {hotelsToShow.map(
+                (hotel) =>
+                  hotel.latitude &&
+                  hotel.longitude && (
+                    <Marker
+                      key={hotel.id}
+                      position={[hotel.latitude, hotel.longitude]}
+                      eventHandlers={{
+                        click: () => {
+                          navigate(
+                            `/room?id=${hotel.id}` +
+                            `&destination=${uid}` +
+                            `&checkin=${checkinParam}` +
+                            `&checkout=${checkoutParam}` +
+                            `&adults=${adultsParam}` +
+                            `&children=${childrenParam}`
+                          );
+                        },
+                      }}
+                    >
+                      <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
+                        <div style={{ minWidth: "150px", maxWidth: "200px" }}>
+                          {hotel.imageUrl ? (
+                            <img
+                              src={hotel.imageUrl}
+                              alt={hotel.name}
+                              style={{
+                                width: "100%",
+                                maxHeight: "100px",
+                                objectFit: "cover",
+                                marginTop: "0.3rem",
+                                borderRadius: "4px"
+                              }}
+                            />
+                          ) : (
+                            <div
+                              style={{
+                                width: "100%",
+                                height: "80px",
+                                backgroundColor: "#ccc",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                marginTop: "0.3rem",
+                                fontSize: "0.75rem"
+                              }}
+                            >
+                              No Image
+                            </div>
+                          )}
+                          <br />
+                          💰 Price: ${hotel.price.toLocaleString()}
+                          <br />
+                          <strong>{hotel.name}</strong>
+                          <br />
+                          ⭐ Star Rating: {hotel.rating ?? "N/A"}
+                          <br />
+                          👤 Guest Rating: {hotel.guestRating ?? "N/A"}
+                          <br />
+                        </div>
+                      </Tooltip>
+                    </Marker>
+                  )
+              )}
 
-          </MapContainer>
+            </MapContainer>
           )}
         </div>
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-          <div
+        <div
+          style={{
+            marginTop: "1.5rem",
+            display: "flex",
+            justifyContent: "center",
+            gap: "0.5rem",
+            flexWrap: "wrap",
+          }}
+        >
+          {/* Prev button */}
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
             style={{
-              marginTop: "1.5rem",
-              display: "flex",
-              justifyContent: "center",
-              gap: "0.5rem",
-              flexWrap: "wrap",
+              padding: "0.4rem 0.8rem",
+              cursor: currentPage === 1 ? "not-allowed" : "pointer",
             }}
           >
-            {/* Prev button */}
-            <button
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              style={{
-                padding: "0.4rem 0.8rem",
-                cursor: currentPage === 1 ? "not-allowed" : "pointer",
-              }}
-            >
-              Prev
-            </button>
+            Prev
+          </button>
 
-            {/* Dynamic sliding pagination */}
-            {(() => {
-              const visiblePages = 3;
-              let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
-              let endPage = startPage + visiblePages - 1;
+          {/* Dynamic sliding pagination */}
+          {(() => {
+            const visiblePages = 3;
+            let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
+            let endPage = startPage + visiblePages - 1;
 
-              if (endPage > totalPages) {
-                endPage = totalPages;
-                startPage = Math.max(1, endPage - visiblePages + 1);
-              }
+            if (endPage > totalPages) {
+              endPage = totalPages;
+              startPage = Math.max(1, endPage - visiblePages + 1);
+            }
 
-              const pageButtons = [];
+            const pageButtons = [];
 
-              for (let i = startPage; i <= endPage; i++) {
-                pageButtons.push(
-                  <button
-                    key={i}
-                    onClick={() => goToPage(i)}
-                    style={{
-                      padding: "0.4rem 0.8rem",
-                      fontWeight: currentPage === i ? "bold" : "normal",
-                      textDecoration: currentPage === i ? "underline" : "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {i}
-                  </button>
-                );
-              }
+            for (let i = startPage; i <= endPage; i++) {
+              pageButtons.push(
+                <button
+                  key={i}
+                  onClick={() => goToPage(i)}
+                  style={{
+                    padding: "0.4rem 0.8rem",
+                    fontWeight: currentPage === i ? "bold" : "normal",
+                    textDecoration: currentPage === i ? "underline" : "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  {i}
+                </button>
+              );
+            }
 
-              // Show first page and ellipsis if startPage > 1
-              if (startPage > 1) {
-                pageButtons.unshift(
-                  <button key={1} onClick={() => goToPage(1)} style={{ padding: "0.4rem 0.8rem" }}>
-                    1
-                  </button>,
-                  <span key="start-ellipsis" style={{ padding: "0.4rem 0.8rem" }}>...</span>
-                );
-              }
+            // Show first page and ellipsis if startPage > 1
+            if (startPage > 1) {
+              pageButtons.unshift(
+                <button key={1} onClick={() => goToPage(1)} style={{ padding: "0.4rem 0.8rem" }}>
+                  1
+                </button>,
+                <span key="start-ellipsis" style={{ padding: "0.4rem 0.8rem" }}>...</span>
+              );
+            }
 
-              // Show ellipsis and last page if endPage < totalPages
-              if (endPage < totalPages) {
-                pageButtons.push(
-                  <span key="end-ellipsis" style={{ padding: "0.4rem 0.8rem" }}>...</span>,
-                  <button key={totalPages} onClick={() => goToPage(totalPages)} style={{ padding: "0.4rem 0.8rem" }}>
-                    {totalPages}
-                  </button>
-                );
-              }
+            // Show ellipsis and last page if endPage < totalPages
+            if (endPage < totalPages) {
+              pageButtons.push(
+                <span key="end-ellipsis" style={{ padding: "0.4rem 0.8rem" }}>...</span>,
+                <button key={totalPages} onClick={() => goToPage(totalPages)} style={{ padding: "0.4rem 0.8rem" }}>
+                  {totalPages}
+                </button>
+              );
+            }
 
-              return pageButtons;
-            })()}
+            return pageButtons;
+          })()}
 
-            {/* Next button */}
-            <button
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              style={{
-                padding: "0.4rem 0.8rem",
-                cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-              }}
-            >
-              Next
-            </button>
-          </div>
-        )
+          {/* Next button */}
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            style={{
+              padding: "0.4rem 0.8rem",
+              cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+            }}
+          >
+            Next
+          </button>
+        </div>
+      )
       }
     </div >
   );
