@@ -12,7 +12,6 @@ import Login            from "./Login";
 import Signup           from "./Signup";
 import Results          from "./Results";
 import HotelDetailsPage from "./HotelDetailsPage";
-import Payment          from "./Payment";
 import PaymentStripe   from "./PaymentStripe";
 import Confirmation     from "./component/Confirmation";
 
@@ -50,7 +49,6 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/results" element={<Results />} />
           <Route path="/room" element={<HotelDetailsPage />} />
-          <Route path="/payment" element={<Payment />} />
           <Route path="/payment-stripe" element={<PaymentStripe />} />
           <Route
             path="/confirmation"

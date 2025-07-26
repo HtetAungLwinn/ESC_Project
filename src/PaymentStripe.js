@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { CardNumberElement, CardExpiryElement, CardCvcElement, Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import "./css/PaymentStripe.css"
 
 // Load your Stripe publishable key
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
@@ -25,6 +26,10 @@ const ELEMENT_OPTIONS = {
 
 function CheckoutForm() {
   const [name, setName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [specialRequests, setSpecialRequests] = useState('');
+  const [billingAddr, setBillingAddr] = useState('');
   const stripe = useStripe();
   const elements = useElements();
   const [clientSecret, setClientSecret] = useState('');
@@ -51,9 +56,14 @@ function CheckoutForm() {
 
     setLoading(true);
 
+    if (!name.trim()){
+      setError("Name on card required");
+      return;
+    }
+
     const result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
-        card: elements.getElement(CardNumberElement),
+        card: elements.getElement(CardElement),
       }
     });
 
@@ -78,30 +88,106 @@ function CheckoutForm() {
   //   </form>
   // );
   <div>
+    <h2>Booking Details</h2>
+    {/* TODO: retrieve and display booking information */}
+    {/* TODO: replace the table with a for loop after retrieving */}
+    <div>
+      <table>
+        <tr>
+          <td>Destination ID</td>
+          <td>Placeholder</td>
+        </tr>
+        <tr>
+          <td>Hotel ID</td>
+          <td>Placeholder</td>
+        </tr>
+        <tr>
+          <td>Booking information</td>
+          <td>Placeholder</td>
+        </tr>
+        <tr>
+          <td>Price</td>
+          <td>Placeholder</td>
+        </tr>
+        <tr>
+          <td>Booking reference</td>
+          <td>Placeholder</td>
+        </tr>
+        <tr>
+          <td>Guest information</td>
+          <td>Placeholder</td>
+        </tr>
+        <tr>
+          <td>Payee information</td>
+          <td>Placeholder</td>
+        </tr>
+      </table> 
+    </div>
     <h2>Payment Details</h2>
     {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name on Card:</label>
-          <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="John Doe"
-          />
-        </div>
-          
-          <label>
+        <label>
             Card Number: <CardNumberElement options={ELEMENT_OPTIONS} />
-          </label>
+          </label> 
           <label>
             Expiry Date (MM/YY): <CardExpiryElement options={ELEMENT_OPTIONS} />
           </label>
           <label>
             CVC: <CardCvcElement options={ELEMENT_OPTIONS} />
           </label>
-          <button type="submit">Pay</button>
+          
         </form>
+        <div>
+          <label>Name on card: </label> <br></br>
+          <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="First and last name"
+          />
+        </div>
+        
+        <div>
+          <label>Phone number: </label> <br></br>
+          <input
+              type="tel"
+              pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="Include country code"
+          />
+        </div>
+
+        <div>
+          <label>Email address: </label> <br></br>
+          <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="someone@example.com"
+          />
+        </div>
+
+        <div>
+          <label>Billing address: </label> <br></br>
+          <input
+              type="text"
+              value={billingAddr}
+              onChange={(e) => setBillingAddr(e.target.value)}
+              placeholder="Billing address"
+          />
+        </div>
+
+        <div>
+          <label>Special requests to hotel: </label> <br></br>
+          <input
+              type="text"
+              value={specialRequests}
+              onChange={(e) => setSpecialRequests(e.target.value)}
+              placeholder="Any extra requests"
+          />
+        </div>
+        <button type="submit">Pay</button>
   </div>
   );
 }
