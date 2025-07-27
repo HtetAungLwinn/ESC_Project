@@ -35,7 +35,7 @@ async function getBulkRoomPrices(req, res) {
 
   const url = `https://hotelapi.loyalty.dev/api/hotels/${id}/price?destination_id=${destination_id}` +
               `&checkin=${checkin}&checkout=${checkout}&lang=en_US&currency=SGD&country_code=SG` +
-              `&guests=${guests}&partner_id=1`;
+              `&guests=${guests}&partner_id=1089&landing_page=wl-acme-earn&product_type=earn`;
 
   try {
     const MAX_RETRIES = 10;

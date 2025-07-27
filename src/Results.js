@@ -459,7 +459,7 @@ export default function Results() {
                   </div>
                   <button
                     onClick={() => navigate(`/room?id=${hotel.id}` +
-                      `&destination=${uid}` +
+                      `&destination_id=${uid}` +
                       `&checkin=${checkinParam}` +
                       `&checkout=${checkoutParam}` +
                       `&adults=${adultsParam}` +

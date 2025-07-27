@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import '../css/ImageBox.css';
 
+const HOTEL_PLACEHOLDER = "/photos/hotelplaceholder.png";
+
 const ImageBox = ({ hotel }) => {
   const prefix = hotel.image_details.prefix;
   const suffix = hotel.image_details.suffix;
@@ -45,6 +47,11 @@ const ImageBox = ({ hotel }) => {
     setActiveIndex(prev => (prev - 1 + total) % total);
   };
 
+  const handleImageError = (e) => {
+    e.target.onerror = null;
+    e.target.src = HOTEL_PLACEHOLDER;
+  };
+
   return (
     <div className="square-carousel-container">
       <button className="nav-button left" onClick={goPrev} disabled={currentIndex === 0}>◀</button>
@@ -58,7 +65,7 @@ const ImageBox = ({ hotel }) => {
         >
           {images.map((img, i) => (
             <div className="square-image" key={i} onClick={() => openModal(i)}>
-              <img src={img} alt={`Hotel ${i + 1}`} />
+              <img src={img} alt={`Hotel ${i + 1}`} onError={handleImageError}/>
             </div>
           ))}
         </div>
@@ -77,7 +84,7 @@ const ImageBox = ({ hotel }) => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={closeModal}>✕</button>
             <button className="modal-nav left" onClick={prevModal}>◀</button>
-            <img src={images[activeIndex]} alt={`Modal ${activeIndex + 1}`} className="modal-img" />
+            <img src={images[activeIndex]} alt={`Modal ${activeIndex + 1}`} className="modal-img" onError={handleImageError} />
             <button className="modal-nav right" onClick={nextModal}>▶</button>
           </div>
         </div>

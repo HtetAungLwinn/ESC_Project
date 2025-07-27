@@ -16,6 +16,7 @@ import { GiKnifeFork } from 'react-icons/gi';
 import SearchBanner from "./component/SearchBanner";
 import HotelMap from './component/HotelMap';
 import ImageBox from './component/ImageBox';
+import ImageBox2 from './component/ImageBox2';
 
 // Map known category keys to icons (optional)
 const categoryIconMap = {
@@ -57,7 +58,7 @@ export default function HotelDetailsPage() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const id = searchParams.get("id") || "";
-  const destination = searchParams.get("destination") || "";
+  const destination = searchParams.get("destination_id") || "";
   const checkinParam = searchParams.get("checkin");
   const checkoutParam = searchParams.get("checkout");
   const adultsParam = parseInt(searchParams.get("adults") || "1", 10);
@@ -66,7 +67,9 @@ export default function HotelDetailsPage() {
   const lang = searchParams.get("lang") || "en_US";
   const currency = searchParams.get("currency") || "SGD";
   const countryCode = searchParams.get("country_code") || "SG";
-  const partnerId = searchParams.get("partner_id") || "1";
+  const partnerId = searchParams.get("partner_id") || "1089";
+  const landing_page = searchParams.get("landing_page") || "wl-acme-earn";
+  const product_type = searchParams.get("product_type") || "earn";
 
   const [hotel, setHotel] = useState(null);
 
@@ -102,7 +105,7 @@ export default function HotelDetailsPage() {
       `&checkin=${checkinParam}` +
       `&checkout=${checkoutParam}` +
       `&lang=${lang}&currency=${currency}&country_code=${countryCode}` +
-      `&guests=${totalGuests}&partner_id=${partnerId}`
+      `&guests=${totalGuests}&partner_id=${partnerId}&landing_page=${landing_page}&product_type=${product_type}`
     )
     .then(res => {
       if (!res.ok) throw new Error("Failed to fetch room prices");
@@ -117,7 +120,7 @@ export default function HotelDetailsPage() {
       document.body.style.overflow = 'hidden';
       const handleEscape = (event) => {
         if (event.key === 'Escape') {
-          setShowModal(false);
+          setSelectedRoom(false);
         }
       };
       document.addEventListener('keydown', handleEscape);
@@ -129,8 +132,6 @@ export default function HotelDetailsPage() {
       document.body.style.overflow = '';
     }
   }, [selectedRoom]);
-
-  if (!selectedRoom) return null;
 
   const visibleRooms = showAllRooms
   ? roomList
@@ -145,7 +146,13 @@ export default function HotelDetailsPage() {
   return (
     <div>
       <section className="gallery">
-        <ImageBox hotel={hotel} />
+        
+        {hotel && hotel.image_details && hotel.hires_image_index ? (
+          <ImageBox hotel={hotel} 
+          />
+        ) : (
+          <ImageBox2 hotel={hotel} />
+        )}
       </section>
 
       <section className="content-section">
@@ -257,7 +264,7 @@ export default function HotelDetailsPage() {
 
         {visibleRooms.map((room) => {
           const thumb = room.images?.[0]?.high_resolution_url
-            || '/images/room-placeholder.jpg';
+            || HOTEL_PLACEHOLDER;
           const isBreakfast = room.roomAdditionalInfo?.breakfastInfo
             ?.toLowerCase().includes('breakfast');
 
@@ -274,13 +281,13 @@ export default function HotelDetailsPage() {
               {/* Left: thumbnail */}
               <img
                 src={thumb}
-                alt={room.roomDescription}
+                alt={room.roomNormalizedDescription}
                 className="room-card__img"
               />
 
               {/* Middle: details */}
               <div className="room-card__details">
-                <h3 className="room-card__title" onClick={() => {setSelectedRoom(room); setImageIndex(0);}}>{room.roomDescription}</h3>
+                <h3 className="room-card__title" onClick={() => {setSelectedRoom(room); setImageIndex(0);}}>{room.roomNormalizedDescription}</h3>
                 <p className="room-card__line">
                   {isBreakfast ? '☕ Breakfast Included' : 'Room Only'}
                 </p>
@@ -322,60 +329,72 @@ export default function HotelDetailsPage() {
           </button>
         )}
 
-        {/* {selectedRoom && ( */}
-    <div className={`modal-overlay ${selectedRoom ? 'show' : ''}`} onClick={() => setSelectedRoom(false)}>
-        <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="room-modal-content">
-                <div className="modal-image-carousel">
-                    <img
-                        src={selectedRoom.images?.[imageIndex]?.high_resolution_url || '/images/room-placeholder.jpg'}
-                        alt={`Room Image ${imageIndex + 1}`}
-                    />
-                    {/* Show carousel navigation only if there's more than one image */}
-                    {selectedRoom.images && selectedRoom.images.length > 1 && (
-                        <>
-                            <button
-                                className="carousel-left"
-                                onClick={() => setImageIndex(prev => (prev - 1 + selectedRoom.images.length) % selectedRoom.images.length)}
-                            >
-                                &#10094;
-                            </button>
-                            <button
-                                className="carousel-right"
-                                onClick={() => setImageIndex(prev => (prev + 1) % selectedRoom.images.length)}
-                            >
-                                &#10095;
-                            </button>
-                            <div className="image-count">
-                                {imageIndex + 1} / {selectedRoom.images.length}
+        {selectedRoom && (
+          <div className={`modal-overlay ${selectedRoom ? 'show' : ''}`} onClick={() => setSelectedRoom(false)}>
+              <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+                  <div className="room-modal-content">
+                      <div className="modal-image-carousel">
+                          <img
+                              src={selectedRoom.images?.[imageIndex]?.high_resolution_url || HOTEL_PLACEHOLDER}
+                              alt={`Room Image ${imageIndex + 1}`}
+                          />
+                          {selectedRoom.images?.length > 1 && (
+                              <>
+                                  <button
+                                      className="carousel-left"
+                                      onClick={() => setImageIndex(prev => (prev - 1 + selectedRoom.images.length) % selectedRoom.images.length)}
+                                  >
+                                      &#10094;
+                                  </button>
+                                  <button
+                                      className="carousel-right"
+                                      onClick={() => setImageIndex(prev => (prev + 1) % selectedRoom.images.length)}
+                                  >
+                                      &#10095;
+                                  </button>
+                                  <div className="image-count">
+                                      {imageIndex + 1} / {selectedRoom.images.length}
+                                  </div>
+                              </>
+                          )}
+                      </div>
+                      <div className="modal-room-info">
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                          <h2>{selectedRoom.roomNormalizedDescription}</h2>
+                          <button className="room-modal-close" onClick={e => {e.stopPropagation(); setSelectedRoom(false);}}>&times;</button>
+                        </div>
+                        <div className="scrollable-room-content">
+                          {selectedRoom.market_rates && selectedRoom.market_rates.length > 0 && (
+                            <div className="room-market-rates" style={{ marginBottom: '1em' }}>
+                              <h3 style={{ marginBottom: '0.3em' }}>Market Rates:</h3>
+                              {selectedRoom.market_rates.map((rate, index) => (
+                                <div key={index} style={{ marginBottom: '0.2em' }} className="room-details">
+                                  <p style={{ margin: 0 }}>- Supplier: {rate.supplier}</p>
+                                  <p style={{ margin: 0 }}>- Rate: SGD {rate.rate.toFixed(0)}</p>
+                                </div>
+                              ))}
                             </div>
-                        </>
-                    )}
-                </div>
-                <div className="modal-room-info">
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-                    <h2>{selectedRoom.roomDescription}</h2>
-                    <button className="room-modal-close" onClick={e => {e.stopPropagation(); setShowModal(false);}}>&times;</button>
+                          )}
+                          <h3 style={{ marginBottom: '0.3em' }}>Description:</h3>
+                          {selectedRoom.long_description && (
+                              <div className="room-details" dangerouslySetInnerHTML={{ __html: selectedRoom.long_description }} />
+                          )}
+                          <h3 style={{ marginBottom: '0em' }}>Amenities:</h3>
+                          {selectedRoom.amenities && selectedRoom.amenities.length > 0 && (
+                            <div className="room-details">                              
+                              <ul style={{ paddingLeft: '1em', margin: 0 }}>
+                                {selectedRoom.amenities.map((amenity, index) => (
+                                  <li key={index}>{amenity}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                      </div>
+                      </div>
                   </div>
-                  <div className="scrollable-room-content">
-                    {selectedRoom.roomAdditionalInfo?.beds && (
-                        <p className="room-subtitle">Beds: {selectedRoom.roomAdditionalInfo.beds}</p>
-                    )}
-                    {selectedRoom.roomSize && (
-                        <p className="room-subtitle">Size: {selectedRoom.roomSize}</p>
-                    )}
-                    {/* Using dangerouslySetInnerHTML for long_description */}
-                    {selectedRoom.long_description && (
-                        <div className="room-details" dangerouslySetInnerHTML={{ __html: selectedRoom.long_description }} />
-                    )}
-                </div>
-                </div>
-            </div>
-        </div>
-    </div>
-{/* )} */}
-
-
+              </div>
+          </div>
+      )}
       </section>
 
 
