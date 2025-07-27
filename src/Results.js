@@ -6,8 +6,6 @@ import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-
-
 // Fix Leaflet's default icon issue
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -130,6 +128,7 @@ export default function Results() {
       params.set("uid", uid);
       params.set("checkin", checkinParam);
       params.set("checkout", checkoutParam);
+      params.set("rooms", roomsParam);
       params.set("adults", adultsParam.toString());
       params.set("children", childrenParam.toString());
       params.set("page", pageNum);
@@ -363,19 +362,13 @@ export default function Results() {
                 } else {
                   setFilters({ ...filterInputs, minPrice: "", maxPrice: "" }); // no filter
                 }
-
-
-
               }}
-
             >
               Filter
             </button>
           </div>
-
         </div>
       </div>
-
 
       <div style={{ display: "flex", gap: "2rem", marginLeft: "2rem" }}>
         {/* Left: Hotels grid */}
@@ -514,9 +507,6 @@ export default function Results() {
               zoom={12}
               scrollWheelZoom={true}
               style={{ height: "100%", width: "100%" }}
-              whenCreated={map => {
-                setMapInstance(map)
-              }}
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

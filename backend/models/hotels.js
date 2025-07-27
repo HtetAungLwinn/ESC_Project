@@ -5,6 +5,7 @@ async function getFilteredHotels(req, res) {
     checkout,
     starRating,
     guestRating,
+    rooms = 1,
     minPrice,
     maxPrice,
     page = 1,
@@ -21,9 +22,14 @@ async function getFilteredHotels(req, res) {
   const pageNum = Number(page) || 1;
   const limitNum = Number(limit) || 18;
   const offset = (pageNum - 1) * limitNum;
-  const guests = Number(adults) + Number(children);
+  const roomsNum = Number(rooms) || 1;
+  const adultsNum = Number(adults) || 1;
+  const childrenNum = Number(children) || 0;
   const minPriceNum = minPrice ? Number(minPrice) : 0;
   const maxPriceNum = maxPrice ? Number(maxPrice) : Infinity;
+
+  const totalguests = Number(adults) + Number(children);
+  const guests = Array(roomsNum).fill(totalguests).join('|');
 
   try {
     console.time("🟡 Total");
@@ -35,11 +41,13 @@ async function getFilteredHotels(req, res) {
     pricesUrl.searchParams.set("destination_id", destination_id);
     pricesUrl.searchParams.set("checkin", checkin);
     pricesUrl.searchParams.set("checkout", checkout);
-    pricesUrl.searchParams.set("guests", guests);
     pricesUrl.searchParams.set("lang", "en_US");
     pricesUrl.searchParams.set("currency", "SGD");
     pricesUrl.searchParams.set("country_code", "SG");
-    pricesUrl.searchParams.set("partner_id", "1");
+    pricesUrl.searchParams.set("guests", guests);
+    pricesUrl.searchParams.set("partner_id", "1089");
+    pricesUrl.searchParams.set("landing_page", "wl-acme-earn");
+    pricesUrl.searchParams.set("product_type", "earn");
 
     console.log("🔗 Full Price URL:", pricesUrl.toString());
 
