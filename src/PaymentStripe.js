@@ -74,6 +74,8 @@ function CheckoutForm() {
     } else if (result.paymentIntent.status === 'succeeded') {
       setMessage('Payment successful!');
       window.location.href = '/confirmation';
+      // window.location.assign('/confirmation');
+
     }
   };
 
@@ -92,36 +94,7 @@ function CheckoutForm() {
     {/* TODO: retrieve and display booking information */}
     {/* TODO: replace the table with a for loop after retrieving */}
     <div>
-      <table>
-        <tr>
-          <td>Destination ID</td>
-          <td>Placeholder</td>
-        </tr>
-        <tr>
-          <td>Hotel ID</td>
-          <td>Placeholder</td>
-        </tr>
-        <tr>
-          <td>Booking information</td>
-          <td>Placeholder</td>
-        </tr>
-        <tr>
-          <td>Price</td>
-          <td>Placeholder</td>
-        </tr>
-        <tr>
-          <td>Booking reference</td>
-          <td>Placeholder</td>
-        </tr>
-        <tr>
-          <td>Guest information</td>
-          <td>Placeholder</td>
-        </tr>
-        <tr>
-          <td>Payee information</td>
-          <td>Placeholder</td>
-        </tr>
-      </table> 
+      
     </div>
     <h2>Payment Details</h2>
     {error && <p style={{ color: 'red' }}>{error}</p>}
