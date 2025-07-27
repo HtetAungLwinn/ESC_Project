@@ -18,6 +18,8 @@ import HotelMap from './component/HotelMap';
 import ImageBox from './component/ImageBox';
 import ImageBox2 from './component/ImageBox2';
 
+const HOTEL_PLACEHOLDER = "/photos/hotelplaceholder.png";
+
 // Map known category keys to icons (optional)
 const categoryIconMap = {
   romantic_hotel: <FaHeart color="hotpink" />,
@@ -112,7 +114,11 @@ export default function HotelDetailsPage() {
       return res.json();
     })
     .then(data => setRoomList(data.rooms || []))
-    .catch(err => console.error(err));
+    .catch(err => {
+      console.error(err); 
+      setRoomsError(true);
+    })
+    .finally(() => setRoomsLoading(false));;
   }, [destination, checkinParam, checkoutParam, totalGuests, id]);
 
   useEffect(() => {
@@ -138,7 +144,6 @@ export default function HotelDetailsPage() {
   : roomList.slice(0, initialVisible);
 
   if (!hotel) return <p>Loading hotel info...</p>;
-
   const fullDesc = hotel.description || "";
   const shortDesc = fullDesc.slice(0, charLimit);
   const toggleExpanded = () => setExpanded(prev => !prev);
@@ -261,7 +266,9 @@ export default function HotelDetailsPage() {
 
       <section className="rooms">
         <h2>Room Options</h2>
-
+        {roomsLoading && <p>Loading room info...</p>}
+        {roomsError && <p>Failed to load room info.</p>}
+        {!roomsLoading && !roomsError && roomList.length === 0 && <p>No rooms available.</p>}
         {visibleRooms.map((room) => {
           const thumb = room.images?.[0]?.high_resolution_url
             || HOTEL_PLACEHOLDER;
@@ -359,9 +366,13 @@ export default function HotelDetailsPage() {
                           )}
                       </div>
                       <div className="modal-room-info">
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                        <button className="room-modal-close" onClick={e => {
+                          e.stopPropagation();
+                          setSelectedRoom(false);
+                        }}>&times;</button>
+                        <div className="room-modal-header">
                           <h2>{selectedRoom.roomNormalizedDescription}</h2>
-                          <button className="room-modal-close" onClick={e => {e.stopPropagation(); setSelectedRoom(false);}}>&times;</button>
+                          {/* <button className="room-modal-close" onClick={e => {e.stopPropagation(); setSelectedRoom(false);}}>&times;</button> */}
                         </div>
                         <div className="scrollable-room-content">
                           {selectedRoom.market_rates && selectedRoom.market_rates.length > 0 && (
@@ -407,13 +418,18 @@ export default function HotelDetailsPage() {
     </div>
   );
 }
-
 function formatAmenityName(key) {
-  const acronyms = ['TV','AC','WiFi','Wi-Fi'];
-  let spaced = key.replace(/([a-z])([A-Z])/g,'$1 $2');
-  return spaced.split(' ').map(word => {
-    const up = word.toUpperCase();
-    return acronyms.includes(up) ? acronyms.find(a => a.toUpperCase()===up) :
-      word[0].toUpperCase()+word.slice(1).toLowerCase();
-  }).join(' ');
+  const acronyms = ['TV', 'AC', 'WiFi', 'Wi-Fi'];
+  acronyms.forEach(acronym => {
+    key = key.replace(new RegExp(acronym, 'gi'), `__${acronym}__`);
+  });
+  let words = key.replace(/([a-z])([A-Z])/g, '$1 $2').split(/[\s_]+/);
+  return words
+    .map(word => {
+      if (word.startsWith('__') && word.endsWith('__')) {
+        return word.replace(/__/g, '');
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(' ');
 }

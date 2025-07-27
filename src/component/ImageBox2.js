@@ -2,14 +2,18 @@ import React, { useState } from "react";
 const HOTEL_PLACEHOLDER = "/photos/hotelplaceholder.png";
 
 const ImageBox2 = ({ hotel }) => {
-  const prefix = hotel.image_details.prefix;
-  const suffix = hotel.image_details.suffix;
-  const imageIndexes = hotel.hires_image_index.split(',').slice(0, hotel.image_details.count).map(Number);
-  const [currentIndex, setCurrentIndex] = useState(hotel.image_details.default_image_index || 0);
+  const prefix = hotel?.image_details?.prefix || '';
+  const suffix = hotel?.image_details?.suffix || '';
+  const defaultIndex = hotel?.image_details?.default_image_index || 0;
+  const count = hotel?.image_details?.count || 0;
+  const imageIndexes = (hotel?.hires_image_index || '').split(',').slice(0, count).map(Number).filter((n) => !isNaN(n));
+  const [currentIndex, setCurrentIndex] = useState(defaultIndex);
 
   const [hasError, setHasError] = useState(false);
 
-  const imageSrc = `${prefix}${imageIndexes[currentIndex]}${suffix}`;
+  const imageSrc = imageIndexes.length > 0 && currentIndex < imageIndexes.length
+      ? `${prefix}${imageIndexes[currentIndex]}${suffix}`
+      : HOTEL_PLACEHOLDER;
 
   return (
     <section className="gallery" style={{ maxWidth: 600, margin: "auto", position: "relative" }}>
