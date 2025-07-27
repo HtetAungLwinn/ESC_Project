@@ -14,6 +14,7 @@ import Results          from "./Results";
 import HotelDetailsPage from "./HotelDetailsPage";
 import PaymentStripe   from "./PaymentStripe";
 import Confirmation     from "./component/Confirmation";
+import Test     from "./Test";
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -54,6 +55,7 @@ export default function App() {
             path="/confirmation"
             element={<Confirmation />}
           />
+          <Route path="/t" element={<Test />} />
         </Routes>
       </main>
 

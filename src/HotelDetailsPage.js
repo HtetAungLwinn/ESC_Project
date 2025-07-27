@@ -79,7 +79,8 @@ export default function HotelDetailsPage() {
   const [expanded, setExpanded] = useState(false);
   const [hover, setHover] = useState(false);
   const charLimit = 1200;
-
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [imageIndex, setImageIndex] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -94,11 +95,8 @@ export default function HotelDetailsPage() {
 
   useEffect(() => {
     if (!destination || !checkinParam || !checkoutParam || !totalGuests || !id) return;
-
     setRoomsLoading(true);
     setRoomsError(false);
-
-
     fetch(
       `/api/rooms/${id}/price?destination_id=${destination}` +
       `&checkin=${checkinParam}` +
@@ -113,6 +111,26 @@ export default function HotelDetailsPage() {
     .then(data => setRoomList(data.rooms || []))
     .catch(err => console.error(err));
   }, [destination, checkinParam, checkoutParam, totalGuests, id]);
+
+  useEffect(() => {
+    if (selectedRoom) {
+      document.body.style.overflow = 'hidden';
+      const handleEscape = (event) => {
+        if (event.key === 'Escape') {
+          setShowModal(false);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+
+      return () => {
+        document.removeEventListener('keydown', handleEscape);
+      };
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [selectedRoom]);
+
+  if (!selectedRoom) return null;
 
   const visibleRooms = showAllRooms
   ? roomList
@@ -262,7 +280,7 @@ export default function HotelDetailsPage() {
 
               {/* Middle: details */}
               <div className="room-card__details">
-                <h3 className="room-card__title">{room.roomDescription}</h3>
+                <h3 className="room-card__title" onClick={() => {setSelectedRoom(room); setImageIndex(0);}}>{room.roomDescription}</h3>
                 <p className="room-card__line">
                   {isBreakfast ? '☕ Breakfast Included' : 'Room Only'}
                 </p>
@@ -303,6 +321,61 @@ export default function HotelDetailsPage() {
             )}
           </button>
         )}
+
+        {/* {selectedRoom && ( */}
+    <div className={`modal-overlay ${selectedRoom ? 'show' : ''}`} onClick={() => setSelectedRoom(false)}>
+        <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="room-modal-content">
+                <div className="modal-image-carousel">
+                    <img
+                        src={selectedRoom.images?.[imageIndex]?.high_resolution_url || '/images/room-placeholder.jpg'}
+                        alt={`Room Image ${imageIndex + 1}`}
+                    />
+                    {/* Show carousel navigation only if there's more than one image */}
+                    {selectedRoom.images && selectedRoom.images.length > 1 && (
+                        <>
+                            <button
+                                className="carousel-left"
+                                onClick={() => setImageIndex(prev => (prev - 1 + selectedRoom.images.length) % selectedRoom.images.length)}
+                            >
+                                &#10094;
+                            </button>
+                            <button
+                                className="carousel-right"
+                                onClick={() => setImageIndex(prev => (prev + 1) % selectedRoom.images.length)}
+                            >
+                                &#10095;
+                            </button>
+                            <div className="image-count">
+                                {imageIndex + 1} / {selectedRoom.images.length}
+                            </div>
+                        </>
+                    )}
+                </div>
+                <div className="modal-room-info">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                    <h2>{selectedRoom.roomDescription}</h2>
+                    <button className="room-modal-close" onClick={e => {e.stopPropagation(); setShowModal(false);}}>&times;</button>
+                  </div>
+                  <div className="scrollable-room-content">
+                    {selectedRoom.roomAdditionalInfo?.beds && (
+                        <p className="room-subtitle">Beds: {selectedRoom.roomAdditionalInfo.beds}</p>
+                    )}
+                    {selectedRoom.roomSize && (
+                        <p className="room-subtitle">Size: {selectedRoom.roomSize}</p>
+                    )}
+                    {/* Using dangerouslySetInnerHTML for long_description */}
+                    {selectedRoom.long_description && (
+                        <div className="room-details" dangerouslySetInnerHTML={{ __html: selectedRoom.long_description }} />
+                    )}
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/* )} */}
+
+
       </section>
 
 
