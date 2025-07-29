@@ -48,12 +48,15 @@ export default function Results() {
   const [center, setCenter] = useState([1.3521, 103.8198]); // default singapore
   const HOTEL_PLACEHOLDER = "/photos/hotelplaceholder.png"
 
-  // const hotels = [
+  //const hotels = [
   //   { name: "Marina Bay Sands", location: "Singapore", price: 500, guestRating: 9.1, starRating: 5 },
   //   { name: "Orchard Hotel", location: "Singapore", price: 200, guestRating: 8.0, starRating: 4 },
   //   { name: "Bali Beach Resort", location: "Bali", price: 150, guestRating: 7.5, starRating: 3 },
   //   { name: "Bangkok Grand", location: "Bangkok", price: 100, guestRating: 6.8, starRating: 2 },
   // ];
+
+  
+
 
   const initialFilters = {
     starRating: searchParams.get("starRating") || "",
@@ -148,6 +151,7 @@ export default function Results() {
 
       const hotelData = await hotelRes.json();
 
+      //change to hotelData
       const formattedHotels = hotelData.hotels.map((h) => ({
         id: h.id,
         name: h.name,
@@ -463,7 +467,8 @@ export default function Results() {
                       `&checkin=${checkinParam}` +
                       `&checkout=${checkoutParam}` +
                       `&adults=${adultsParam}` +
-                      `&children=${childrenParam}`
+                      `&children=${childrenParam}` +
+                      `&destination_name=${destination}`
                     )}
                     style={{
                       marginTop: "0.5rem",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from "react-router-dom";
+import { useLocation,useNavigate } from "react-router-dom";
 import { FiMapPin, FiChevronDown } from 'react-icons/fi';
 import { AiFillStar } from 'react-icons/ai';
 import {
@@ -61,6 +61,7 @@ export default function HotelDetailsPage() {
   const searchParams = new URLSearchParams(location.search);
   const id = searchParams.get("id") || "";
   const destination = searchParams.get("destination_id") || "";
+  const destination_name = searchParams.get("destination_name");
   const checkinParam = searchParams.get("checkin");
   const checkoutParam = searchParams.get("checkout");
   const adultsParam = parseInt(searchParams.get("adults") || "1", 10);
@@ -80,6 +81,8 @@ export default function HotelDetailsPage() {
   const [roomsError, setRoomsError] = useState(false);
   const [showAllRooms, setShowAllRooms] = useState(false);
   const initialVisible = 2; // set rooms to show
+
+  const navigate = useNavigate();
 
   const [expanded, setExpanded] = useState(false);
   const [hover, setHover] = useState(false);
@@ -312,7 +315,14 @@ export default function HotelDetailsPage() {
               {/* Right: select button */}
               <button
                 className="room-card__btn"
-                onClick={() => console.log('Select', room.key)}
+                onClick={() => navigate(`/payment-stripe?destination_name=${encodeURIComponent(destination_name)}`+
+                                    `&hotel=${encodeURIComponent(hotel.name)}` +
+                                    `&hotel_addr=${encodeURIComponent(hotel.address)}` +
+                                    `&checkin=${encodeURIComponent(checkinParam)}` +
+                                    `&checkout=${encodeURIComponent(checkoutParam)}` + 
+                                    `&adults=${encodeURIComponent(adultsParam)}` +
+                                    `&children=${encodeURIComponent(childrenParam)}`)
+                }                                    
               >
                 Select
               </button>
