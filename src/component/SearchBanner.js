@@ -7,26 +7,50 @@ import DateRangePicker from "./ReactDatePicker";
 export default function SearchBanner() {
   const location = useLocation();
   const navigate = useNavigate();
-  const qs       = new URLSearchParams(location.search);
+  const qs = new URLSearchParams(location.search);
 
-  // Initialize from URL or fall back to defaults
-  const initialDestination = qs.get("destination") || "";
-  const initialCheckin     = qs.get("checkin");
-  const initialCheckout    = qs.get("checkout");
-  const initialRooms       = parseInt(qs.get("rooms")    || "1", 10);
-  const initialAdults      = parseInt(qs.get("adults")   || "1", 10);
-  const initialChildren    = parseInt(qs.get("children") || "0", 10);
 
-  const [destination, setDestination] = useState(initialDestination);
+  const minCheckinDate = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 3);
+    return d;
+  }, []);
+
+
+  const rawDest      = qs.get("destination") || "";
+  const rawCheckin   = qs.get("checkin");
+  const parsedStart  = rawCheckin ? new Date(rawCheckin) : null;
+  const initialStart = parsedStart && parsedStart < minCheckinDate
+    ? minCheckinDate
+    : parsedStart;
+
+  const rawCheckout  = qs.get("checkout");
+  const initialEnd   = rawCheckout ? new Date(rawCheckout) : null;
+
+  const initialRooms    = parseInt(qs.get("rooms")    || "1", 10);
+  const initialAdults   = parseInt(qs.get("adults")   || "1", 10);
+  const initialChildren = parseInt(qs.get("children") || "0", 10);
+
+  // state
+  const [destination, setDestination] = useState(rawDest);
   const [allDestinations, setAllDestinations] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef(null);
 
   const [dateRange, setDateRange] = useState({
-    startDate: initialCheckin  ? new Date(initialCheckin)  : null,
-    endDate:   initialCheckout ? new Date(initialCheckout) : null
+    startDate: initialStart,
+    endDate:   initialEnd,
   });
+
+
+  const minCheckoutDate = useMemo(() => {
+    if (!dateRange.startDate) return null;
+    const d = new Date(dateRange.startDate);
+    d.setDate(d.getDate() + 1);
+    return d;
+  }, [dateRange.startDate]);
 
   const [rooms, setRooms]       = useState(initialRooms);
   const [adults, setAdults]     = useState(initialAdults);
@@ -35,7 +59,7 @@ export default function SearchBanner() {
   const [rgOpen, setRgOpen] = useState(false);
   const rgRef               = useRef(null);
 
-  // Fetch destinations once
+
   useEffect(() => {
     fetch("/api/destinations/all")
       .then(res => {
@@ -51,24 +75,24 @@ export default function SearchBanner() {
       .catch(console.error);
   }, []);
 
-  // Fuse index for autocomplete
+
   const fuse = useMemo(
     () => new Fuse(allDestinations, { threshold: 0.3, minMatchCharLength: 2 }),
     [allDestinations]
   );
 
-  // Close guest dropdown on outside click
+  // close guest dropdown outside click
   useEffect(() => {
-    function handleClickOutside(e) {
+    const handler = e => {
       if (rgRef.current && !rgRef.current.contains(e.target)) {
         setRgOpen(false);
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Autocomplete handlers
+  // autocomplete
   const handleDestinationChange = e => {
     const v = e.target.value;
     setDestination(v);
@@ -94,28 +118,44 @@ export default function SearchBanner() {
     }
   };
 
-  // Helpers for guest counts
+  const handleDateRangeChange = ({ startDate, endDate }) => {
+
+    if (startDate && startDate < minCheckinDate) {
+      startDate = minCheckinDate;
+    }
+
+    if (endDate && startDate && endDate <= startDate) {
+      endDate = null;
+    }
+    setDateRange({ startDate, endDate });
+  };
+
+  // guest inc/dec
   const inc = (fn, max) => () => fn(v => Math.min(v + 1, max));
   const dec = (fn, min) => () => fn(v => Math.max(v - 1, min));
 
-  // Compute nights
+  // compute nights
   const getNights = () => {
     const { startDate, endDate } = dateRange;
     if (!startDate || !endDate) return 0;
-    const diff = endDate.getTime() - startDate.getTime();
+    const diff = endDate - startDate;
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
-  // Perform the search
+  // do search
   const handleSearch = () => {
     if (!destination.trim()) return;
+    const { startDate } = dateRange;
+    if (startDate && startDate < minCheckinDate) {
+      alert(`Check‑in must be on or after ${minCheckinDate.toLocaleDateString("en-CA")}`);
+      return;
+    }
+
     fetch(`/api/destinations/uid?term=${encodeURIComponent(destination)}`)
       .then(res => res.json())
       .then(data => {
         const uid    = data.uid;
         const nights = getNights();
-
-        // Format in local (Singapore) time as YYYY-MM-DD
         const checkin  = dateRange.startDate
           ? dateRange.startDate.toLocaleDateString("en-CA")
           : "";
@@ -124,13 +164,13 @@ export default function SearchBanner() {
           : "";
 
         navigate(
-          `/results?destination=${encodeURIComponent(destination)}` +
-          `&uid=${encodeURIComponent(uid)}` +
-          `&checkin=${checkin}` +
-          `&checkout=${checkout}` +
-          `&nights=${nights}` +
-          `&rooms=${rooms}` +
-          `&adults=${adults}` +
+          `/results?destination=${encodeURIComponent(destination)}`+
+          `&uid=${encodeURIComponent(uid)}`+
+          `&checkin=${checkin}`+
+          `&checkout=${checkout}`+
+          `&nights=${nights}`+
+          `&rooms=${rooms}`+
+          `&adults=${adults}`+
           `&children=${children}`
         );
       })
@@ -174,7 +214,9 @@ export default function SearchBanner() {
         <DateRangePicker
           startDate={dateRange.startDate}
           endDate={dateRange.endDate}
-          onChange={setDateRange}
+          onChange={handleDateRangeChange}
+          minDate={minCheckinDate}
+          minCheckoutDate={minCheckoutDate}
         />
       </div>
 
@@ -217,7 +259,7 @@ export default function SearchBanner() {
         </div>
       </div>
 
-      {/* Search button */}
+      {/* Search */}
       <div className="search-field search-button">
         <button
           type="button"
