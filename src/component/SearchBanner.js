@@ -1,4 +1,4 @@
-// src/SearchBanner.js
+// src/component/SearchBanner.js
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Fuse from "fuse.js";
@@ -18,21 +18,21 @@ export default function SearchBanner() {
   }, []);
 
 
-  const rawDest      = qs.get("destination") || "";
-  const rawCheckin   = qs.get("checkin");
-  const parsedStart  = rawCheckin ? new Date(rawCheckin) : null;
+  const rawDest     = qs.get("destination") || "";
+  const rawCheckin  = qs.get("checkin");
+  const parsedStart = rawCheckin ? new Date(rawCheckin) : null;
   const initialStart = parsedStart && parsedStart < minCheckinDate
     ? minCheckinDate
     : parsedStart;
 
-  const rawCheckout  = qs.get("checkout");
-  const initialEnd   = rawCheckout ? new Date(rawCheckout) : null;
+  const rawCheckout = qs.get("checkout");
+  const initialEnd  = rawCheckout ? new Date(rawCheckout) : null;
 
   const initialRooms    = parseInt(qs.get("rooms")    || "1", 10);
   const initialAdults   = parseInt(qs.get("adults")   || "1", 10);
   const initialChildren = parseInt(qs.get("children") || "0", 10);
 
-  // state
+
   const [destination, setDestination] = useState(rawDest);
   const [allDestinations, setAllDestinations] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
@@ -43,7 +43,6 @@ export default function SearchBanner() {
     startDate: initialStart,
     endDate:   initialEnd,
   });
-
 
   const minCheckoutDate = useMemo(() => {
     if (!dateRange.startDate) return null;
@@ -81,7 +80,7 @@ export default function SearchBanner() {
     [allDestinations]
   );
 
-  // close guest dropdown outside click
+
   useEffect(() => {
     const handler = e => {
       if (rgRef.current && !rgRef.current.contains(e.target)) {
@@ -92,7 +91,7 @@ export default function SearchBanner() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // autocomplete
+
   const handleDestinationChange = e => {
     const v = e.target.value;
     setDestination(v);
@@ -118,23 +117,21 @@ export default function SearchBanner() {
     }
   };
 
-  const handleDateRangeChange = ({ startDate, endDate }) => {
 
+  const handleDateRangeChange = ({ startDate, endDate }) => {
     if (startDate && startDate < minCheckinDate) {
       startDate = minCheckinDate;
     }
-
     if (endDate && startDate && endDate <= startDate) {
       endDate = null;
     }
     setDateRange({ startDate, endDate });
   };
 
-  // guest inc/dec
-  const inc = (fn, max) => () => fn(v => Math.min(v + 1, max));
+  const inc = fn => () => fn(v => v + 1);
   const dec = (fn, min) => () => fn(v => Math.max(v - 1, min));
 
-  // compute nights
+
   const getNights = () => {
     const { startDate, endDate } = dateRange;
     if (!startDate || !endDate) return 0;
@@ -142,7 +139,7 @@ export default function SearchBanner() {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
-  // do search
+
   const handleSearch = () => {
     if (!destination.trim()) return;
     const { startDate } = dateRange;
@@ -243,7 +240,7 @@ export default function SearchBanner() {
                   <div className="rg-controls">
                     <button onClick={dec(set, min)}>-</button>
                     <span>{value}</span>
-                    <button onClick={inc(set, 10)}>+</button>
+                    <button onClick={inc(set)}>+</button>
                   </div>
                 </div>
               ))}
