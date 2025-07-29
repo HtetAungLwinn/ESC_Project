@@ -1,5 +1,6 @@
 // src/Payment.js
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { CardNumberElement, CardExpiryElement, CardCvcElement, Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import "./css/PaymentStripe.css"
@@ -36,6 +37,17 @@ function CheckoutForm() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(location.search);
+  const destination_name = searchParams.get('destination_name');
+  const checkinParam = searchParams.get('checkin');
+  const checkoutParam = searchParams.get('checkout');
+  const adultsParam = searchParams.get('adults');
+  const childrenParam = searchParams.get('children');
+  const hotel = searchParams.get('hotel');
+  const hotel_addr = searchParams.get('hotel_addr');
 
   useEffect(() => {
     fetch('/api/payment-stripe/create-payment-intent', {
@@ -92,6 +104,13 @@ function CheckoutForm() {
   <div>
     <h2>Booking Details</h2>
     {/* TODO: retrieve and display booking information */}
+    <p>Destination: {destination_name}</p>
+    <p>Hotel: {hotel}</p>
+    <p>Address: {hotel_addr}</p>
+    <p>Checkin Date: {checkinParam}</p>
+    <p>Checkout Date: {checkoutParam}</p>
+    <p>Adults: {adultsParam}</p>
+    <p>Children: {childrenParam}</p>
     {/* TODO: replace the table with a for loop after retrieving */}
     <div>
       

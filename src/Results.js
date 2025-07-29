@@ -467,7 +467,8 @@ export default function Results() {
                       `&checkin=${checkinParam}` +
                       `&checkout=${checkoutParam}` +
                       `&adults=${adultsParam}` +
-                      `&children=${childrenParam}`
+                      `&children=${childrenParam}` +
+                      `&destination_name=${destination}`
                     )}
                     style={{
                       marginTop: "0.5rem",

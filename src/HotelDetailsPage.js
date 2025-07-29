@@ -61,6 +61,7 @@ export default function HotelDetailsPage() {
   const searchParams = new URLSearchParams(location.search);
   const id = searchParams.get("id") || "";
   const destination = searchParams.get("destination_id") || "";
+  const destination_name = searchParams.get("destination_name");
   const checkinParam = searchParams.get("checkin");
   const checkoutParam = searchParams.get("checkout");
   const adultsParam = parseInt(searchParams.get("adults") || "1", 10);
@@ -314,12 +315,13 @@ export default function HotelDetailsPage() {
               {/* Right: select button */}
               <button
                 className="room-card__btn"
-                onClick={() => navigate(`/payment-stripe?destination=${encodeURIComponent(destination)}`+
-                                    `hotel=${encodeURIComponent(id)}` +
-                                    `checkin=${encodeURIComponent(checkinParam)}` +
-                                    `checkout=${encodeURIComponent(checkoutParam)}` + 
-                                    `adults=${encodeURIComponent(adultsParam)}` +
-                                    `children=${encodeURIComponent(childrenParam)}`)
+                onClick={() => navigate(`/payment-stripe?destination_name=${encodeURIComponent(destination_name)}`+
+                                    `&hotel=${encodeURIComponent(hotel.name)}` +
+                                    `&hotel_addr=${encodeURIComponent(hotel.address)}` +
+                                    `&checkin=${encodeURIComponent(checkinParam)}` +
+                                    `&checkout=${encodeURIComponent(checkoutParam)}` + 
+                                    `&adults=${encodeURIComponent(adultsParam)}` +
+                                    `&children=${encodeURIComponent(childrenParam)}`)
                 }                                    
               >
                 Select

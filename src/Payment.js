@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+
 function PaymentPage() {
     const [name, setName] = useState('');
     const [cardNumber, setCardNumber] = useState('');
