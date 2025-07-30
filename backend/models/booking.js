@@ -38,7 +38,7 @@ async function createBooking(req, res){
 }
 
 async function getBookingByID(req,res){
-    const { id, uid } = req.params;
+    const { uid,id } = req.params;
 
     try{
         const [rows] = await db.query('SELECT * FROM bookings WHERE bid = ? AND uid = ?', [id, uid]);
@@ -84,5 +84,6 @@ async function getAllBookings(req,res) {
 
 module.exports = {
   createBooking,
-  getBookingByID
+  getBookingByID,
+  getAllBookings
 };
