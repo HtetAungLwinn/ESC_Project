@@ -68,12 +68,14 @@ function CheckoutForm() {
     e.preventDefault();
     if (!stripe || !elements || !clientSecret) return;
 
-    // Commented out for testing
-    // const cardElement = elements.getElement(CardElement);
-    // if (!cardElement) {
-    //   setError("Please wait and try again.");
-    //   return;
-    // }
+    const cardNumberElement = elements.getElement(CardNumberElement);
+    const cardExpiryElement = elements.getElement(CardExpiryElement);
+    const cardCvcElement = elements.getElement(CardCvcElement);
+
+    if (!cardNumberElement || !cardExpiryElement || !cardCvcElement) {
+      setError("Please wait and try again.");
+      return;
+    }
 
     setLoading(true);
 
@@ -91,19 +93,24 @@ function CheckoutForm() {
       }
     }
 
-    // const result = await stripe.confirmCardPayment(clientSecret, {
-    //   payment_method: {
-    //     card: elements.getElement(CardElement),
-    //   }
-    // });
+    const { error: pmError, paymentMethod } = await stripe.createPaymentMethod({
+      type: 'card',
+      card: cardNumberElement,
+    });
 
-    // Use the line below to bypass Stripe (no test keys)
-    const result = { paymentIntent: { status: 'succeeded' } };
+    if (pmError) {
+      setError(pmError.message || "Payment method creation failed.");
+      return;
+    }
+
+    const result = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: paymentMethod.id
+    });
 
     setLoading(false);
 
     if (result.error) {
-      setMessage(result.error.message);
+      setMessage(result.error.message || 'Payment failed.');
     } else if (result.paymentIntent.status === 'succeeded') {
       setMessage('Payment successful!');
       window.location.href = '/confirmation';
@@ -111,15 +118,6 @@ function CheckoutForm() {
   };
 
   return (
-    //   <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: '0 auto' }}>
-    //     <h2>Payment</h2>
-    //     <CardElement />    //stripe default card element's which includes card number, expiry, and CVC
-    //     <button type="submit" disabled={!stripe || loading} style={{ marginTop: 20 }}>
-    //       {loading ? 'Processing…' : 'Pay Now'}
-    //     </button>
-    //     {message && <p style={{ color: 'green' }}>{message}</p>}
-    //   </form>
-    // );
     <div className='payment-container'>
       <div>
         <div>
@@ -230,7 +228,7 @@ function CheckoutForm() {
           </label>
         </div>
 
-        <button type="submit">Pay</button>
+        <button type="submit" disabled={!stripe || loading}>Pay</button>
       </form>
     </div>
   );

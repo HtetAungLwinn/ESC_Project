@@ -15,7 +15,8 @@ function Confirmation() {
             {/* Title */}
             <h1 className="centered">Booking Confirmed</h1>
             <p className="subheading">
-              Thank you!
+              Thank you! <br></br>
+              You may view and edit your booking under your profile page.
             </p>
           </div>
   );
