@@ -15,6 +15,7 @@ import HotelDetailsPage from "./HotelDetailsPage";
 import PaymentStripe   from "./PaymentStripe";
 import Confirmation     from "./component/Confirmation";
 import Test     from "./Test";
+import BookingDetailsPage from "./BookingDetailsPage";
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -51,6 +52,7 @@ export default function App() {
           <Route path="/results" element={<Results />} />
           <Route path="/room" element={<HotelDetailsPage />} />
           <Route path="/payment-stripe" element={<PaymentStripe />} />
+          <Route path="/booking" element={<BookingDetailsPage />} />
           <Route
             path="/confirmation"
             element={<Confirmation />}
