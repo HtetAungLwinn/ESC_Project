@@ -49,7 +49,7 @@ function CheckoutForm() {
   const hotel = searchParams.get('hotel');
   const hotel_addr = searchParams.get('hotel_addr');
   // TODO: Retrieve room price from HotelDetailsPage
-  const room_price = 10.00;
+  const room_price = parseFloat(searchParams.get('price'));
 
   useEffect(() => {
     fetch('/api/payment-stripe/create-payment-intent', {

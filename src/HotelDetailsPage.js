@@ -316,12 +316,15 @@ export default function HotelDetailsPage() {
               <button
                 className="room-card__btn"
                 onClick={() => navigate(`/payment-stripe?destination_name=${encodeURIComponent(destination_name)}`+
+                                    `&destination_id=${encodeURIComponent(destination)}` +
                                     `&hotel=${encodeURIComponent(hotel.name)}` +
+                                    `&hotel_id=${encodeURIComponent(id)}` +
                                     `&hotel_addr=${encodeURIComponent(hotel.address)}` +
                                     `&checkin=${encodeURIComponent(checkinParam)}` +
                                     `&checkout=${encodeURIComponent(checkoutParam)}` + 
                                     `&adults=${encodeURIComponent(adultsParam)}` +
-                                    `&children=${encodeURIComponent(childrenParam)}`)
+                                    `&children=${encodeURIComponent(childrenParam)}` +
+                                    `&price=${room.converted_price.toFixed(0)}`)
                 }                                    
               >
                 Select
