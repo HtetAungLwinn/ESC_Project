@@ -38,18 +38,18 @@ async function createBooking(req, res){
 }
 
 async function getBookingByID(req,res){
-    const { id } = req.params;
+    const { uid,id } = req.params;
 
     try{
-        const [rows] = await db.query('SELECT * FROM bookings WHERE bid = ?', [id]);
+        const [rows] = await db.query('SELECT * FROM bookings WHERE bid = ? AND uid = ?', [id, uid]);
 
         if (rows.length === 0) {
             return res.status(404).json({ error: 'Booking not found' });
         }
 
         const booking = rows[0];
-        booking.stay_info = booking.stay_info;
-        booking.payment_info = booking.payment_info;
+        booking.stay_info = JSON.parse(booking.stay_info);
+        booking.payment_info = JSON.parse(booking.payment_info);
 
         res.status(200).json(booking);
     } catch (err) {
@@ -58,7 +58,31 @@ async function getBookingByID(req,res){
     }
 }
 
+async function getAllBookings(req,res) {
+  const { uid } = req.query;
+  console.log("Received uid in query:", uid);  
+
+  try{
+    const [rows] = await db.query('SELECT * FROM bookings WHERE uid = ?', [uid]);
+    console.log('DB query result:', rows);
+
+    
+    if (rows.length == 0){
+      return res.status(404).json({ error: 'No bookings found' });
+    }
+
+    const bookings = rows;
+    
+    res.status(202).json(bookings)
+  }catch (err) {
+    console.error('Fetch error');
+    res.status(500).json({ error: 'Failed to recieve bookings' });
+  }
+  
+}
+
 module.exports = {
   createBooking,
-  getBookingByID
+  getBookingByID,
+  getAllBookings
 };

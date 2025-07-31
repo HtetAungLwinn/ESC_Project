@@ -42,14 +42,18 @@ function CheckoutForm() {
 
   const searchParams = new URLSearchParams(location.search);
   const destination_name = searchParams.get('destination_name');
+  const destination_id = searchParams.get('destination_id');
+  const hotel_id = searchParams.get('hotel_id');
   const checkinParam = searchParams.get('checkin');
   const checkoutParam = searchParams.get('checkout');
   const adultsParam = searchParams.get('adults');
   const childrenParam = searchParams.get('children');
   const hotel = searchParams.get('hotel');
   const hotel_addr = searchParams.get('hotel_addr');
+  const room = searchParams.get('room_name');
+  const nights = searchParams.get('nights');
   // TODO: Retrieve room price from HotelDetailsPage
-  const room_price = 10.00;
+  const room_price = parseFloat(searchParams.get('price'));
 
   useEffect(() => {
     fetch('/api/payment-stripe/create-payment-intent', {
@@ -112,6 +116,32 @@ function CheckoutForm() {
     if (result.error) {
       setMessage(result.error.message || 'Payment failed.');
     } else if (result.paymentIntent.status === 'succeeded') {
+      fetch('/api/bookings/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dest_id: destination_id,
+          start_date: checkinParam,
+          end_date: checkoutParam,
+          stay_info: {
+            nights: nights,
+            adults: adultsParam,
+            children: childrenParam,
+            room_type: room,
+          },
+          price: room_price,
+          payment_info: {
+            amount: room_price,
+            method: 'Stripe Card',
+            payment_method_id: paymentMethod.id,
+            status: 'Paid',
+            paid_at: new Date().toISOString(),
+            currency: 'SGD',
+            transaction_id: result.paymentIntent.id
+          }
+          //message_to_hotel: 'Please prepare early check-in.'
+        }),
+      });
       setMessage('Payment successful!');
       window.location.href = '/confirmation';
     }
