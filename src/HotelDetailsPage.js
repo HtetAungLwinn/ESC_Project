@@ -324,7 +324,9 @@ export default function HotelDetailsPage() {
                                     `&checkout=${encodeURIComponent(checkoutParam)}` + 
                                     `&adults=${encodeURIComponent(adultsParam)}` +
                                     `&children=${encodeURIComponent(childrenParam)}` +
-                                    `&price=${room.converted_price.toFixed(0)}`)
+                                    `&price=${room.converted_price.toFixed(0)}`) +
+                                    `room_name=${encodeURIComponent(room.roomNormalizedDescription)}` +
+                                    `nights=${encodeURIComponent(nights)}`
                 }                                    
               >
                 Select

@@ -7,6 +7,7 @@ function PaymentPage() {
     const [expiryDate, setExpiryDate] = useState('');
     const [cvv, setCvv] = useState('');
     const [error, setError] = useState('');
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -51,6 +52,7 @@ function PaymentPage() {
 
             if (res.ok && data.success) { 
                     window.location.href = '/confirmation';
+
                 } else {
                     setError(data.error || 'Payment failed');
                 };
