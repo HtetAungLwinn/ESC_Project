@@ -48,6 +48,8 @@ function CheckoutForm() {
   const childrenParam = searchParams.get('children');
   const hotel = searchParams.get('hotel');
   const hotel_addr = searchParams.get('hotel_addr');
+  // TODO: Retrieve room price from HotelDetailsPage
+  const room_price = 10.00;
 
   useEffect(() => {
     fetch('/api/payment-stripe/create-payment-intent', {
@@ -66,124 +68,172 @@ function CheckoutForm() {
     e.preventDefault();
     if (!stripe || !elements || !clientSecret) return;
 
+    const cardNumberElement = elements.getElement(CardNumberElement);
+    const cardExpiryElement = elements.getElement(CardExpiryElement);
+    const cardCvcElement = elements.getElement(CardCvcElement);
+
+    if (!cardNumberElement || !cardExpiryElement || !cardCvcElement) {
+      setError("Please wait and try again.");
+      return;
+    }
+
     setLoading(true);
 
-    if (!name.trim()){
-      setError("Name on card required");
+    const requiredFields = [
+      { label: "Name on card", value: name },
+      { label: "Phone number", value: phoneNumber },
+      { label: "Email address", value: email },
+      { label: "Billing address", value: billingAddr },
+    ];
+
+    for (let field of requiredFields) {
+      if (!field.value.trim()) {
+        setError(`${field.label} is required.`);
+        return;
+      }
+    }
+
+    const { error: pmError, paymentMethod } = await stripe.createPaymentMethod({
+      type: 'card',
+      card: cardNumberElement,
+    });
+
+    if (pmError) {
+      setError(pmError.message || "Payment method creation failed.");
       return;
     }
 
     const result = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: elements.getElement(CardElement),
-      }
+      payment_method: paymentMethod.id
     });
 
     setLoading(false);
 
     if (result.error) {
-      setMessage(result.error.message);
+      setMessage(result.error.message || 'Payment failed.');
     } else if (result.paymentIntent.status === 'succeeded') {
       setMessage('Payment successful!');
       window.location.href = '/confirmation';
-      // window.location.assign('/confirmation');
-
     }
   };
 
   return (
-  //   <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: '0 auto' }}>
-  //     <h2>Payment</h2>
-  //     <CardElement />    //stripe default card element's which includes card number, expiry, and CVC
-  //     <button type="submit" disabled={!stripe || loading} style={{ marginTop: 20 }}>
-  //       {loading ? 'Processing…' : 'Pay Now'}
-  //     </button>
-  //     {message && <p style={{ color: 'green' }}>{message}</p>}
-  //   </form>
-  // );
-  <div>
-    <h2>Booking Details</h2>
-    {/* TODO: retrieve and display booking information */}
-    <p>Destination: {destination_name}</p>
-    <p>Hotel: {hotel}</p>
-    <p>Address: {hotel_addr}</p>
-    <p>Checkin Date: {checkinParam}</p>
-    <p>Checkout Date: {checkoutParam}</p>
-    <p>Adults: {adultsParam}</p>
-    <p>Children: {childrenParam}</p>
-    {/* TODO: replace the table with a for loop after retrieving */}
-    <div>
-      
-    </div>
-    <h2>Payment Details</h2>
-    {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <label>
+    <div className='payment-container'>
+      <div>
+        <div>
+          <h2 >Booking Details</h2>
+          <table className="booking-table">
+            <thead>
+              <tr>
+                {[
+                  'Destination',
+                  'Hotel',
+                  'Address',
+                  'Checkin Date',
+                  'Checkout Date',
+                  'Adults',
+                  'Children',
+                  'Price',
+                ].map((label) => (
+                  <th key={label}>{label}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {[
+                  destination_name,
+                  hotel,
+                  hotel_addr,
+                  checkinParam,
+                  checkoutParam,
+                  adultsParam,
+                  childrenParam,
+                  `SGD$${room_price.toFixed(2)}`,
+                ].map((value, index) => (
+                  <td key={index}>{value}</td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+
+
+        </div>
+
+      </div>
+      <h2>Payment Details</h2>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <form onSubmit={handleSubmit} className='payment-form'>
+        <div className='form-left'>
+          <div>
+            <label>Name on card: </label> <br></br>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="First and last name"
+            />
+          </div>
+
+          <div>
+            <label>Phone number: </label> <br></br>
+            <input
+              type="tel"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="Include country code"
+            />
+          </div>
+
+          <div>
+            <label>Email address: </label> <br></br>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="someone@example.com"
+            />
+          </div>
+
+          <div>
+            <label>Billing address: </label> <br></br>
+            <input
+              type="text"
+              value={billingAddr}
+              onChange={(e) => setBillingAddr(e.target.value)}
+              placeholder="Billing address"
+            />
+          </div>
+
+          <div>
+            <label>Special requests to hotel: </label> <br></br>
+            <input
+              type="text"
+              value={specialRequests}
+              onChange={(e) => setSpecialRequests(e.target.value)}
+              placeholder="Any extra requests"
+            />
+          </div>
+        </div>
+
+        <div className='form-right'>
+          <label>
             Card Number: <CardNumberElement options={ELEMENT_OPTIONS} />
-          </label> 
+          </label>
           <label>
             Expiry Date (MM/YY): <CardExpiryElement options={ELEMENT_OPTIONS} />
           </label>
           <label>
             CVC: <CardCvcElement options={ELEMENT_OPTIONS} />
           </label>
-          
-        </form>
-        <div>
-          <label>Name on card: </label> <br></br>
-          <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="First and last name"
-          />
-        </div>
-        
-        <div>
-          <label>Phone number: </label> <br></br>
-          <input
-              type="tel"
-              pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Include country code"
-          />
         </div>
 
-        <div>
-          <label>Email address: </label> <br></br>
-          <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="someone@example.com"
-          />
-        </div>
-
-        <div>
-          <label>Billing address: </label> <br></br>
-          <input
-              type="text"
-              value={billingAddr}
-              onChange={(e) => setBillingAddr(e.target.value)}
-              placeholder="Billing address"
-          />
-        </div>
-
-        <div>
-          <label>Special requests to hotel: </label> <br></br>
-          <input
-              type="text"
-              value={specialRequests}
-              onChange={(e) => setSpecialRequests(e.target.value)}
-              placeholder="Any extra requests"
-          />
-        </div>
-        <button type="submit">Pay</button>
-  </div>
+        <button type="submit" disabled={!stripe || loading}>Pay</button>
+      </form>
+    </div>
   );
 }
-    
+
 
 export default function Payment() {
   return (
