@@ -17,6 +17,7 @@ const hotelsRoutes = require('./routes/hotels');
 const paymentRoutes = require('./routes/paymentMock');
 const paymentStripeRoutes = require('./routes/paymentStripe');
 const roomsRoutes = require('./routes/rooms');
+const bookingRoutes = require('./routes/bookings');
 
 app.use('/api/signup', signupRoutes);
 app.use('/api/destinations', destinationRoutes);
@@ -24,6 +25,7 @@ app.use('/api/hotels', hotelsRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/payment-stripe', paymentStripeRoutes);
 app.use('/api/rooms', roomsRoutes)
+app.use('/api/bookings', bookingRoutes)
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

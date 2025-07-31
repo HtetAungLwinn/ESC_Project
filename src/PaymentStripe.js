@@ -112,6 +112,35 @@ function CheckoutForm() {
     if (result.error) {
       setMessage(result.error.message || 'Payment failed.');
     } else if (result.paymentIntent.status === 'succeeded') {
+      if (result.paymentIntent.status === 'succeeded') {
+        fetch('/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            dest_id: destination_name,
+            stay_info: {
+              start_date: checkinParam,
+              end_date: checkoutParam,
+              adults: adultsParam,
+              children: childrenParam,
+            },
+            message_to_hotel: specialRequests,
+            amount: room_price ,
+            payment_id: result.paymentIntent.id,
+            payee_id: email
+          })
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              setMessage('Booking created!');
+              window.location.href = `/confirmation?ref=${data.booking_reference}`;
+            } else {
+              setMessage('Payment succeeded, but booking failed.');
+            }
+          });
+      }
+
       setMessage('Payment successful!');
       window.location.href = '/confirmation';
     }
