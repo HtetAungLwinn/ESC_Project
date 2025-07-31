@@ -21,6 +21,7 @@ export default function Login({ setLoggedIn }) {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      
 
       if (!user.emailVerified) {
         setErrorMessage("Please verify your email before logging in.");
@@ -56,6 +57,7 @@ export default function Login({ setLoggedIn }) {
       const data = await response.json();
 
       if (data.success || response.status === 409) {
+        localStorage.setItem("uid", user.uid);
         setSuccessMessage("Login successful!");
         setUserInfo({ uid: user.uid, email, firstName, lastName, salutation, phoneNumber, address, postalCode, roles });
         setLoggedIn(true);     // update global state

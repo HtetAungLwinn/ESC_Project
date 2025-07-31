@@ -59,21 +59,20 @@ async function getBookingByID(req,res){
 }
 
 async function getAllBookings(req,res) {
-  const { uid } = req.params;
+  const { uid } = req.query;
+  console.log("Received uid in query:", uid);  
 
   try{
     const [rows] = await db.query('SELECT * FROM bookings WHERE uid = ?', [uid]);
+    console.log('DB query result:', rows);
 
+    
     if (rows.length == 0){
       return res.status(404).json({ error: 'No bookings found' });
     }
 
     const bookings = rows;
-    for (let i in bookings){
-      bookings[i].stay_info = JSON.parse(bookings[i].stay_info);
-      bookings[i].payment_info = JSON.parse(bookings[i].payment_info);
-    }
-
+    
     res.status(202).json(bookings)
   }catch (err) {
     console.error('Fetch error');
