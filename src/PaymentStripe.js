@@ -54,6 +54,7 @@ function CheckoutForm() {
   const nights = searchParams.get('nights');
   // TODO: Retrieve room price from HotelDetailsPage
   const room_price = parseFloat(searchParams.get('price'));
+  const uid = localStorage.getItem('uid')
 
   useEffect(() => {
     fetch('/api/payment-stripe/create-payment-intent', {
@@ -123,6 +124,10 @@ function CheckoutForm() {
           dest_id: destination_id,
           start_date: checkinParam,
           end_date: checkoutParam,
+          uid: uid,
+          hotel_id: hotel_id,
+          hotel_name: hotel,
+          hotel_addr: hotel_addr,
           stay_info: {
             nights: nights,
             adults: adultsParam,
@@ -138,8 +143,8 @@ function CheckoutForm() {
             paid_at: new Date().toISOString(),
             currency: 'SGD',
             transaction_id: result.paymentIntent.id
-          }
-          //message_to_hotel: 'Please prepare early check-in.'
+          },
+          message_to_hotel: specialRequests || null
         }),
       });
       setMessage('Payment successful!');
