@@ -38,13 +38,14 @@ export default function BookingDetailsPage(){
           <div key={booking.hotel_name} style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem' }}>
             <h3>{booking.hotel_name}</h3>
             <p>
-              Room: {booking.stay_info.room}<br />
+              Room: {booking.stay_info.room_type}<br />
               Address: {booking.hotel_addr}<br />
               Price: {booking.price}<br />
               Check-in: {new Date(booking.start_date).toISOString().split("T")[0]} <br />
               Check-out: {new Date(booking.end_date).toISOString().split("T")[0]} <br />
               Adults: {booking.stay_info.adults} <br />
               Children: {booking.stay_info.children} <br />
+              Message to hotel: {booking.message_to_hotel}
             </p>
           </div>
         );

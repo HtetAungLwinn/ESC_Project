@@ -6,7 +6,13 @@ async function createBooking(req, res){
         stay_info, //stores json file of format start_date, end_date, nights, adults, children, room_type
         price,
         payment_info, // stores payment_id and payee_id
-        message_to_hotel
+        message_to_hotel,
+        uid,
+        start_date,
+        end_date,
+        hotel_addr,
+        hotel_name,
+        hotel_id
     } = req.body;
 
     const booking_reference = `REF-${Date.now()}`;
@@ -15,15 +21,23 @@ async function createBooking(req, res){
         const [result] = await db.query(`
       INSERT INTO bookings (
         dest_id, stay_info, message_to_hotel,
-        price, payment_info, booking_reference
-      ) VALUES (?, ?, ?, ?, ?, ?)
+        price, payment_info, booking_reference,
+        uid, start_date, end_date, hotel_id, 
+        hotel_name, hotel_addr
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       dest_id,
       JSON.stringify(stay_info),
       message_to_hotel,
       price,
       JSON.stringify(payment_info),
-      booking_reference
+      booking_reference,
+      uid,
+      start_date,
+      end_date,
+      hotel_id,
+      hotel_name,
+      hotel_addr
     ]);
 
     res.status(200).json({
