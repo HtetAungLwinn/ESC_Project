@@ -1,0 +1,675 @@
+{
+  "searchCompleted": null,
+  "completed": true,
+  "status": null,
+  "currency": null,
+  "rooms": [
+    {
+      "key": "d898dc2d-8e07-548a-b5bd-979bd5766d9a",
+      "roomDescription": "Superior Double or Twin Room 1 King Bed",
+      "roomNormalizedDescription": "Superior Double Or Twin Room 1 King Bed",
+      "type": "200803848",
+      "free_cancellation": true,
+      "long_description": "\u003Cp\u003E\u003Cstrong\u003E1 King Bed OR 2 Twin Beds\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003E204 sq feet \u003C/p\u003E\u003Cbr/\u003E\u003Cp\u003E\u003Cb\u003EInternet\u003C/b\u003E - Free WiFi \u003C/p\u003E\u003Cp\u003E\u003Cb\u003EEntertainment\u003C/b\u003E - LED television with cable channels\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EFood & Drink\u003C/b\u003E - Mini-fridge, minibar (fees may apply), coffee/tea maker, and electric kettle\u003C/p\u003E\u003Cp\u003E\u003Cb\u003ESleep\u003C/b\u003E - Bed sheets \u003C/p\u003E\u003Cp\u003E\u003Cb\u003EBathroom\u003C/b\u003E - Private bathroom, bathtub, slippers, and a hair dryer\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EPractical\u003C/b\u003E - Safe, iron/ironing board, and laptop workspace\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EComfort\u003C/b\u003E - Air conditioning and daily housekeeping\u003C/p\u003E\u003Cp\u003ENon-Smoking\u003C/p\u003E",
+      "roomAdditionalInfo": {
+        "breakfastInfo": "hotel_detail_room_only",
+        "displayFields": {
+          "special_check_in_instructions": "Front desk staff will greet guests on arrival at the property.",
+          "check_in_instructions": "\u003Cul\u003E  \u003Cli\u003EExtra-person charges may apply and vary depending on property policy\u003C/li\u003E\u003Cli\u003EGovernment-issued photo identification and a credit card, debit card, or cash deposit may be required at check-in for incidental charges\u003C/li\u003E\u003Cli\u003ESpecial requests are subject to availability upon check-in and may incur additional charges; special requests cannot be guaranteed\u003C/li\u003E\u003Cli\u003EThis property accepts credit cards and cash\u003C/li\u003E  \u003C/ul\u003E",
+          "know_before_you_go": "\u003Cul\u003E   \u003Cli\u003EOne child 12 years old or younger stays free when occupying the parent or guardian's room, using existing bedding. \u003C/li\u003E\u003Cli\u003ENo pets and no service animals are allowed at this property. \u003C/li\u003E\u003Cli\u003EParking height restrictions apply. \u003C/li\u003E \u003C/ul\u003E",
+          "fees_optional": "\u003Cul\u003E \u003Cli\u003EFee for buffet breakfast: approximately SGD 35 for adults and SGD 22 for children\u003C/li\u003E\u003Cli\u003ECovered self parking fee: SGD 8 per night\u003C/li\u003E\u003C/ul\u003E \u003Cp\u003EThe above list may not be comprehensive. Fees and deposits may not include tax and are subject to change. \u003C/p\u003E",
+          "fees_mandatory": null,
+          "kaligo_service_fee": 295.52,
+          "hotel_fees": [],
+          "surcharges": [
+            {
+              "type": "TaxAndServiceFee",
+              "amount": 316.46
+            }
+          ]
+        }
+      },
+      "description": "Superior Double or Twin Room 1 King Bed",
+      "rooms_available": 7,
+      "images": [
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/68404fde_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/68404fde_z.jpg",
+          "hero_image": true
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/1162b969_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/1162b969_z.jpg",
+          "hero_image": false
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/95ba8298_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/95ba8298_z.jpg",
+          "hero_image": false
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0a5af278_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0a5af278_z.jpg",
+          "hero_image": false
+        }
+      ],
+      "amenities": [
+        "Air conditioning",
+        "Electric kettle",
+        "Towels provided",
+        "Bedsheets provided",
+        "Laptop-friendly workspace",
+        "Mini-fridge",
+        "Minibar",
+        "Coffee/tea maker",
+        "Daily housekeeping",
+        "Phone",
+        "Private bathroom",
+        "Hair dryer",
+        "Iron/ironing board",
+        "In-room safe",
+        "Desk",
+        "Room service",
+        "Wireless internet access",
+        "Slippers",
+        "Bathtub only",
+        "Cable TV service",
+        "Free WiFi",
+        "LED TV",
+        "Non-Smoking"
+      ],
+      "price_type": "single",
+      "max_cash_payment": 2202.16,
+      "coverted_max_cash_payment": 2898.44,
+      "points": 8917,
+      "bonuses": 0,
+      "bonus_programs": [],
+      "bonus_tiers": [],
+      "lowest_price": 2202.16,
+      "price": 2898.44,
+      "converted_price": 2898.44,
+      "lowest_converted_price": 2898.44,
+      "chargeableRate": 2202.16,
+      "market_rates": [
+        {
+          "supplier": "expedia",
+          "rate": 2509.4784227088
+        }
+      ],
+      "base_rate": 1885.7,
+      "base_rate_in_currency": 2481.92,
+      "included_taxes_and_fees_total": 316.46,
+      "included_taxes_and_fees_total_in_currency": 416.52,
+      "excluded_taxes_and_fees_currency": "USD",
+      "excluded_taxes_and_fees_total": 0,
+      "excluded_taxes_and_fees_total_in_currency": 0,
+      "included_taxes_and_fees": [
+        {
+          "id": "tax_and_service_fee",
+          "amount": 316.46,
+          "currency": "USD"
+        }
+      ],
+      "included_taxes_and_fees_in_currency": [
+        {
+          "id": "tax_and_service_fee",
+          "amount": 416.52,
+          "currency": "SGD"
+        }
+      ]
+    },
+    {
+      "key": "fb3b9059-5d2d-5368-987b-64885477d66c",
+      "roomDescription": "Superior Double or Twin Room 2 Twin Beds",
+      "roomNormalizedDescription": "Superior Double Or Twin Room 2 Twin Beds",
+      "type": "200803848",
+      "free_cancellation": true,
+      "long_description": "\u003Cp\u003E\u003Cstrong\u003E1 King Bed OR 2 Twin Beds\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003E204 sq feet \u003C/p\u003E\u003Cbr/\u003E\u003Cp\u003E\u003Cb\u003EInternet\u003C/b\u003E - Free WiFi \u003C/p\u003E\u003Cp\u003E\u003Cb\u003EEntertainment\u003C/b\u003E - LED television with cable channels\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EFood & Drink\u003C/b\u003E - Mini-fridge, minibar (fees may apply), coffee/tea maker, and electric kettle\u003C/p\u003E\u003Cp\u003E\u003Cb\u003ESleep\u003C/b\u003E - Bed sheets \u003C/p\u003E\u003Cp\u003E\u003Cb\u003EBathroom\u003C/b\u003E - Private bathroom, bathtub, slippers, and a hair dryer\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EPractical\u003C/b\u003E - Safe, iron/ironing board, and laptop workspace\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EComfort\u003C/b\u003E - Air conditioning and daily housekeeping\u003C/p\u003E\u003Cp\u003ENon-Smoking\u003C/p\u003E",
+      "roomAdditionalInfo": {
+        "breakfastInfo": "hotel_detail_room_only",
+        "displayFields": {
+          "special_check_in_instructions": "Front desk staff will greet guests on arrival at the property.",
+          "check_in_instructions": "\u003Cul\u003E  \u003Cli\u003EExtra-person charges may apply and vary depending on property policy\u003C/li\u003E\u003Cli\u003EGovernment-issued photo identification and a credit card, debit card, or cash deposit may be required at check-in for incidental charges\u003C/li\u003E\u003Cli\u003ESpecial requests are subject to availability upon check-in and may incur additional charges; special requests cannot be guaranteed\u003C/li\u003E\u003Cli\u003EThis property accepts credit cards and cash\u003C/li\u003E  \u003C/ul\u003E",
+          "know_before_you_go": "\u003Cul\u003E   \u003Cli\u003EOne child 12 years old or younger stays free when occupying the parent or guardian's room, using existing bedding. \u003C/li\u003E\u003Cli\u003ENo pets and no service animals are allowed at this property. \u003C/li\u003E\u003Cli\u003EParking height restrictions apply. \u003C/li\u003E \u003C/ul\u003E",
+          "fees_optional": "\u003Cul\u003E \u003Cli\u003EFee for buffet breakfast: approximately SGD 35 for adults and SGD 22 for children\u003C/li\u003E\u003Cli\u003ECovered self parking fee: SGD 8 per night\u003C/li\u003E\u003C/ul\u003E \u003Cp\u003EThe above list may not be comprehensive. Fees and deposits may not include tax and are subject to change. \u003C/p\u003E",
+          "fees_mandatory": null,
+          "kaligo_service_fee": 295.52,
+          "hotel_fees": [],
+          "surcharges": [
+            {
+              "type": "TaxAndServiceFee",
+              "amount": 316.46
+            }
+          ]
+        }
+      },
+      "description": "Superior Double or Twin Room 2 Twin Beds",
+      "rooms_available": 7,
+      "images": [
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/68404fde_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/68404fde_z.jpg",
+          "hero_image": true
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/1162b969_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/1162b969_z.jpg",
+          "hero_image": false
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/95ba8298_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/95ba8298_z.jpg",
+          "hero_image": false
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0a5af278_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0a5af278_z.jpg",
+          "hero_image": false
+        }
+      ],
+      "amenities": [
+        "Air conditioning",
+        "Electric kettle",
+        "Towels provided",
+        "Bedsheets provided",
+        "Laptop-friendly workspace",
+        "Mini-fridge",
+        "Minibar",
+        "Coffee/tea maker",
+        "Daily housekeeping",
+        "Phone",
+        "Private bathroom",
+        "Hair dryer",
+        "Iron/ironing board",
+        "In-room safe",
+        "Desk",
+        "Room service",
+        "Wireless internet access",
+        "Slippers",
+        "Bathtub only",
+        "Cable TV service",
+        "Free WiFi",
+        "LED TV",
+        "Non-Smoking"
+      ],
+      "price_type": "single",
+      "max_cash_payment": 2202.16,
+      "coverted_max_cash_payment": 2898.44,
+      "points": 8917,
+      "bonuses": 0,
+      "bonus_programs": [],
+      "bonus_tiers": [],
+      "lowest_price": 2202.16,
+      "price": 2898.44,
+      "converted_price": 2898.44,
+      "lowest_converted_price": 2898.44,
+      "chargeableRate": 2202.16,
+      "market_rates": [],
+      "base_rate": 1885.7,
+      "base_rate_in_currency": 2481.92,
+      "included_taxes_and_fees_total": 316.46,
+      "included_taxes_and_fees_total_in_currency": 416.52,
+      "excluded_taxes_and_fees_currency": "USD",
+      "excluded_taxes_and_fees_total": 0,
+      "excluded_taxes_and_fees_total_in_currency": 0,
+      "included_taxes_and_fees": [
+        {
+          "id": "tax_and_service_fee",
+          "amount": 316.46,
+          "currency": "USD"
+        }
+      ],
+      "included_taxes_and_fees_in_currency": [
+        {
+          "id": "tax_and_service_fee",
+          "amount": 416.52,
+          "currency": "SGD"
+        }
+      ]
+    },
+    {
+      "key": "b5ca9e10-0593-5076-97f8-cbbd800d2b89",
+      "roomDescription": "Deluxe Double or Twin Room 1 Double Bed",
+      "roomNormalizedDescription": "Deluxe Double Or Twin Room 1 Double Bed",
+      "type": "200803849",
+      "free_cancellation": true,
+      "long_description": "\u003Cp\u003E\u003Cstrong\u003E1 Double Bed OR 2 Twin Beds\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003E237 sq feet \u003C/p\u003E\u003Cbr/\u003E\u003Cp\u003E\u003Cb\u003EInternet\u003C/b\u003E - Free WiFi \u003C/p\u003E\u003Cp\u003E\u003Cb\u003EEntertainment\u003C/b\u003E - LED television with cable channels\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EFood & Drink\u003C/b\u003E - Mini-fridge, minibar (fees may apply), coffee/tea maker, and electric kettle\u003C/p\u003E\u003Cp\u003E\u003Cb\u003ESleep\u003C/b\u003E - Bed sheets \u003C/p\u003E\u003Cp\u003E\u003Cb\u003EBathroom\u003C/b\u003E - Private bathroom, bathtub, slippers, and a hair dryer\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EPractical\u003C/b\u003E - Safe, iron/ironing board, and laptop workspace\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EComfort\u003C/b\u003E - Air conditioning and daily housekeeping\u003C/p\u003E\u003Cp\u003ENon-Smoking\u003C/p\u003E",
+      "roomAdditionalInfo": {
+        "breakfastInfo": "hotel_detail_room_only",
+        "displayFields": {
+          "special_check_in_instructions": "Front desk staff will greet guests on arrival at the property.",
+          "check_in_instructions": "\u003Cul\u003E  \u003Cli\u003EExtra-person charges may apply and vary depending on property policy\u003C/li\u003E\u003Cli\u003EGovernment-issued photo identification and a credit card, debit card, or cash deposit may be required at check-in for incidental charges\u003C/li\u003E\u003Cli\u003ESpecial requests are subject to availability upon check-in and may incur additional charges; special requests cannot be guaranteed\u003C/li\u003E\u003Cli\u003EThis property accepts credit cards and cash\u003C/li\u003E  \u003C/ul\u003E",
+          "know_before_you_go": "\u003Cul\u003E   \u003Cli\u003EOne child 12 years old or younger stays free when occupying the parent or guardian's room, using existing bedding. \u003C/li\u003E\u003Cli\u003ENo pets and no service animals are allowed at this property. \u003C/li\u003E\u003Cli\u003EParking height restrictions apply. \u003C/li\u003E \u003C/ul\u003E",
+          "fees_optional": "\u003Cul\u003E \u003Cli\u003EFee for buffet breakfast: approximately SGD 35 for adults and SGD 22 for children\u003C/li\u003E\u003Cli\u003ECovered self parking fee: SGD 8 per night\u003C/li\u003E\u003C/ul\u003E \u003Cp\u003EThe above list may not be comprehensive. Fees and deposits may not include tax and are subject to change. \u003C/p\u003E",
+          "fees_mandatory": null,
+          "kaligo_service_fee": 305.63,
+          "hotel_fees": [],
+          "surcharges": [
+            {
+              "type": "TaxAndServiceFee",
+              "amount": 327.21
+            }
+          ]
+        }
+      },
+      "description": "Deluxe Double or Twin Room 1 Double Bed",
+      "rooms_available": 3,
+      "images": [
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0483623b_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0483623b_z.jpg",
+          "hero_image": true
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/95ba8298_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/95ba8298_z.jpg",
+          "hero_image": false
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0a5af278_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0a5af278_z.jpg",
+          "hero_image": false
+        }
+      ],
+      "amenities": [
+        "Air conditioning",
+        "Electric kettle",
+        "Towels provided",
+        "Bedsheets provided",
+        "Laptop-friendly workspace",
+        "Mini-fridge",
+        "Minibar",
+        "Coffee/tea maker",
+        "Daily housekeeping",
+        "Phone",
+        "Private bathroom",
+        "Hair dryer",
+        "Iron/ironing board",
+        "In-room safe",
+        "Desk",
+        "Room service",
+        "Wireless internet access",
+        "Slippers",
+        "Bathtub only",
+        "Cable TV service",
+        "Free WiFi",
+        "LED TV",
+        "Non-Smoking"
+      ],
+      "price_type": "single",
+      "max_cash_payment": 2277.27,
+      "coverted_max_cash_payment": 2997.29,
+      "points": 9160,
+      "bonuses": 0,
+      "bonus_programs": [],
+      "bonus_tiers": [],
+      "lowest_price": 2277.27,
+      "price": 2997.29,
+      "converted_price": 2997.29,
+      "lowest_converted_price": 2997.29,
+      "chargeableRate": 2277.27,
+      "market_rates": [],
+      "base_rate": 1950.06,
+      "base_rate_in_currency": 2566.63,
+      "included_taxes_and_fees_total": 327.21,
+      "included_taxes_and_fees_total_in_currency": 430.67,
+      "excluded_taxes_and_fees_currency": "USD",
+      "excluded_taxes_and_fees_total": 0,
+      "excluded_taxes_and_fees_total_in_currency": 0,
+      "included_taxes_and_fees": [
+        {
+          "id": "tax_and_service_fee",
+          "amount": 327.21,
+          "currency": "USD"
+        }
+      ],
+      "included_taxes_and_fees_in_currency": [
+        {
+          "id": "tax_and_service_fee",
+          "amount": 430.67,
+          "currency": "SGD"
+        }
+      ]
+    },
+    {
+      "key": "2ca09c48-c0ab-5b2d-95a0-06e5a0376e70",
+      "roomDescription": "Deluxe Double or Twin Room 2 Twin Beds",
+      "roomNormalizedDescription": "Deluxe Double Or Twin Room 2 Twin Beds",
+      "type": "200803849",
+      "free_cancellation": true,
+      "long_description": "\u003Cp\u003E\u003Cstrong\u003E1 Double Bed OR 2 Twin Beds\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003E237 sq feet \u003C/p\u003E\u003Cbr/\u003E\u003Cp\u003E\u003Cb\u003EInternet\u003C/b\u003E - Free WiFi \u003C/p\u003E\u003Cp\u003E\u003Cb\u003EEntertainment\u003C/b\u003E - LED television with cable channels\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EFood & Drink\u003C/b\u003E - Mini-fridge, minibar (fees may apply), coffee/tea maker, and electric kettle\u003C/p\u003E\u003Cp\u003E\u003Cb\u003ESleep\u003C/b\u003E - Bed sheets \u003C/p\u003E\u003Cp\u003E\u003Cb\u003EBathroom\u003C/b\u003E - Private bathroom, bathtub, slippers, and a hair dryer\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EPractical\u003C/b\u003E - Safe, iron/ironing board, and laptop workspace\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EComfort\u003C/b\u003E - Air conditioning and daily housekeeping\u003C/p\u003E\u003Cp\u003ENon-Smoking\u003C/p\u003E",
+      "roomAdditionalInfo": {
+        "breakfastInfo": "hotel_detail_room_only",
+        "displayFields": {
+          "special_check_in_instructions": "Front desk staff will greet guests on arrival at the property.",
+          "check_in_instructions": "\u003Cul\u003E  \u003Cli\u003EExtra-person charges may apply and vary depending on property policy\u003C/li\u003E\u003Cli\u003EGovernment-issued photo identification and a credit card, debit card, or cash deposit may be required at check-in for incidental charges\u003C/li\u003E\u003Cli\u003ESpecial requests are subject to availability upon check-in and may incur additional charges; special requests cannot be guaranteed\u003C/li\u003E\u003Cli\u003EThis property accepts credit cards and cash\u003C/li\u003E  \u003C/ul\u003E",
+          "know_before_you_go": "\u003Cul\u003E   \u003Cli\u003EOne child 12 years old or younger stays free when occupying the parent or guardian's room, using existing bedding. \u003C/li\u003E\u003Cli\u003ENo pets and no service animals are allowed at this property. \u003C/li\u003E\u003Cli\u003EParking height restrictions apply. \u003C/li\u003E \u003C/ul\u003E",
+          "fees_optional": "\u003Cul\u003E \u003Cli\u003EFee for buffet breakfast: approximately SGD 35 for adults and SGD 22 for children\u003C/li\u003E\u003Cli\u003ECovered self parking fee: SGD 8 per night\u003C/li\u003E\u003C/ul\u003E \u003Cp\u003EThe above list may not be comprehensive. Fees and deposits may not include tax and are subject to change. \u003C/p\u003E",
+          "fees_mandatory": null,
+          "kaligo_service_fee": 305.63,
+          "hotel_fees": [],
+          "surcharges": [
+            {
+              "type": "TaxAndServiceFee",
+              "amount": 327.21
+            }
+          ]
+        }
+      },
+      "description": "Deluxe Double or Twin Room 2 Twin Beds",
+      "rooms_available": 3,
+      "images": [
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0483623b_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0483623b_z.jpg",
+          "hero_image": true
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/95ba8298_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/95ba8298_z.jpg",
+          "hero_image": false
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0a5af278_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0a5af278_z.jpg",
+          "hero_image": false
+        }
+      ],
+      "amenities": [
+        "Air conditioning",
+        "Electric kettle",
+        "Towels provided",
+        "Bedsheets provided",
+        "Laptop-friendly workspace",
+        "Mini-fridge",
+        "Minibar",
+        "Coffee/tea maker",
+        "Daily housekeeping",
+        "Phone",
+        "Private bathroom",
+        "Hair dryer",
+        "Iron/ironing board",
+        "In-room safe",
+        "Desk",
+        "Room service",
+        "Wireless internet access",
+        "Slippers",
+        "Bathtub only",
+        "Cable TV service",
+        "Free WiFi",
+        "LED TV",
+        "Non-Smoking"
+      ],
+      "price_type": "single",
+      "max_cash_payment": 2277.27,
+      "coverted_max_cash_payment": 2997.29,
+      "points": 9160,
+      "bonuses": 0,
+      "bonus_programs": [],
+      "bonus_tiers": [],
+      "lowest_price": 2277.27,
+      "price": 2997.29,
+      "converted_price": 2997.29,
+      "lowest_converted_price": 2997.29,
+      "chargeableRate": 2277.27,
+      "market_rates": [],
+      "base_rate": 1950.06,
+      "base_rate_in_currency": 2566.63,
+      "included_taxes_and_fees_total": 327.21,
+      "included_taxes_and_fees_total_in_currency": 430.67,
+      "excluded_taxes_and_fees_currency": "USD",
+      "excluded_taxes_and_fees_total": 0,
+      "excluded_taxes_and_fees_total_in_currency": 0,
+      "included_taxes_and_fees": [
+        {
+          "id": "tax_and_service_fee",
+          "amount": 327.21,
+          "currency": "USD"
+        }
+      ],
+      "included_taxes_and_fees_in_currency": [
+        {
+          "id": "tax_and_service_fee",
+          "amount": 430.67,
+          "currency": "SGD"
+        }
+      ]
+    },
+    {
+      "key": "0023189a-ddf6-54b7-af86-0b1b399a31be",
+      "roomDescription": "Executive Premier Suite 1 King Bed",
+      "roomNormalizedDescription": "Executive Premier Suite 1 King Bed",
+      "type": "218144634",
+      "free_cancellation": true,
+      "long_description": "\u003Cp\u003E\u003Cstrong\u003E1 King Bed OR 2 Twin Beds\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003E527 sq feet \u003C/p\u003E\u003Cbr/\u003E\u003Cp\u003E\u003Cb\u003ELayout\u003C/b\u003E - Bedroom, dining area, and sitting area\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EInternet\u003C/b\u003E - Free WiFi \u003C/p\u003E\u003Cp\u003E\u003Cb\u003EEntertainment\u003C/b\u003E - LED television with cable channels\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EFood & Drink\u003C/b\u003E - Kitchenette with stovetop, cookware/dishware, espresso maker, and electric kettle\u003C/p\u003E\u003Cp\u003E\u003Cb\u003ESleep\u003C/b\u003E - Bed sheets \u003C/p\u003E\u003Cp\u003E\u003Cb\u003EBathroom\u003C/b\u003E - Private bathroom, bathtub, slippers, and a hair dryer\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EPractical\u003C/b\u003E - Washer/dryer, safe, and iron/ironing board\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EComfort\u003C/b\u003E - Air conditioning and daily housekeeping\u003C/p\u003E\u003Cp\u003E\u003Cb\u003ENeed to Know\u003C/b\u003E - No rollaway/extra beds available\u003C/p\u003E\u003Cp\u003ENon-Smoking\u003C/p\u003E",
+      "roomAdditionalInfo": {
+        "breakfastInfo": "hotel_detail_room_only",
+        "displayFields": {
+          "special_check_in_instructions": "Front desk staff will greet guests on arrival at the property.",
+          "check_in_instructions": "\u003Cul\u003E  \u003Cli\u003EExtra-person charges may apply and vary depending on property policy\u003C/li\u003E\u003Cli\u003EGovernment-issued photo identification and a credit card, debit card, or cash deposit may be required at check-in for incidental charges\u003C/li\u003E\u003Cli\u003ESpecial requests are subject to availability upon check-in and may incur additional charges; special requests cannot be guaranteed\u003C/li\u003E\u003Cli\u003EThis property accepts credit cards and cash\u003C/li\u003E  \u003C/ul\u003E",
+          "know_before_you_go": "\u003Cul\u003E   \u003Cli\u003EOne child 12 years old or younger stays free when occupying the parent or guardian's room, using existing bedding. \u003C/li\u003E\u003Cli\u003ENo pets and no service animals are allowed at this property. \u003C/li\u003E\u003Cli\u003EParking height restrictions apply. \u003C/li\u003E \u003C/ul\u003E",
+          "fees_optional": "\u003Cul\u003E \u003Cli\u003EFee for buffet breakfast: approximately SGD 35 for adults and SGD 22 for children\u003C/li\u003E\u003Cli\u003ECovered self parking fee: SGD 8 per night\u003C/li\u003E\u003C/ul\u003E \u003Cp\u003EThe above list may not be comprehensive. Fees and deposits may not include tax and are subject to change. \u003C/p\u003E",
+          "fees_mandatory": null,
+          "kaligo_service_fee": 366.13,
+          "hotel_fees": [],
+          "surcharges": [
+            {
+              "type": "TaxAndServiceFee",
+              "amount": 392.06
+            }
+          ]
+        }
+      },
+      "description": "Executive Premier Suite 1 King Bed",
+      "rooms_available": 1,
+      "images": [
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/fdffb178_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/fdffb178_z.jpg",
+          "hero_image": true
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/1f9be6c1_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/1f9be6c1_z.jpg",
+          "hero_image": false
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/7c118de6_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/7c118de6_z.jpg",
+          "hero_image": false
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0a5af278_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0a5af278_z.jpg",
+          "hero_image": false
+        }
+      ],
+      "amenities": [
+        "Air conditioning",
+        "Electric kettle",
+        "Towels provided",
+        "Bedsheets provided",
+        "Cleaning supplies",
+        "Laundry detergent",
+        "Laptop-friendly workspace",
+        "Mini-fridge",
+        "Minibar",
+        "Daily housekeeping",
+        "Phone",
+        "Private bathroom",
+        "Hair dryer",
+        "Iron/ironing board",
+        "In-room safe",
+        "Desk",
+        "Separate sitting area",
+        "Room service",
+        "Cookware, dishware, and utensils",
+        "Wireless internet access",
+        "Slippers",
+        "Bathtub only",
+        "Separate dining area",
+        "Stovetop",
+        "Cable TV service",
+        "Free WiFi",
+        "Kitchenette",
+        "Washer/dryer",
+        "Espresso maker",
+        "No rollaway/extra beds",
+        "LED TV",
+        "Non-Smoking"
+      ],
+      "price_type": "single",
+      "max_cash_payment": 2728.26,
+      "coverted_max_cash_payment": 3590.88,
+      "points": 10938,
+      "bonuses": 0,
+      "bonus_programs": [],
+      "bonus_tiers": [],
+      "lowest_price": 2728.26,
+      "price": 3590.88,
+      "converted_price": 3590.88,
+      "lowest_converted_price": 3590.88,
+      "chargeableRate": 2728.26,
+      "market_rates": [],
+      "base_rate": 2336.2,
+      "base_rate_in_currency": 3074.85,
+      "included_taxes_and_fees_total": 392.06,
+      "included_taxes_and_fees_total_in_currency": 516.03,
+      "excluded_taxes_and_fees_currency": "USD",
+      "excluded_taxes_and_fees_total": 0,
+      "excluded_taxes_and_fees_total_in_currency": 0,
+      "included_taxes_and_fees": [
+        {
+          "id": "tax_and_service_fee",
+          "amount": 392.06,
+          "currency": "USD"
+        }
+      ],
+      "included_taxes_and_fees_in_currency": [
+        {
+          "id": "tax_and_service_fee",
+          "amount": 516.03,
+          "currency": "SGD"
+        }
+      ]
+    },
+    {
+      "key": "a93301d0-084b-5e2f-8513-10848f51f956",
+      "roomDescription": "Executive Premier Suite 2 Twin Beds",
+      "roomNormalizedDescription": "Executive Premier Suite 2 Twin Beds",
+      "type": "218144634",
+      "free_cancellation": true,
+      "long_description": "\u003Cp\u003E\u003Cstrong\u003E1 King Bed OR 2 Twin Beds\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003E527 sq feet \u003C/p\u003E\u003Cbr/\u003E\u003Cp\u003E\u003Cb\u003ELayout\u003C/b\u003E - Bedroom, dining area, and sitting area\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EInternet\u003C/b\u003E - Free WiFi \u003C/p\u003E\u003Cp\u003E\u003Cb\u003EEntertainment\u003C/b\u003E - LED television with cable channels\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EFood & Drink\u003C/b\u003E - Kitchenette with stovetop, cookware/dishware, espresso maker, and electric kettle\u003C/p\u003E\u003Cp\u003E\u003Cb\u003ESleep\u003C/b\u003E - Bed sheets \u003C/p\u003E\u003Cp\u003E\u003Cb\u003EBathroom\u003C/b\u003E - Private bathroom, bathtub, slippers, and a hair dryer\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EPractical\u003C/b\u003E - Washer/dryer, safe, and iron/ironing board\u003C/p\u003E\u003Cp\u003E\u003Cb\u003EComfort\u003C/b\u003E - Air conditioning and daily housekeeping\u003C/p\u003E\u003Cp\u003E\u003Cb\u003ENeed to Know\u003C/b\u003E - No rollaway/extra beds available\u003C/p\u003E\u003Cp\u003ENon-Smoking\u003C/p\u003E",
+      "roomAdditionalInfo": {
+        "breakfastInfo": "hotel_detail_room_only",
+        "displayFields": {
+          "special_check_in_instructions": "Front desk staff will greet guests on arrival at the property.",
+          "check_in_instructions": "\u003Cul\u003E  \u003Cli\u003EExtra-person charges may apply and vary depending on property policy\u003C/li\u003E\u003Cli\u003EGovernment-issued photo identification and a credit card, debit card, or cash deposit may be required at check-in for incidental charges\u003C/li\u003E\u003Cli\u003ESpecial requests are subject to availability upon check-in and may incur additional charges; special requests cannot be guaranteed\u003C/li\u003E\u003Cli\u003EThis property accepts credit cards and cash\u003C/li\u003E  \u003C/ul\u003E",
+          "know_before_you_go": "\u003Cul\u003E   \u003Cli\u003EOne child 12 years old or younger stays free when occupying the parent or guardian's room, using existing bedding. \u003C/li\u003E\u003Cli\u003ENo pets and no service animals are allowed at this property. \u003C/li\u003E\u003Cli\u003EParking height restrictions apply. \u003C/li\u003E \u003C/ul\u003E",
+          "fees_optional": "\u003Cul\u003E \u003Cli\u003EFee for buffet breakfast: approximately SGD 35 for adults and SGD 22 for children\u003C/li\u003E\u003Cli\u003ECovered self parking fee: SGD 8 per night\u003C/li\u003E\u003C/ul\u003E \u003Cp\u003EThe above list may not be comprehensive. Fees and deposits may not include tax and are subject to change. \u003C/p\u003E",
+          "fees_mandatory": null,
+          "kaligo_service_fee": 366.13,
+          "hotel_fees": [],
+          "surcharges": [
+            {
+              "type": "TaxAndServiceFee",
+              "amount": 392.06
+            }
+          ]
+        }
+      },
+      "description": "Executive Premier Suite 2 Twin Beds",
+      "rooms_available": 1,
+      "images": [
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/fdffb178_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/fdffb178_z.jpg",
+          "hero_image": true
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/1f9be6c1_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/1f9be6c1_z.jpg",
+          "hero_image": false
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/7c118de6_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/7c118de6_z.jpg",
+          "hero_image": false
+        },
+        {
+          "url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0a5af278_b.jpg",
+          "high_resolution_url": "https://i.travelapi.com/lodging/5000000/4720000/4715700/4715695/0a5af278_z.jpg",
+          "hero_image": false
+        }
+      ],
+      "amenities": [
+        "Air conditioning",
+        "Electric kettle",
+        "Towels provided",
+        "Bedsheets provided",
+        "Cleaning supplies",
+        "Laundry detergent",
+        "Laptop-friendly workspace",
+        "Mini-fridge",
+        "Minibar",
+        "Daily housekeeping",
+        "Phone",
+        "Private bathroom",
+        "Hair dryer",
+        "Iron/ironing board",
+        "In-room safe",
+        "Desk",
+        "Separate sitting area",
+        "Room service",
+        "Cookware, dishware, and utensils",
+        "Wireless internet access",
+        "Slippers",
+        "Bathtub only",
+        "Separate dining area",
+        "Stovetop",
+        "Cable TV service",
+        "Free WiFi",
+        "Kitchenette",
+        "Washer/dryer",
+        "Espresso maker",
+        "No rollaway/extra beds",
+        "LED TV",
+        "Non-Smoking"
+      ],
+      "price_type": "single",
+      "max_cash_payment": 2728.26,
+      "coverted_max_cash_payment": 3590.88,
+      "points": 10938,
+      "bonuses": 0,
+      "bonus_programs": [],
+      "bonus_tiers": [],
+      "lowest_price": 2728.26,
+      "price": 3590.88,
+      "converted_price": 3590.88,
+      "lowest_converted_price": 3590.88,
+      "chargeableRate": 2728.26,
+      "market_rates": [],
+      "base_rate": 2336.2,
+      "base_rate_in_currency": 3074.85,
+      "included_taxes_and_fees_total": 392.06,
+      "included_taxes_and_fees_total_in_currency": 516.03,
+      "excluded_taxes_and_fees_currency": "USD",
+      "excluded_taxes_and_fees_total": 0,
+      "excluded_taxes_and_fees_total_in_currency": 0,
+      "included_taxes_and_fees": [
+        {
+          "id": "tax_and_service_fee",
+          "amount": 392.06,
+          "currency": "USD"
+        }
+      ],
+      "included_taxes_and_fees_in_currency": [
+        {
+          "id": "tax_and_service_fee",
+          "amount": 516.03,
+          "currency": "SGD"
+        }
+      ]
+    }
+  ]
+}

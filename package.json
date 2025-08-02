@@ -24,7 +24,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test-backend": "jest backend/tests --runInBand"
   },
   "browserslist": {
     "production": [
@@ -41,6 +42,8 @@
   "proxy": "http://localhost:5000",
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.4",
-    "@testing-library/react": "^16.3.0"
+    "@testing-library/react": "^16.3.0",
+    "jest": "^27.5.1",
+    "node-mocks-http": "^1.17.2"
   }
 }

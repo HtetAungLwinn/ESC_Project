@@ -1,0 +1,53 @@
+{
+  "id": "jOZC",
+  "imageCount": 69,
+  "latitude": 1.3049,
+  "longitude": 103.788184,
+  "name": "Park Avenue Rochester",
+  "address": "31 Rochester Drive",
+  "address1": "31 Rochester Drive",
+  "rating": 4,
+  "trustyou": {
+    "id": "e4236a08-3177-41ae-8270-d9e3b9963de9",
+    "score": {
+      "overall": 88,
+      "kaligo_overall": 4.4,
+      "solo": 82,
+      "couple": 89,
+      "family": 86,
+      "business": 82
+    }
+  },
+  "categories": {
+
+  },
+  "amenities_ratings": [],
+  "description": "Don't miss out on recreational opportunities including an outdoor pool and a fitness center. This hotel also features complimentary wireless internet access, concierge services, and a banquet hall.\n\nEnjoy a meal at the restaurant, or stay in and take advantage of the hotel's room service. Quench your thirst with your favorite drink at the bar/lounge. Buffet breakfasts are available daily from 6:30 AM to 10:30 AM for a fee.\n\nFeatured amenities include complimentary newspapers in the lobby, dry cleaning/laundry services, and a 24-hour front desk. This hotel has 5 meeting rooms available for events. Self parking (subject to charges) is available onsite.\n\nMake yourself at home in one of the 351 air-conditioned rooms featuring minibars and LED televisions. Complimentary wireless internet access keeps you connected, and cable programming is available for your entertainment. Private bathrooms with bathtubs feature hair dryers and slippers. Conveniences include phones, as well as safes and desks.\n\nDistances are displayed to the nearest 0.1 mile and kilometer. \u003Cbr /\u003E \u003Cp\u003ENational University of Singapore - 1.6 km / 1 mi \u003Cbr /\u003E Clementi Mall - 3.3 km / 2 mi \u003Cbr /\u003E West Coast Park - 3.4 km / 2.1 mi \u003Cbr /\u003E Alexandra Hospital - 3.4 km / 2.1 mi \u003Cbr /\u003E Gleneagles Hospital - 4.2 km / 2.6 mi \u003Cbr /\u003E National Orchid Garden - 4.6 km / 2.9 mi \u003Cbr /\u003E Singapore Botanic Gardens - 4.8 km / 3 mi \u003Cbr /\u003E Orchard Tower - 5.7 km / 3.5 mi \u003Cbr /\u003E ION Orchard - 6.1 km / 3.8 mi \u003Cbr /\u003E Lucky Plaza - 6.2 km / 3.8 mi \u003Cbr /\u003E Mount Faber Park - 6.3 km / 3.9 mi \u003Cbr /\u003E The Paragon - 6.4 km / 3.9 mi \u003Cbr /\u003E Mount Elizabeth Medical Center - 6.7 km / 4.1 mi \u003Cbr /\u003E Orchard Road - 6.9 km / 4.3 mi \u003Cbr /\u003E Takashimaya Shopping Centre - 7 km / 4.4 mi \u003Cbr /\u003E \u003C/p\u003E\u003Cp\u003EThe nearest airports are:\u003Cbr /\u003ESeletar Airport (XSP) - 20.7 km / 12.9 mi\u003Cbr /\u003E Singapore Changi Airport (SIN) - 31.2 km / 19.4 mi\u003Cbr /\u003E Senai International Airport (JHB) - 61.6 km / 38.3 mi\u003Cbr /\u003E \u003C/p\u003E\u003Cp\u003E\u003C/p\u003E\n\nWith a stay at Park Avenue Rochester in Singapore (Queenstown), you'll be a 5-minute drive from Singapore Botanic Gardens and 8 minutes from Orchard Road.  This hotel is 5.9 mi (9.5 km) from Marina Bay Sands Skypark and 6 mi (9.6 km) from Marina Bay Sands Casino.\n\nIn Singapore (Queenstown)",
+  "amenities": {
+    "inHouseBar": true,
+    "fitnessFacility": true,
+    "inHouseDining": true,
+    "dryCleaning": true,
+    "outdoorPool": true,
+    "nonSmokingRooms": true,
+    "continentalBreakfast": true,
+    "airportTransportation": true
+  },
+  "original_metadata": {
+    "name": null,
+    "city": "Singapore",
+    "state": null,
+    "country": "SG"
+  },
+  "image_details": {
+    "suffix": ".jpg",
+    "count": 69,
+    "prefix": "https://d2ey9sqrvkqdfs.cloudfront.net/jOZC/"
+  },
+  "hires_image_index": "",
+  "number_of_images": 69,
+  "default_image_index": 1,
+  "imgix_url": "https://kaligo-web-old.imgix.net",
+  "cloudflare_image_url": "https://www.kaligo-staging.xyz/images/new",
+  "checkin_time": "3:00 PM"
+}
