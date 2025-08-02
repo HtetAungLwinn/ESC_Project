@@ -19,7 +19,7 @@ const paymentStripeRoutes = require('./routes/paymentStripe');
 const roomsRoutes = require('./routes/rooms');
 const bookingsRoutes = require('./routes/bookings');
 
-app.use('/api/signup', signupRoutes);
+app.use('/api/signup', signupRoutes.router);
 app.use('/api/destinations', destinationRoutes);
 app.use('/api/hotels', hotelsRoutes);
 app.use('/api/payment', paymentRoutes);
