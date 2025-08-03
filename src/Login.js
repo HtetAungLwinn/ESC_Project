@@ -6,11 +6,11 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebase";
 
 export default function Login({ setLoggedIn }) {
-  const [email, setEmail]           = useState("");
-  const [password, setPassword]     = useState("");
-  const [errorMessage, setErrorMessage]   = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [userInfo, setUserInfo]     = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -22,7 +22,6 @@ export default function Login({ setLoggedIn }) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       
-
       if (!user.emailVerified) {
         setErrorMessage("Please verify your email before logging in.");
         return;
@@ -32,6 +31,7 @@ export default function Login({ setLoggedIn }) {
       const firstName   = localStorage.getItem("firstName")   || "Unknown";
       const lastName    = localStorage.getItem("lastName")    || "Unknown";
       const salutation  = localStorage.getItem("salutation")  || "Unknown";
+      const religion    = localStorage.getItem("religion")    || "Unknown";
       const phoneNumber = localStorage.getItem("phoneNumber") || "Unknown";
       const address     = localStorage.getItem("address")     || "Unknown";
       const postalCode  = localStorage.getItem("postalCode")  || "Unknown";
@@ -46,6 +46,7 @@ export default function Login({ setLoggedIn }) {
           firstName,
           lastName,
           salutation,
+          religion,
           phoneNumber,
           address,
           postalCode,
@@ -59,7 +60,7 @@ export default function Login({ setLoggedIn }) {
       if (data.success || response.status === 409) {
         localStorage.setItem("uid", user.uid);
         setSuccessMessage("Login successful!");
-        setUserInfo({ uid: user.uid, email, firstName, lastName, salutation, phoneNumber, address, postalCode, roles });
+        setUserInfo({ uid: user.uid, email, firstName, lastName, salutation, religion, phoneNumber, address, postalCode, roles });
         setLoggedIn(true);     // update global state
         navigate("/");         // ← redirect to homepage
       } else {
