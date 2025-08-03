@@ -44,4 +44,7 @@ async function getUidByDestinationTerm(req, res) {
 module.exports = {
   getAllDestinations,
   getUidByDestinationTerm,
+  __test: {
+    clearCache: () => { cachedDestinations.length = 0; }
+  }
 };
