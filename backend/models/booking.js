@@ -17,6 +17,11 @@ async function createBooking(req, res){
 
     const booking_reference = `REF-${Date.now()}`;
 
+    if (!dest_id || !stay_info || !price || !payment_info || !uid || !start_date || !end_date || 
+      !hotel_addr || !hotel_name || !hotel_id){
+      return res.status(400).json({ error: 'Missing query parameters' })
+    }
+
     try{
         const [result] = await db.query(`
       INSERT INTO bookings (
@@ -94,6 +99,8 @@ async function getAllBookings(req,res) {
   }
   
 }
+
+
 
 module.exports = {
   createBooking,
