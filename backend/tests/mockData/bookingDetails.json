@@ -1,0 +1,29 @@
+{
+  "bid": 9,
+  "dest_id": "M781",
+  "stay_info": {
+    "adults": "2",
+    "nights": "3",
+    "children": "1",
+    "room_type": "Family Suite"
+  },
+  "price": 720.00,
+  "payment_info": {
+    "amount": 720,
+    "method": "Stripe Card",
+    "status": "Paid",
+    "paid_at": "2025-08-01T10:12:34.000Z",
+    "currency": "SGD",
+    "transaction_id": "pi_test_0001",
+    "payment_method_id": "pm_test_0001"
+  },
+  "booking_reference": "REF-1754039184260",
+  "created_at": "2025-08-01 10:12:34",
+  "message_to_hotel": "Please provide baby cot",
+  "uid": "user_A1",
+  "start_date": "2025-08-10",
+  "end_date": "2025-08-13",
+  "hotel_id": "2A12",
+  "hotel_name": "Marina Bay Family Hotel",
+  "hotel_addr": "12 Orchard Rd, Singapore"
+}
