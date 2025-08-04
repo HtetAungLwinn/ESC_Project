@@ -1,4 +1,4 @@
-{
+[{
   "bid": 9,
   "dest_id": "M781",
   "stay_info": {
@@ -26,4 +26,4 @@
   "hotel_id": "2A12",
   "hotel_name": "Marina Bay Family Hotel",
   "hotel_addr": "12 Orchard Rd, Singapore"
-}
+}]
