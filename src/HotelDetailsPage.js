@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation,useNavigate } from "react-router-dom";
 import { FiMapPin, FiChevronDown } from 'react-icons/fi';
-import { AiFillStar } from 'react-icons/ai';
 import {
   FaHeart,
   FaBriefcase,
@@ -9,14 +8,15 @@ import {
   FaStar,
   FaStarHalfAlt,
   FaRegStar,
-  FaCoffee
 } from 'react-icons/fa';
 import './css/HotelDetailsPage.css';
-import { GiKnifeFork } from 'react-icons/gi';
-import SearchBanner from "./component/SearchBanner";
-import HotelMap from './component/HotelMap';
+// import HotelMap from './component/HotelMap'; read in LocationMapSection below
 import ImageBox from './component/ImageBox';
 import ImageBox2 from './component/ImageBox2';
+
+import RoomsSection from './RoomsSection';
+import LocationMapSection from './LocationMapSection';
+
 
 const HOTEL_PLACEHOLDER = "/photos/hotelplaceholder.png";
 
@@ -267,169 +267,24 @@ export default function HotelDetailsPage() {
         </section>
       )}
 
-      <section className="rooms">
-        <h2>Room Options</h2>
-        {roomsLoading && <p>Loading room info...</p>}
-        {roomsError && <p>Failed to load room info.</p>}
-        {!roomsLoading && !roomsError && roomList.length === 0 && <p>No rooms available.</p>}
-        {visibleRooms.map((room) => {
-          const thumb = room.images?.[0]?.high_resolution_url
-            || HOTEL_PLACEHOLDER;
-          const isBreakfast = room.roomAdditionalInfo?.breakfastInfo
-            ?.toLowerCase().includes('breakfast');
+    {/* seperated room options section into a different file for easier testing --> RoomsSection.js*/}
+    <RoomsSection
+      roomsLoading={roomsLoading}
+      roomsError={roomsError}
+      roomList={roomList}
+      checkinParam={checkinParam}
+      checkoutParam={checkoutParam}
+      destination_name={destination_name}
+      destination={destination}
+      hotel={hotel}
+      id={id}
+      adultsParam={adultsParam}
+      childrenParam={childrenParam}
+    />
 
-          // calculate nights
-          let nights = '';
-          if (checkinParam && checkoutParam) {
-            const inD = new Date(checkinParam);
-            const outD = new Date(checkoutParam);
-            nights = Math.round((outD - inD) / (1000*60*60*24));
-          }
+    {/* likewise ^ seperated map section into diff file --> LocationMapSection.js */}
+    <LocationMapSection hotel={hotel} />
 
-          return (
-            <div className="room-card" key={room.key}>
-              {/* Left: thumbnail */}
-              <img
-                src={thumb}
-                alt={room.roomNormalizedDescription}
-                className="room-card__img"
-              />
-
-              {/* Middle: details */}
-              <div className="room-card__details">
-                <h3 className="room-card__title" onClick={() => {setSelectedRoom(room); setImageIndex(0);}}>{room.roomNormalizedDescription}</h3>
-                <p className="room-card__line">
-                  {isBreakfast ? '☕ Breakfast Included' : 'Room Only'}
-                </p>
-                <p className="room-card__sub">
-                  {room.free_cancellation ? 'Free cancellation' : 'Non-refundable'}
-                </p>
-                <p className="room-card__price">
-                  SGD {room.converted_price.toFixed(0)}
-                </p>
-                <p className="room-card__duration">
-                  1 room • {nights} night{nights > 1 ? 's' : ''}
-                </p>
-              </div>
-
-              {/* Right: select button */}
-              <button
-                className="room-card__btn"
-                onClick={() => navigate(`/payment-stripe?destination_name=${encodeURIComponent(destination_name)}`+
-                                    `&destination_id=${encodeURIComponent(destination)}` +
-                                    `&hotel=${encodeURIComponent(hotel.name)}` +
-                                    `&hotel_id=${encodeURIComponent(id)}` +
-                                    `&hotel_addr=${encodeURIComponent(hotel.address)}` +
-                                    `&checkin=${encodeURIComponent(checkinParam)}` +
-                                    `&checkout=${encodeURIComponent(checkoutParam)}` + 
-                                    `&adults=${encodeURIComponent(adultsParam)}` +
-                                    `&children=${encodeURIComponent(childrenParam)}` +
-                                    `&price=${room.converted_price.toFixed(0)}` +
-                                    `room_name=${encodeURIComponent(room.roomNormalizedDescription)}` +
-                                    `nights=${encodeURIComponent(nights)}`)
-                }                                    
-              >
-                Select
-              </button>
-            </div>
-          );
-        })}
-
-        {roomList.length > initialVisible && (
-          <button
-            className="see-more-rooms"
-            onClick={() => setShowAllRooms(prev => !prev)}
-          >
-            {!showAllRooms ? (
-              <>
-                <FiChevronDown size={20} style={{ verticalAlign: 'middle' }} />
-                <span style={{ marginLeft: 8 }}>More Rooms</span>
-              </>
-            ) : (
-              'Show Less'
-            )}
-          </button>
-        )}
-
-        {selectedRoom && (
-          <div className={`modal-overlay ${selectedRoom ? 'show' : ''}`} onClick={() => setSelectedRoom(false)}>
-              <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-                  <div className="room-modal-content">
-                      <div className="modal-image-carousel">
-                          <img
-                              src={selectedRoom.images?.[imageIndex]?.high_resolution_url || HOTEL_PLACEHOLDER}
-                              alt={`Room Image ${imageIndex + 1}`}
-                          />
-                          {selectedRoom.images?.length > 1 && (
-                              <>
-                                  <button
-                                      className="carousel-left"
-                                      onClick={() => setImageIndex(prev => (prev - 1 + selectedRoom.images.length) % selectedRoom.images.length)}
-                                  >
-                                      &#10094;
-                                  </button>
-                                  <button
-                                      className="carousel-right"
-                                      onClick={() => setImageIndex(prev => (prev + 1) % selectedRoom.images.length)}
-                                  >
-                                      &#10095;
-                                  </button>
-                                  <div className="image-count">
-                                      {imageIndex + 1} / {selectedRoom.images.length}
-                                  </div>
-                              </>
-                          )}
-                      </div>
-                      <div className="modal-room-info">
-                        <button className="room-modal-close" onClick={e => {
-                          e.stopPropagation();
-                          setSelectedRoom(false);
-                        }}>&times;</button>
-                        <div className="room-modal-header">
-                          <h2>{selectedRoom.roomNormalizedDescription}</h2>
-                          {/* <button className="room-modal-close" onClick={e => {e.stopPropagation(); setSelectedRoom(false);}}>&times;</button> */}
-                        </div>
-                        <div className="scrollable-room-content">
-                          {selectedRoom.market_rates && selectedRoom.market_rates.length > 0 && (
-                            <div className="room-market-rates" style={{ marginBottom: '1em' }}>
-                              <h3 style={{ marginBottom: '0.3em' }}>Market Rates:</h3>
-                              {selectedRoom.market_rates.map((rate, index) => (
-                                <div key={index} style={{ marginBottom: '0.2em' }} className="room-details">
-                                  <p style={{ margin: 0 }}>- Supplier: {rate.supplier}</p>
-                                  <p style={{ margin: 0 }}>- Rate: SGD {rate.rate.toFixed(0)}</p>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                          <h3 style={{ marginBottom: '0.3em' }}>Description:</h3>
-                          {selectedRoom.long_description && (
-                              <div className="room-details" dangerouslySetInnerHTML={{ __html: selectedRoom.long_description }} />
-                          )}
-                          <h3 style={{ marginBottom: '0em' }}>Amenities:</h3>
-                          {selectedRoom.amenities && selectedRoom.amenities.length > 0 && (
-                            <div className="room-details">                              
-                              <ul style={{ paddingLeft: '1em', margin: 0 }}>
-                                {selectedRoom.amenities.map((amenity, index) => (
-                                  <li key={index}>{amenity}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                      </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      )}
-      </section>
-
-
-      {hotel.latitude && hotel.longitude && (
-        <section className="location-map">
-          <h2>Location</h2>
-          <HotelMap latitude={hotel.latitude} longitude={hotel.longitude} name={hotel.name} />
-        </section>
-      )}
     </div>
   );
 }
