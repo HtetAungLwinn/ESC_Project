@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiChevronDown } from 'react-icons/fi';
 
@@ -28,6 +28,24 @@ export default function RoomsSection({
   const visibleRooms = showAllRooms
     ? roomList
     : roomList.slice(0, initialVisible);
+
+  useEffect(() => {
+    if (selectedRoom) {
+      document.body.style.overflow = 'hidden';
+      const handleEscape = (event) => {
+        if (event.key === 'Escape') {
+          setSelectedRoom(false);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+
+      return () => {
+        document.removeEventListener('keydown', handleEscape);
+      };
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [selectedRoom]);
 
   return (
     <section className="rooms">
@@ -121,51 +139,68 @@ export default function RoomsSection({
               >
                 <div className="modal-container" onClick={(e) => e.stopPropagation()}>
                   <div className="room-modal-content">
-                    <div className="modal-image-carousel">
-                      <img
-                        src={
-                          selectedRoom.images?.[imageIndex]?.high_resolution_url ||
-                          HOTEL_PLACEHOLDER
-                        }
-                        alt={`Room Image ${imageIndex + 1}`}
-                      />
-                      {selectedRoom.images?.length > 1 && (
-                        <>
-                          <button
-                            className="carousel-left"
-                            onClick={() =>
-                              setImageIndex(
-                                (prev) =>
-                                  (prev - 1 + selectedRoom.images.length) %
-                                  selectedRoom.images.length
-                              )
-                            }
-                          >
-                            &#10094;
-                          </button>
-                          <button
-                            className="carousel-right"
-                            onClick={() =>
-                              setImageIndex((prev) => (prev + 1) % selectedRoom.images.length)
-                            }
-                          >
-                            &#10095;
-                          </button>
-                          <div className="image-count">
-                            {imageIndex + 1} / {selectedRoom.images.length}
-                          </div>
-                        </>
-                      )}
+                      <div className="modal-image-carousel">
+                          <img
+                              src={selectedRoom.images?.[imageIndex]?.high_resolution_url || HOTEL_PLACEHOLDER}
+                              alt={`Room Image ${imageIndex + 1}`}
+                          />
+                          {selectedRoom.images?.length > 1 && (
+                              <>
+                                  <button
+                                      className="carousel-left"
+                                      onClick={() => setImageIndex(prev => (prev - 1 + selectedRoom.images.length) % selectedRoom.images.length)}
+                                  >
+                                      &#10094;
+                                  </button>
+                                  <button
+                                      className="carousel-right"
+                                      onClick={() => setImageIndex(prev => (prev + 1) % selectedRoom.images.length)}
+                                  >
+                                      &#10095;
+                                  </button>
+                                  <div className="image-count">
+                                      {imageIndex + 1} / {selectedRoom.images.length}
+                                  </div>
+                              </>
+                          )}
+                      </div>
+                      <div className="modal-room-info">
+                        <button className="room-modal-close" onClick={e => {
+                          e.stopPropagation();
+                          setSelectedRoom(false);
+                        }}>&times;</button>
+                        <div className="room-modal-header">
+                          <h2>{selectedRoom.roomNormalizedDescription}</h2>
+                          {/* <button className="room-modal-close" onClick={e => {e.stopPropagation(); setSelectedRoom(false);}}>&times;</button> */}
+                        </div>
+                        <div className="scrollable-room-content">
+                          {selectedRoom.market_rates && selectedRoom.market_rates.length > 0 && (
+                            <div className="room-market-rates" style={{ marginBottom: '1em' }}>
+                              <h3 style={{ marginBottom: '0.3em' }}>Market Rates:</h3>
+                              {selectedRoom.market_rates.map((rate, index) => (
+                                <div key={index} style={{ marginBottom: '0.2em' }} className="room-details">
+                                  <p style={{ margin: 0 }}>- Supplier: {rate.supplier}</p>
+                                  <p style={{ margin: 0 }}>- Rate: SGD {rate.rate.toFixed(0)}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <h3 style={{ marginBottom: '0.3em' }}>Description:</h3>
+                          {selectedRoom.long_description && (
+                              <div className="room-details" dangerouslySetInnerHTML={{ __html: selectedRoom.long_description }} />
+                          )}
+                          <h3 style={{ marginBottom: '0em' }}>Amenities:</h3>
+                          {selectedRoom.amenities && selectedRoom.amenities.length > 0 && (
+                            <div className="room-details">                              
+                              <ul style={{ paddingLeft: '1em', margin: 0 }}>
+                                {selectedRoom.amenities.map((amenity, index) => (
+                                  <li key={index}>{amenity}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                      </div>
                     </div>
-                    <button
-                      className="room-modal-close"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedRoom(null);
-                      }}
-                    >
-                      &times;
-                    </button>
                   </div>
                 </div>
               </div>
