@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FiChevronDown } from 'react-icons/fi';
 
 const HOTEL_PLACEHOLDER = "/photos/hotelplaceholder.png";
@@ -18,6 +18,7 @@ export default function RoomsSection({
   childrenParam,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showAllRooms, setShowAllRooms] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [imageIndex, setImageIndex] = useState(0);
@@ -85,26 +86,30 @@ export default function RoomsSection({
 
             <button
               className="room-card__btn"
-              onClick={() =>
-                navigate(
-                  `/payment-stripe?destination_name=${encodeURIComponent(
-                    destination_name
-                  )}` +
-                    `&destination_id=${encodeURIComponent(destination)}` +
-                    `&hotel=${encodeURIComponent(hotel.name)}` +
-                    `&hotel_id=${encodeURIComponent(id)}` +
-                    `&hotel_addr=${encodeURIComponent(hotel.address)}` +
-                    `&checkin=${encodeURIComponent(checkinParam)}` +
-                    `&checkout=${encodeURIComponent(checkoutParam)}` +
-                    `&adults=${encodeURIComponent(adultsParam)}` +
-                    `&children=${encodeURIComponent(childrenParam)}` +
-                    `&price=${room.converted_price.toFixed(0)}` +
-                    `&room_name=${encodeURIComponent(
-                      room.roomNormalizedDescription
-                    )}` +
-                    `&nights=${encodeURIComponent(nights)}`
-                )
-              }
+              onClick={() => {
+                const uid = localStorage.getItem("uid");
+                const paymentUrl =
+                  `/payment-stripe?destination_name=${encodeURIComponent(destination_name)}` +
+                  `&destination_id=${encodeURIComponent(destination)}` +
+                  `&hotel=${encodeURIComponent(hotel.name)}` +
+                  `&hotel_id=${encodeURIComponent(id)}` +
+                  `&hotel_addr=${encodeURIComponent(hotel.address)}` +
+                  `&checkin=${encodeURIComponent(checkinParam)}` +
+                  `&checkout=${encodeURIComponent(checkoutParam)}` +
+                  `&adults=${encodeURIComponent(adultsParam)}` +
+                  `&children=${encodeURIComponent(childrenParam)}` +
+                  `&price=${room.converted_price.toFixed(0)}` +
+                  `&room_name=${encodeURIComponent(room.roomNormalizedDescription)}` +
+                  `&nights=${encodeURIComponent(nights)}`;
+
+                if (!uid) {
+                  navigate('/login', {
+                    state: { from: location, afterLogin: paymentUrl }
+                  });
+                } else {
+                  navigate(paymentUrl);
+                }
+              }}
             >
               Select
             </button>

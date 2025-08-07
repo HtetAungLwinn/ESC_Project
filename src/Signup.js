@@ -1,11 +1,13 @@
 // src/Signup.js
 import React, { useState } from "react";
 import { Plane } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth } from "./firebase";
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState({
     salutation: "",
     firstName: "",
@@ -77,6 +79,9 @@ export default function Signup() {
         "Signup successful! A verification email has been sent. Please check your inbox and verify your email before logging in."
       );
       setForm((prev) => ({ ...prev, password: "", confirmPassword: "" }));
+      setTimeout(() => {
+        navigate("/login", { state: location.state });
+      }, 1500); // Give user time to read success message
     } catch (error) {
       setErrorMessage(error.message);
     }

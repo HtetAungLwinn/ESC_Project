@@ -1,5 +1,7 @@
 // src/Confirmation.js
 import React from 'react';
+import HeaderBanner from './HeaderBanner';
+
 
 function Confirmation() {
   return (    

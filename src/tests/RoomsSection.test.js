@@ -1,10 +1,22 @@
 // 1. Define your mock before you mock the module
 const mockNavigate = jest.fn();
+const mockLocation = {
+  pathname: '/rooms',
+  search: '',
+  hash: '',
+  state: null,
+  key: 'default',
+};
 
 // 2. Mock react-router-dom so that useNavigate() returns your mock
-jest.mock('react-router-dom', () => ({
-  useNavigate: () => mockNavigate
-}));
+jest.mock('react-router-dom', () => {
+  const actual = jest.requireActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    useLocation: () => mockLocation,
+  };
+});
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -39,6 +51,7 @@ test('renders loading, error, and empty states', () => {
 });
 
 test('renders a room card and navigates on Select click', () => {
+  localStorage.setItem('uid', 'testuid'); // Simulate logged in
   const sample = {
     key: 'r1',
     roomNormalizedDescription: 'Suite',
@@ -58,6 +71,7 @@ test('renders a room card and navigates on Select click', () => {
   expect(mockNavigate).toHaveBeenCalledWith(
     expect.stringContaining('/payment-stripe?destination_name=TestCity')
   );
+  localStorage.removeItem('uid'); // Clean up
 });
 
 test('toggles More Rooms button text', () => {
