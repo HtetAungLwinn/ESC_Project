@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import BookingDetailsPage from './BookingDetailsPage';
-import bookingDetails from '../backend/tests/mockData/bookingDetails.json';
+import BookingDetailsPage from '../BookingDetailsPage';
+import bookingDetails from '../../backend/tests/mockData/bookingDetails.json';
 import '@testing-library/jest-dom';
 
 
