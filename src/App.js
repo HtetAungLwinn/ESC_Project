@@ -18,7 +18,10 @@ import Test     from "./Test";
 import BookingDetailsPage from "./BookingDetailsPage";
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(() => {
+    // Initialize from localStorage
+    return !!localStorage.getItem("uid");
+  });
   const [darkMode, setDarkMode] = useState(
     () => JSON.parse(localStorage.getItem("ocbcDarkMode")) || false
   );

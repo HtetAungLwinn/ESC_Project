@@ -36,7 +36,11 @@ export default function HeaderBanner({
             <Link
               to="/"
               className="signup-btn"
-              onClick={() => setLoggedIn(false)}
+              onClick={() => {
+                localStorage.removeItem("uid");
+                // localStorage.removeItem("user");
+                setLoggedIn(false);
+              }}
             >
               Log Out
             </Link>

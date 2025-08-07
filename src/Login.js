@@ -1,6 +1,6 @@
 // src/Login.js
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Plane } from "lucide-react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebase";
@@ -12,6 +12,7 @@ export default function Login({ setLoggedIn }) {
   const [successMessage, setSuccessMessage] = useState("");
   const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,7 +63,12 @@ export default function Login({ setLoggedIn }) {
         setSuccessMessage("Login successful!");
         setUserInfo({ uid: user.uid, email, firstName, lastName, salutation, religion, phoneNumber, address, postalCode, roles });
         setLoggedIn(true);     // update global state
-        navigate("/");         // ← redirect to homepage
+        const afterLogin = location.state?.afterLogin;
+        if (afterLogin) {
+          navigate(afterLogin);
+        } else {
+          navigate("/"); // fallback to homepage
+        }
       } else {
         setErrorMessage("Login succeeded, but saving to database failed.");
       }
@@ -106,7 +112,16 @@ export default function Login({ setLoggedIn }) {
           </div>
         </form>
       
+      <div style={{ marginTop: 20, textAlign: 'center' }}>
+        <span>Don't have an account? </span>
+        <Link
+          to="/signup"
+          state={location.state} // preserve afterLogin
+        >
+          Sign Up
+        </Link>
       </div>
     </div>
+  </div>
   );
 }
