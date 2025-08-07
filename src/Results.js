@@ -121,13 +121,12 @@ export default function Results() {
     }, { replace: true });
   }, [filters, navigate, location.pathname]);
 
-  const fetchPage = async (pageNum, isPrefetch = false) => { // prevent interruption to map as future pages load
-    if (!uid || !checkinParam || !checkoutParam || !totalGuests) return;
+  const fetchPage = async (pageNum, isPrefetch = false, retryCount = 0) => {
+  if (!uid || !checkinParam || !checkoutParam || !totalGuests) return;
 
-    if (!isPrefetch) setIsLoading(true);
+  if (!isPrefetch) setIsLoading(true);
     try {
       const params = new URLSearchParams();
-
       params.set("uid", uid);
       params.set("checkin", checkinParam);
       params.set("checkout", checkoutParam);
@@ -143,36 +142,82 @@ export default function Results() {
       if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
       if (filters.sortBy) params.set("sortBy", filters.sortBy);
 
-
       const url = `/api/hotels?${params.toString()}`;
-
       const hotelRes = await fetch(url);
+
+      // --- Handle 202: Prices not ready ---
+      if (hotelRes.status === 202 && retryCount < 5) {
+        const partialData = await hotelRes.json();
+        const partialHotels = Array.isArray(partialData.hotels) ? partialData.hotels : [];
+
+        // Save hotels immediately with price=null
+        const formattedPartial = partialHotels.map((h) => ({
+          id: h.id,
+          name: h.name,
+          price: h.price || 0, // currently null or 0
+          rating: h.rating,
+          guestRating: h.trustyou?.score?.overall || 0,
+          imageUrl:
+            h.image_details && h.image_details.prefix && h.image_details.suffix
+              ? `${h.image_details.prefix}${h.default_image_index ?? 0}${h.image_details.suffix}`
+              : null,
+          latitude: h.latitude ?? null,
+          longitude: h.longitude ?? null,
+        }));
+
+        // Merge into cache without wiping previous data
+        setPagesCache((prevCache) => ({
+          ...prevCache,
+          [pageNum]: {
+            hotels: formattedPartial,
+            total: partialData.total,
+          },
+        }));
+
+        if (pageNum === 1 || partialData.total !== totalHotels) {
+          setTotalHotels(partialData.total);
+        }
+
+        // Poll again after 2s for updated prices
+        setTimeout(() => fetchPage(pageNum, isPrefetch, retryCount + 1), 2000);
+        return;
+      }
+
       if (!hotelRes.ok) throw new Error("Failed to fetch hotels");
 
+      // --- Prices are now ready ---
       const hotelData = await hotelRes.json();
+      const fullHotels = Array.isArray(hotelData.hotels) ? hotelData.hotels : [];
 
-      //change to hotelData
-      const formattedHotels = hotelData.hotels.map((h) => ({
-        id: h.id,
-        name: h.name,
-        price: h.price || 0,
-        rating: h.rating,
-        guestRating: h.trustyou?.score?.overall || 0,
-        imageUrl:
-          h.image_details && h.image_details.prefix && h.image_details.suffix
-            ? `${h.image_details.prefix}${h.default_image_index ?? 0}${h.image_details.suffix}`
-            : null,
-        latitude: h.latitude ?? null,
-        longitude: h.longitude ?? null,
-      }));
+      // Patch only the prices into existing cache
+      setPagesCache((prevCache) => {
+        const current = prevCache[pageNum]?.hotels || [];
+        const updatedHotels = current.length
+          ? current.map((h) => {
+              const updated = fullHotels.find((u) => u.id === h.id);
+              return updated
+                ? { ...h, price: updated.price || 0 }
+                : h;
+            })
+          : fullHotels.map((h) => ({
+              id: h.id,
+              name: h.name,
+              price: h.price || 0,
+              rating: h.rating,
+              guestRating: h.trustyou?.score?.overall || 0,
+              imageUrl:
+                h.image_details && h.image_details.prefix && h.image_details.suffix
+                  ? `${h.image_details.prefix}${h.default_image_index ?? 0}${h.image_details.suffix}`
+                  : null,
+              latitude: h.latitude ?? null,
+              longitude: h.longitude ?? null,
+            }));
 
-      setPagesCache((prevCache) => ({
-        ...prevCache,
-        [pageNum]: {
-          hotels: formattedHotels,
-          total: hotelData.total,
-        },
-      }));
+        return {
+          ...prevCache,
+          [pageNum]: { hotels: updatedHotels, total: hotelData.total },
+        };
+      });
 
       if (pageNum === 1 || hotelData.total !== totalHotels) {
         setTotalHotels(hotelData.total);
@@ -184,9 +229,10 @@ export default function Results() {
         [pageNum]: { hotels: [], total: 0 },
       }));
     } finally {
-      if (!isPrefetch) setIsLoading(false); // ✅ This ensures the map & page know when to render
+      if (!isPrefetch) setIsLoading(false);
     }
   };
+
 
   // auto fetch whenever params change
   useEffect(() => {
