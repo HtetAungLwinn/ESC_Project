@@ -4,7 +4,17 @@ const db = require('../models/database');
 const bcrypt = require('bcrypt');
 
 async function signupHandler(req, res) {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method Not Allowed' });
+    return;
+  }
+
   const { uid, firstName, lastName, salutation, religion, phoneNumber, address, postalCode, email, password, roles } = req.body;
+
+  if (!uid || !firstName || !lastName || !salutation || !religion || !phoneNumber || !address || !postalCode || !email || !password || !roles) {
+    res.status(400).json({ error: 'Missing required fields' });
+    return;
+  }
 
   try {
     // Hash password

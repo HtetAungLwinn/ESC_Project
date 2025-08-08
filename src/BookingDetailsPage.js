@@ -14,7 +14,17 @@ export default function BookingDetailsPage(){
         try {
           const res = await fetch(`/api/bookings?uid=${userId}`);
           const bookingsData = await res.json();
-          setBookings(bookingsData);
+          //setBookings(bookingsData);
+          // Safely handle null, undefined, or wrong types
+          if (Array.isArray(bookingsData)) {
+            setBookings(bookingsData);
+          } else if (bookingsData === null || bookingsData === undefined) {
+            console.warn("Bookings data is null or undefined");
+            setBookings([]); // Fallback to empty array
+          } else {
+            console.error("Unexpected bookings format:", data);
+            setBookings([]); // Fallback to avoid crashing the app
+          }
         } catch (err) {
           console.error("Error fetching bookings:", err);
           setError(true);
