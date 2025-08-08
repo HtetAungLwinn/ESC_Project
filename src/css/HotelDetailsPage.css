@@ -82,8 +82,9 @@
 /* === Gallery === */
 .gallery {
   display: flex;
+  justify-content: center;
   gap: 0.5rem;
-  margin: 1rem 2rem;
+  /* margin: 1rem 2rem; */
 }
 
 .gallery-main img {

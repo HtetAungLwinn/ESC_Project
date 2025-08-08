@@ -11,8 +11,9 @@ import {
 } from 'react-icons/fa';
 import './css/HotelDetailsPage.css';
 // import HotelMap from './component/HotelMap'; read in LocationMapSection below
-import ImageBox from './component/ImageBox';
-import ImageBox2 from './component/ImageBox2';
+// import ImageBox from './component/ImageBox';
+// import ImageBox2 from './component/ImageBox2';
+import GallerySection from './GallerySection';
 
 import RoomsSection from './RoomsSection';
 import LocationMapSection from './LocationMapSection';
@@ -149,12 +150,12 @@ export default function HotelDetailsPage() {
 
   if (!hotel) return <p>Loading hotel info...</p>;
   const fullDesc = hotel.description || "";
-  const shortDesc = fullDesc.slice(0, charLimit);
+  // const shortDesc = fullDesc.slice(0, charLimit);
   const toggleExpanded = () => setExpanded(prev => !prev);
 
   return (
     <div>
-      <section className="gallery">
+      {/* <section className="gallery">
         
         {hotel && hotel.image_details && hotel.hires_image_index ? (
           <ImageBox hotel={hotel} 
@@ -162,7 +163,12 @@ export default function HotelDetailsPage() {
         ) : (
           <ImageBox2 hotel={hotel} />
         )}
+      </section> */}
+
+      <section className="gallery">
+        <GallerySection hotel={hotel} />
       </section>
+
 
       <section className="content-section">
         <div className="overview">
@@ -184,17 +190,18 @@ export default function HotelDetailsPage() {
           </div>
 
           <p className="address">
-            <FiMapPin /> {hotel.address} — <a href="#">show map</a>
+            <FiMapPin /> {hotel.address} 
           </p>
 
            <h2>Overview</h2>
           <div style={{ display: "inline" }}>
             <span
               dangerouslySetInnerHTML={{
-                __html: expanded ? fullDesc : shortDesc + "...",
+                // __html: expanded ? fullDesc : shortDesc + "...",
+                __html: fullDesc,
               }}
             />
-            <span
+            {/* <span
               onClick={toggleExpanded}
               onMouseEnter={() => setHover(true)}
               onMouseLeave={() => setHover(false)}
@@ -206,7 +213,7 @@ export default function HotelDetailsPage() {
               }}
             >
               {expanded ? "Read less" : "Read more"}
-            </span>
+            </span> */}
           </div>
         </div>
 
