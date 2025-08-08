@@ -18,10 +18,23 @@ export default function Login({ setLoggedIn }) {
     setErrorMessage("");
     setSuccessMessage("");
 
+    const emailTrimmed = (email || "").trim();
+    const passwordTrimmed = (password || "").trim();
+
+    // ✅ Validation: block empty submissions
+    if (!emailTrimmed || !passwordTrimmed) {
+      setErrorMessage("Email and password are required");
+      return; // do NOT call Firebase
+    }
+
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        emailTrimmed,
+        passwordTrimmed
+      );
       const user = userCredential.user;
-      
+
       if (!user.emailVerified) {
         setErrorMessage("Please verify your email before logging in.");
         return;
@@ -50,8 +63,8 @@ export default function Login({ setLoggedIn }) {
           phoneNumber,
           address,
           postalCode,
-          email,
-          password,
+          email: emailTrimmed,
+          password: passwordTrimmed,
           roles,
         }),
       });
@@ -60,13 +73,23 @@ export default function Login({ setLoggedIn }) {
       if (data.success || response.status === 409) {
         localStorage.setItem("uid", user.uid);
         setSuccessMessage("Login successful!");
-        setUserInfo({ uid: user.uid, email, firstName, lastName, salutation, religion, phoneNumber, address, postalCode, roles });
-        setLoggedIn(true);     // update global state
-        navigate("/");         // ← redirect to homepage
+        setUserInfo({
+          uid: user.uid,
+          email: emailTrimmed,
+          firstName,
+          lastName,
+          salutation,
+          religion,
+          phoneNumber,
+          address,
+          postalCode,
+          roles,
+        });
+        setLoggedIn(true); // update global state
+        navigate("/");     // redirect to homepage
       } else {
         setErrorMessage("Login succeeded, but saving to database failed.");
       }
-
     } catch (err) {
       setErrorMessage(err.message);
     }
@@ -86,7 +109,7 @@ export default function Login({ setLoggedIn }) {
                 type="email"
                 id="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -96,7 +119,7 @@ export default function Login({ setLoggedIn }) {
                 type="password"
                 id="password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
@@ -105,7 +128,6 @@ export default function Login({ setLoggedIn }) {
             <button type="submit">Log In</button>
           </div>
         </form>
-      
       </div>
     </div>
   );

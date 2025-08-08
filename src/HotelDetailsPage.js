@@ -18,6 +18,7 @@ import RoomsSection from './RoomsSection';
 import LocationMapSection from './LocationMapSection';
 
 
+
 const HOTEL_PLACEHOLDER = "/photos/hotelplaceholder.png";
 
 // Map known category keys to icons (optional)
