@@ -55,7 +55,7 @@ export default function App() {
           <Route path="/results" element={<Results />} />
           <Route path="/room" element={<HotelDetailsPage />} />
           <Route path="/payment-stripe" element={<PaymentStripe />} />
-          <Route path="/booking" element={<BookingDetailsPage />} />
+          <Route path="/booking" element={<BookingDetailsPage setLoggedIn={setLoggedIn}/>} />
           <Route
             path="/confirmation"
             element={<Confirmation />}
