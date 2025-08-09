@@ -4,9 +4,7 @@ import BookingDetailsPage from '../BookingDetailsPage';
 import bookingDetails from '../../backend/tests/mockData/bookingDetails.json';
 import '@testing-library/jest-dom';
 
-
 beforeEach(() => {
-  // Fix 1: Mock correct key
   Storage.prototype.getItem = jest.fn((key) => {
     if (key === 'uid') return 'user_A1';
     return null;
@@ -29,6 +27,7 @@ test('displays loading message', async () => {
 test('displays hotel name after successful fetch', async () => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
+      ok: true,
       json: () => Promise.resolve(bookingDetails),
     })
   );
@@ -36,14 +35,13 @@ test('displays hotel name after successful fetch', async () => {
   render(<BookingDetailsPage />);
 
   const hotel_addr = await screen.findByText(/12 Orchard Rd, Singapore/i);
-  
   expect(hotel_addr).toBeInTheDocument();
-  
 });
 
 test('displays price after successful fetch', async () => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
+      ok: true,
       json: () => Promise.resolve(bookingDetails),
     })
   );
@@ -51,14 +49,13 @@ test('displays price after successful fetch', async () => {
   render(<BookingDetailsPage />);
 
   const price = await screen.findByText(/720/i);
-  
   expect(price).toBeInTheDocument();
-  
 });
 
 test('displays address after successful fetch', async () => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
+      ok: true,
       json: () => Promise.resolve(bookingDetails),
     })
   );
@@ -66,14 +63,13 @@ test('displays address after successful fetch', async () => {
   render(<BookingDetailsPage />);
 
   const hotelName = await screen.findByText(/Marina Bay Family Hotel/i);
-  
   expect(hotelName).toBeInTheDocument();
-  
 });
 
 test('shows "No bookings found..." if fetch returns empty array', async () => {
   global.fetch = jest.fn(() => 
     Promise.resolve({
+      ok: true,
       json: () => Promise.resolve([]),
     })
   );
@@ -87,6 +83,7 @@ test('shows "No bookings found..." if fetch returns empty array', async () => {
 test('displays checkin and checkout date after successful fetch', async () => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
+      ok: true,
       json: () => Promise.resolve(bookingDetails),
     })
   );
@@ -94,16 +91,16 @@ test('displays checkin and checkout date after successful fetch', async () => {
   render(<BookingDetailsPage />);
 
   const checkinDate = await screen.findByText(/2025-08-10/i);
-  const checkoutDate = await screen.findByText(/2025-08-13/i)
+  const checkoutDate = await screen.findByText(/2025-08-13/i);
 
   expect(checkinDate).toBeInTheDocument();
   expect(checkoutDate).toBeInTheDocument();
-  
 });
 
 test('displays number of adults and children after successful fetch', async () => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
+      ok: true,
       json: () => Promise.resolve(bookingDetails),
     })
   );
@@ -111,16 +108,16 @@ test('displays number of adults and children after successful fetch', async () =
   render(<BookingDetailsPage />);
 
   const adults = await screen.findByText(/3/i);
-  const children = await screen.findByText(/1/i)
+  const children = await screen.findByText(/1/i);
 
   expect(adults).toBeInTheDocument();
   expect(children).toBeInTheDocument();
-  
 });
 
 test('displays message to hotel after successful fetch', async () => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
+      ok: true,
       json: () => Promise.resolve(bookingDetails),
     })
   );
@@ -128,9 +125,7 @@ test('displays message to hotel after successful fetch', async () => {
   render(<BookingDetailsPage />);
 
   const message = await screen.findByText(/Please provide baby cot/i);
-
   expect(message).toBeInTheDocument();
-  
 });
 
 test('shows error message after fetch fails', async () => {
@@ -140,4 +135,18 @@ test('shows error message after fetch fails', async () => {
 
   const errorMessage = await screen.findByText(/Error loading bookings\.\.\./i);
   expect(errorMessage).toBeInTheDocument();
+});
+
+test('shows "No bookings found..." if backend returns null object', async () => {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(null),
+    })
+  );
+
+  render(<BookingDetailsPage />);
+
+  const noBookingsMessage = await screen.findByText(/No bookings found\.\.\./i);
+  expect(noBookingsMessage).toBeInTheDocument();
 });
