@@ -52,7 +52,6 @@ export function CheckoutForm() {
   const hotel_addr = searchParams.get('hotel_addr');
   const room = searchParams.get('room_name');
   const nights = searchParams.get('nights');
-  // TODO: Retrieve room price from HotelDetailsPage
   const room_price = parseFloat(searchParams.get('price'));
   const uid = localStorage.getItem('uid')
 
@@ -71,8 +70,7 @@ export function CheckoutForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    
+
     if (!stripe || !elements || !clientSecret) return;
 
     const cardNumberElement = elements.getElement(CardNumberElement);
@@ -96,6 +94,7 @@ export function CheckoutForm() {
     for (let field of requiredFields) {
       if (!field.value.trim()) {
         setError(`${field.label} is required.`);
+        console.log(`${field.label} is required.`);
         return;
       }
     }
@@ -107,6 +106,7 @@ export function CheckoutForm() {
 
     if (pmError) {
       setError(pmError.message || "Payment method creation failed.");
+      console.log(pmError.message);
       return;
     }
 
@@ -117,7 +117,7 @@ export function CheckoutForm() {
     setLoading(false);
 
     if (result.error) {
-      setMessage(result.error.message || 'Payment failed.');
+      setError(result.error.message || 'Payment failed.');
       console.log(result.error.message);
     } else if (result.paymentIntent.status === 'succeeded') {
       fetch('/api/bookings/create', {
