@@ -1,7 +1,6 @@
 // src/Login.js
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { Plane } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebase";
 
@@ -21,10 +20,9 @@ export default function Login({ setLoggedIn }) {
     const emailTrimmed = (email || "").trim();
     const passwordTrimmed = (password || "").trim();
 
-    // ✅ Validation: block empty submissions
     if (!emailTrimmed || !passwordTrimmed) {
       setErrorMessage("Email and password are required");
-      return; // do NOT call Firebase
+      return;
     }
 
     try {
@@ -35,12 +33,13 @@ export default function Login({ setLoggedIn }) {
       );
       const user = userCredential.user;
 
-      if (!user.emailVerified) {
+      const testMode = process.env.REACT_APP_TEST_MODE === "true";
+      console.log("TEST MODE?", testMode); // optional: helps verify env is set
+      if (!testMode && !user.emailVerified) {
         setErrorMessage("Please verify your email before logging in.");
         return;
       }
 
-      // pull info from localStorage…
       const firstName   = localStorage.getItem("firstName")   || "Unknown";
       const lastName    = localStorage.getItem("lastName")    || "Unknown";
       const salutation  = localStorage.getItem("salutation")  || "Unknown";
@@ -50,7 +49,6 @@ export default function Login({ setLoggedIn }) {
       const postalCode  = localStorage.getItem("postalCode")  || "Unknown";
       const roles       = localStorage.getItem("roles")       || "Unknown";
 
-      // send to your backend…
       const response = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,8 +83,8 @@ export default function Login({ setLoggedIn }) {
           postalCode,
           roles,
         });
-        setLoggedIn(true); // update global state
-        navigate("/");     // redirect to homepage
+        setLoggedIn(true);
+        navigate("/");
       } else {
         setErrorMessage("Login succeeded, but saving to database failed.");
       }
