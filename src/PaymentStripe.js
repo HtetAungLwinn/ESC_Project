@@ -256,17 +256,26 @@ export function CheckoutForm() {
 
         <div className='form-right'>
           <label>
-            Card Number: <CardNumberElement options={ELEMENT_OPTIONS} />
+            Card Number:
+            <div data-cy="card-number-element">
+              <CardNumberElement options={ELEMENT_OPTIONS} />
+            </div>
           </label>
           <label>
-            Expiry Date (MM/YY): <CardExpiryElement options={ELEMENT_OPTIONS} />
+            Expiry Date (MM/YY):
+            <div data-cy="card-expiry-element">
+              <CardExpiryElement options={ELEMENT_OPTIONS} />
+            </div>
           </label>
           <label>
-            CVC: <CardCvcElement options={ELEMENT_OPTIONS} />
+            CVC:
+            <div data-cy="card-cvc-element">
+              <CardCvcElement options={ELEMENT_OPTIONS} />
+            </div>
           </label>
         </div>
 
-        <button type="submit" >Pay</button>
+        <button type="submit">Pay</button>
       </form>
     </div>
   );
