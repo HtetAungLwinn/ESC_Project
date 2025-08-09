@@ -1,68 +1,5 @@
-// Simple in-memory cache for raw data
-const searchCache = new Map();
+const cache = new Map();
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
-
-// Generate cache key
-function generateCacheKey(params) {
-  return [
-    params.destination_id,
-    params.checkin,
-    params.checkout,
-    params.guests,
-    params.rooms
-  ].join('|');
-}
-
-// Pagination helper
-function paginate(data, page, limit) {
-  const offset = (page - 1) * limit;
-  return {
-    hotels: data.slice(offset, offset + limit),
-    total: data.length,
-    page,
-    limit,
-    hasMore: offset + limit < data.length,
-  };
-}
-
-// Background price fetcher
-async function fetchPricesInBackground(cacheKey, pricesUrl) {
-  try {
-    console.log("🔄 Background price fetch started...");
-
-    const priceResp = await fetch(pricesUrl);
-    if (!priceResp.ok) {
-      console.error("❌ Background price fetch failed:", priceResp.status);
-      return;
-    }
-
-    const priceData = JSON.parse(await priceResp.text());
-    if (!priceData.completed) {
-      console.log("⏳ Prices still not ready in background.");
-      return;
-    }
-
-    // Merge prices into cached hotels
-    const cached = searchCache.get(cacheKey);
-    if (!cached) return;
-
-    const priceMap = new Map();
-    priceData.hotels?.forEach(({ id, price }) => {
-      if (typeof price === "number") priceMap.set(id, price);
-    });
-
-    const updated = cached.data.map(h => ({
-      ...h,
-      price: priceMap.get(h.id) ?? null
-    }));
-
-    searchCache.set(cacheKey, { data: updated, timestamp: Date.now() });
-    console.log("✅ Background price fetch completed, cache updated.");
-
-  } catch (err) {
-    console.error("❌ Background price fetch error:", err);
-  }
-}
 
 async function getFilteredHotels(req, res) {
   const {
@@ -87,35 +24,37 @@ async function getFilteredHotels(req, res) {
 
   const pageNum = Number(page) || 1;
   const limitNum = Number(limit) || 18;
+  const offset = (pageNum - 1) * limitNum;
   const roomsNum = Number(rooms) || 1;
   const adultsNum = Number(adults) || 1;
   const childrenNum = Number(children) || 0;
   const minPriceNum = minPrice ? Number(minPrice) : 0;
   const maxPriceNum = maxPrice ? Number(maxPrice) : Infinity;
+
   const totalGuests = adultsNum + childrenNum;
   const guests = Array(roomsNum).fill(totalGuests).join('|');
 
-  const cacheKey = generateCacheKey({
+  // Cache key includes only base params that affect raw data
+  const cacheKey = JSON.stringify({
     destination_id,
     checkin,
     checkout,
-    guests,
-    rooms: roomsNum,
+    roomsNum,
+    adultsNum,
+    childrenNum,
   });
 
   try {
-    let rawData;
-
-    // Use cached data if valid
-    const cached = searchCache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-      console.log("✅ Using cached data");
-      rawData = cached.data;
+    // Check cache
+    let baseData = null;
+    const cached = cache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
+      console.log("Serving base data from cache");
+      baseData = cached.data;
     } else {
-      console.time("🟡 Fetch Raw Data");
-
-      // Construct URLs
+      // Fetch base hotel list
       const hotelUrl = `https://hotelapi.loyalty.dev/api/hotels?destination_id=${destination_id}`;
+
       const pricesUrl = new URL("https://hotelapi.loyalty.dev/api/hotels/prices");
       pricesUrl.searchParams.set("destination_id", destination_id);
       pricesUrl.searchParams.set("checkin", checkin);
@@ -128,88 +67,110 @@ async function getFilteredHotels(req, res) {
       pricesUrl.searchParams.set("landing_page", "wl-acme-earn");
       pricesUrl.searchParams.set("product_type", "earn");
 
-      // Fetch hotels & prices
+      console.log("🔗 Fetching base data from upstream APIs");
+
       const [hotelResp, priceResp] = await Promise.all([
         fetch(hotelUrl),
         fetch(pricesUrl.toString())
       ]);
-      const hotelText = await hotelResp.text();
-      const priceText = await priceResp.text();
 
       if (!hotelResp.ok) {
-        return res.status(hotelResp.status).json({ error: "Hotel API error", details: hotelText });
+        const text = await hotelResp.text();
+        return res.status(hotelResp.status).json({ error: "Hotel API error", details: text });
+      }
+      if (!priceResp.ok) {
+        const text = await priceResp.text();
+        return res.status(priceResp.status).json({ error: "Price API error", details: text });
       }
 
-      let hotelData = JSON.parse(hotelText);
-      let priceData;
-      try {
-        priceData = JSON.parse(priceText);
-      } catch {
-        priceData = { completed: false, hotels: [] };
-      }
+      let hotelData = await hotelResp.json();
+      let priceData = await priceResp.json();
 
-      // Normalize hotel data
-      let hotels = Array.isArray(hotelData) ? hotelData : hotelData.hotels || [];
+      // Retry logic if prices incomplete
+      const MAX_RETRIES = 2;
+      const RETRY_DELAY_MS = 300;
+
+      for (let attempt = 1; attempt <= MAX_RETRIES && !priceData.completed; attempt++) {
+        console.log(`⏳ Prices not ready. Retry ${attempt}/${MAX_RETRIES}`);
+        await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+        const retryResp = await fetch(pricesUrl.toString());
+        if (!retryResp.ok) {
+          const retryText = await retryResp.text();
+          return res.status(retryResp.status).json({ error: "Price API retry error", details: retryText });
+        }
+        priceData = await retryResp.json();
+        if (priceData.completed) break;
+      }
 
       if (!priceData.completed) {
-        console.log("⏳ Prices not ready, returning hotels without prices.");
-
-        // Set price to null for all hotels
-        const merged = hotels.map(h => ({ ...h, price: null }));
-
-        // Cache raw hotels immediately
-        searchCache.set(cacheKey, { data: merged, timestamp: Date.now() });
-
-        // Trigger background price fetching
-        fetchPricesInBackground(cacheKey, pricesUrl.toString());
-
-        console.timeEnd("🟡 Fetch Raw Data");
-
-        // Return hotels without prices (202 Accepted)
-        return res.status(202).json(paginate(merged, pageNum, limitNum));
+        return res.status(202).json({ error: "Prices not ready after retries. Try again later." });
       }
 
-      // Merge hotels with prices (if prices ready)
-      const priceMap = new Map();
-      priceData.hotels?.forEach(({ id, price }) => {
-        if (typeof price === "number") priceMap.set(id, price);
-      });
+      // Extract hotels list
+      let hotels = Array.isArray(hotelData) ? hotelData : hotelData.hotels || [];
 
-      const merged = hotels.map(h => ({
-        ...h,
-        price: priceMap.get(h.id) ?? null
-      }));
+      // Merge prices in (priceData.hotels has id and price)
+      if (priceData.hotels && priceData.hotels.length > 0) {
+        const priceMap = new Map();
+        priceData.hotels.forEach(({ id, price }) => {
+          priceMap.set(id, price);
+        });
 
-      rawData = merged;
+        hotels = hotels.map(h => ({
+          ...h,
+          price: priceMap.get(h.id) ?? null,
+        }));
+      } else {
+        hotels = hotels.map(h => ({ ...h, price: null }));
+      }
 
-      // Cache merged data
-      searchCache.set(cacheKey, { data: rawData, timestamp: Date.now() });
-
-      console.timeEnd("🟡 Fetch Raw Data");
+      // Save raw base data in cache (no filtering or sorting here)
+      baseData = hotels;
+      cache.set(cacheKey, { timestamp: Date.now(), data: baseData });
     }
 
-    // Apply filters
-    let filtered = rawData.filter(hotel => {
-      const ratingOk = !starRating || hotel.rating >= Number(starRating);
-      const guestScore = hotel.trustyou?.score?.overall ?? 0;
-      const guestOk = !guestRating || guestScore >= Number(guestRating);
-      const priceOk = hotel.price === null || (hotel.price >= minPriceNum && hotel.price <= maxPriceNum);
-      return ratingOk && guestOk && priceOk;
+    // Now apply filtering and sorting on baseData according to query params:
+
+    let filtered = baseData;
+
+    // Filter by starRating
+    if (starRating) {
+      filtered = filtered.filter(hotel => hotel.rating >= Number(starRating));
+    }
+
+    // Filter by guestRating
+    if (guestRating) {
+      filtered = filtered.filter(hotel => (hotel.trustyou?.score?.overall || 0) >= Number(guestRating));
+    }
+
+    // Filter by price range
+    filtered = filtered.filter(hotel => {
+      const price = hotel.price;
+      return typeof price === "number" && price >= minPriceNum && price <= maxPriceNum;
     });
 
-    // Sort dynamically
-    filtered = filtered.sort((a, b) => {
-      if (sortBy === "price") return (a.price ?? Infinity) - (b.price ?? Infinity);
+    // Sort
+    filtered.sort((a, b) => {
+      if (sortBy === "price") return b.price - a.price;
       if (sortBy === "guestRating") {
         const aScore = a.trustyou?.score?.overall || 0;
         const bScore = b.trustyou?.score?.overall || 0;
         return bScore - aScore;
       }
+      // Default sort by rating descending
       return b.rating - a.rating;
     });
 
-    // Return paginated response
-    return res.json(paginate(filtered, pageNum, limitNum));
+    // Paginate
+    const paged = filtered.slice(offset, offset + limitNum);
+
+    return res.json({
+      hotels: paged,
+      total: filtered.length,
+      page: pageNum,
+      limit: limitNum,
+      hasMore: offset + limitNum < filtered.length,
+    });
 
   } catch (err) {
     console.error("❌ Backend error:", err);
@@ -217,4 +178,4 @@ async function getFilteredHotels(req, res) {
   }
 }
 
-module.exports = { getFilteredHotels, searchCache };
+module.exports = { getFilteredHotels };
