@@ -26,7 +26,37 @@ test('displays loading message', async () => {
   expect(loadingText).toBeInTheDocument();
 });
 
-test('displays bookings after successful fetch', async () => {
+test('displays hotel name after successful fetch', async () => {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () => Promise.resolve(bookingDetails),
+    })
+  );
+
+  render(<BookingDetailsPage />);
+
+  const hotel_addr = await screen.findByText(/12 Orchard Rd, Singapore/i);
+  
+  expect(hotel_addr).toBeInTheDocument();
+  
+});
+
+test('displays price after successful fetch', async () => {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () => Promise.resolve(bookingDetails),
+    })
+  );
+
+  render(<BookingDetailsPage />);
+
+  const price = await screen.findByText(/720/i);
+  
+  expect(price).toBeInTheDocument();
+  
+});
+
+test('displays address after successful fetch', async () => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
       json: () => Promise.resolve(bookingDetails),
@@ -36,10 +66,9 @@ test('displays bookings after successful fetch', async () => {
   render(<BookingDetailsPage />);
 
   const hotelName = await screen.findByText(/Marina Bay Family Hotel/i);
-  const address = await screen.findByText(/12 Orchard Rd, Singapore/i);
-
+  
   expect(hotelName).toBeInTheDocument();
-  expect(address).toBeInTheDocument();
+  
 });
 
 test('shows "No bookings found..." if fetch returns empty array', async () => {
@@ -53,6 +82,55 @@ test('shows "No bookings found..." if fetch returns empty array', async () => {
 
   const noBookings = await screen.findByText(/No bookings found\.\.\./i);
   expect(noBookings).toBeInTheDocument();
+});
+
+test('displays checkin and checkout date after successful fetch', async () => {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () => Promise.resolve(bookingDetails),
+    })
+  );
+
+  render(<BookingDetailsPage />);
+
+  const checkinDate = await screen.findByText(/2025-08-10/i);
+  const checkoutDate = await screen.findByText(/2025-08-13/i)
+
+  expect(checkinDate).toBeInTheDocument();
+  expect(checkoutDate).toBeInTheDocument();
+  
+});
+
+test('displays number of adults and children after successful fetch', async () => {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () => Promise.resolve(bookingDetails),
+    })
+  );
+
+  render(<BookingDetailsPage />);
+
+  const adults = await screen.findByText(/3/i);
+  const children = await screen.findByText(/1/i)
+
+  expect(adults).toBeInTheDocument();
+  expect(children).toBeInTheDocument();
+  
+});
+
+test('displays message to hotel after successful fetch', async () => {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () => Promise.resolve(bookingDetails),
+    })
+  );
+
+  render(<BookingDetailsPage />);
+
+  const message = await screen.findByText(/Please provide baby cot/i);
+
+  expect(message).toBeInTheDocument();
+  
 });
 
 test('shows error message after fetch fails', async () => {

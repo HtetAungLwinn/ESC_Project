@@ -16,18 +16,22 @@ export default function BookingDetailsPage(){
           const bookingsData = await res.json();
           //setBookings(bookingsData);
           // Safely handle null, undefined, or wrong types
+          console.log(bookingsData);
           if (Array.isArray(bookingsData)) {
             setBookings(bookingsData);
-          } else if (bookingsData === null || bookingsData === undefined) {
-            console.warn("Bookings data is null or undefined");
-            setBookings([]); // Fallback to empty array
           } else {
             console.error("Unexpected bookings format:", data);
             setBookings([]); // Fallback to avoid crashing the app
           }
         } catch (err) {
-          console.error("Error fetching bookings:", err);
-          setError(true);
+          
+          if (err.message.includes("No bookings found")){
+            setBookings([]);
+          }else{
+            console.error("Error fetching bookings:", err);
+            setError(true);
+          }
+          
         } finally {
           setLoading(false);
         }
