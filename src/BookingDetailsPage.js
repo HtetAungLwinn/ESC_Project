@@ -17,25 +17,34 @@ export default function BookingDetailsPage({ setLoggedIn }){
     const fetchBookings = async () => {
       try {
         const res = await fetch(`/api/bookings?uid=${userId}`);
+      
+        if (!res.ok) {
+          // get error message from server
+          const errorData = await res.json();
+          throw new Error(errorData.error || 'Failed to fetch bookings');
+        }
+      
         const bookingsData = await res.json();
-          //setBookings(bookingsData);
-          // Safely handle null, undefined, or wrong types
-          if (Array.isArray(bookingsData)) {
-            setBookings(bookingsData);
-          } else if (bookingsData === null || bookingsData === undefined) {
-            console.warn("Bookings data is null or undefined");
-            setBookings([]); // Fallback to empty array
-          } else {
-            console.error("Unexpected bookings format:", data);
-            setBookings([]); // Fallback to avoid crashing the app
-          }
-        } catch (err) {
+      
+        if (Array.isArray(bookingsData)) {
+          setBookings(bookingsData);
+        } else {
+          console.error("Unexpected bookings format:", bookingsData);
+          setBookings([]);
+        }
+      } catch (err) {
+        if (err.message.includes("No bookings found")) {
+          // Backend says no bookings, show empty list
+          setBookings([]);
+        } else {
           console.error("Error fetching bookings:", err);
           setError(true);
-        } finally {
-          setLoading(false);
         }
-      };
+      } finally {
+        setLoading(false);
+      }
+    };
+
 
     fetchBookings();
   }, [userId]);
