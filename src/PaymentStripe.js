@@ -25,7 +25,7 @@ const ELEMENT_OPTIONS = {
   },
 };
 
-function CheckoutForm() {
+export function CheckoutForm() {
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
@@ -71,6 +71,8 @@ function CheckoutForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    
     if (!stripe || !elements || !clientSecret) return;
 
     const cardNumberElement = elements.getElement(CardNumberElement);
@@ -116,6 +118,7 @@ function CheckoutForm() {
 
     if (result.error) {
       setMessage(result.error.message || 'Payment failed.');
+      console.log(result.error.message);
     } else if (result.paymentIntent.status === 'succeeded') {
       fetch('/api/bookings/create', {
         method: 'POST',
@@ -263,7 +266,7 @@ function CheckoutForm() {
           </label>
         </div>
 
-        <button type="submit" disabled={!stripe || loading}>Pay</button>
+        <button type="submit" >Pay</button>
       </form>
     </div>
   );
