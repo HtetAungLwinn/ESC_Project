@@ -49,7 +49,6 @@ async function getFilteredHotels(req, res) {
     let baseData = null;
     const cached = cache.get(cacheKey);
     if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
-      console.log("Serving base data from cache");
       baseData = cached.data;
     } else {
       // Fetch base hotel list
@@ -66,8 +65,6 @@ async function getFilteredHotels(req, res) {
       pricesUrl.searchParams.set("partner_id", "1089");
       pricesUrl.searchParams.set("landing_page", "wl-acme-earn");
       pricesUrl.searchParams.set("product_type", "earn");
-
-      console.log("🔗 Fetching base data from upstream APIs");
 
       const [hotelResp, priceResp] = await Promise.all([
         fetch(hotelUrl),
@@ -91,7 +88,6 @@ async function getFilteredHotels(req, res) {
       const RETRY_DELAY_MS = 300;
 
       for (let attempt = 1; attempt <= MAX_RETRIES && !priceData.completed; attempt++) {
-        console.log(`⏳ Prices not ready. Retry ${attempt}/${MAX_RETRIES}`);
         await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
         const retryResp = await fetch(pricesUrl.toString());
         if (!retryResp.ok) {
@@ -173,7 +169,6 @@ async function getFilteredHotels(req, res) {
     });
 
   } catch (err) {
-    console.error("❌ Backend error:", err);
     return res.status(500).json({ error: "Internal server error" });
   }
 }
