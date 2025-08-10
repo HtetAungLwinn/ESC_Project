@@ -1,3 +1,21 @@
+jest.mock('../firebase', () => ({
+  auth: { currentUser: { uid: 'user_A1' } }
+}));
+
+jest.mock('firebase/auth', () => ({
+  EmailAuthProvider: { credential: jest.fn() },
+  reauthenticateWithCredential: jest.fn()
+}));
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: jest.fn()
+}));
+
+jest.mock('../DeleteAccount', () => ({
+  handleDeleteAccount: jest.fn(() => jest.fn()) // returns a function for onClick
+}));
+
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import BookingDetailsPage from '../BookingDetailsPage';
@@ -5,6 +23,7 @@ import bookingDetails from '../../backend/tests/mockData/bookingDetails.json';
 import '@testing-library/jest-dom';
 
 beforeEach(() => {
+  
   Storage.prototype.getItem = jest.fn((key) => {
     if (key === 'uid') return 'user_A1';
     return null;
@@ -150,3 +169,4 @@ test('shows "No bookings found..." if backend returns null object', async () => 
   const noBookingsMessage = await screen.findByText(/No bookings found\.\.\./i);
   expect(noBookingsMessage).toBeInTheDocument();
 });
+

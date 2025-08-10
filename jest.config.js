@@ -1,4 +1,5 @@
 module.exports = {
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: "jsdom",
   transformIgnorePatterns: [
     "/node_modules/(?!react-leaflet|@react-leaflet|leaflet)"
