@@ -1,198 +1,194 @@
-const { getFilteredHotels, searchCache } = require('../models/hotels');
-
 // Mock fetch globally
 global.fetch = jest.fn();
+console.log('fetch is', fetch);
 
-describe('Hotel Controller Unit Tests', () => {
-  let mockReq, mockRes;
+const httpMocks = require('node-mocks-http');
+const path = require('path');
+const { getFilteredHotels, cache } = require('../models/hotels');
+
+console.log('Global fetch in test:', global.fetch);
+
+const hotelDetails = require(path.resolve(__dirname, './mockData/hotelsDetails.json'));
+const priceDetails = require(path.resolve(__dirname, './mockData/priceDetails.json'));
+
+describe('getFilteredHotels Controller', () => {
+  let req, res;
 
   beforeEach(() => {
-    mockReq = {
-      query: {}
-    };
-    mockRes = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn()
-    };
-    
-    // Clear all mocks
+    cache.clear();
     jest.clearAllMocks();
-    
-    // Clear cache
-    if (searchCache && typeof searchCache.clear === 'function') {
-      searchCache.clear();
-    }
-  });
-
-  // Helper function to create proper fetch mock response
-  const createMockResponse = (data, ok = true) => ({
-    ok,
-    json: jest.fn().mockResolvedValue(data),
-    text: jest.fn().mockResolvedValue(JSON.stringify(data))
-  });
-
-  describe('Input Validation', () => {
-    test('should return 400 if destination_id is missing', async () => {
-      mockReq.query = {
-        checkin: '2025-08-10',
-        checkout: '2025-08-12'
-      };
-
-      await getFilteredHotels(mockReq, mockRes);
-
-      expect(mockRes.status).toHaveBeenCalledWith(400);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Missing required parameters'
-      });
-    });
-
-    test('should return 400 if checkin is missing', async () => {
-      mockReq.query = {
-        uid: 'dest1',
-        checkout: '2025-08-12'
-      };
-
-      await getFilteredHotels(mockReq, mockRes);
-
-      expect(mockRes.status).toHaveBeenCalledWith(400);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Missing required parameters'
-      });
-    });
-
-    test('should return 400 if checkout is missing', async () => {
-      mockReq.query = {
-        uid: 'dest1',
-        checkin: '2025-08-10'
-      };
-
-      await getFilteredHotels(mockReq, mockRes);
-
-      expect(mockRes.status).toHaveBeenCalledWith(400);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Missing required parameters'
-      });
-    });
-  });
-
-  describe('Cache Functionality', () => {
-    test('should use cached data when available and valid', async () => {
-      const cacheKey = 'test_cache_key';
-      const cachedData = {
-        hotels: [{ id: '1', name: 'Cached Hotel' }],
-        timestamp: Date.now()
-      };
-
-      // Mock cache get/set if available
-      if (searchCache && typeof searchCache.get === 'function') {
-        searchCache.get = jest.fn().mockReturnValue(cachedData);
-        searchCache.set = jest.fn();
+    req = httpMocks.createRequest({
+      method: 'GET',
+      query: {
+        uid: '123',
+        checkin: '2025-08-15',
+        checkout: '2025-08-20'
       }
-
-      mockReq.query = {
-        uid: 'dest1',
-        checkin: '2025-08-10',
-        checkout: '2025-08-12'
-      };
-
-      await getFilteredHotels(mockReq, mockRes);
-
-      // Fetch should not be called if cache is used
-      expect(fetch).not.toHaveBeenCalled();
     });
-
-    test('should fetch new data when cache is expired', async () => {
-      const expiredCacheData = {
-        hotels: [{ id: '1', name: 'Expired Hotel' }],
-        timestamp: Date.now() - (11 * 60 * 1000) // 11 minutes ago
-      };
-
-      // Mock expired cache
-      if (searchCache && typeof searchCache.get === 'function') {
-        searchCache.get = jest.fn().mockReturnValue(expiredCacheData);
-        searchCache.set = jest.fn();
-      }
-
-      mockReq.query = {
-        uid: 'dest1',
-        checkin: '2025-08-10',
-        checkout: '2025-08-12'
-      };
-
-      // Mock fresh API response
-      const mockData = {
-        completed: true,
-        hotels: [{ id: '2', name: 'Fresh Hotel' }]
-      };
-      fetch.mockResolvedValueOnce(createMockResponse(mockData));
-
-      await getFilteredHotels(mockReq, mockRes);
-
-      expect(fetch).toHaveBeenCalled();
-    });
+    res = httpMocks.createResponse();
   });
 
-  describe('API Integration', () => {
-    test('should handle invalid price JSON gracefully', async () => {
-      mockReq.query = {
-        uid: 'dest1',
-        checkin: '2025-08-10',
-        checkout: '2025-08-12'
-      };
-
-      // Mock API response with invalid JSON
+  const setFetchMockSequence = (...responses) => {
+    fetch.mockReset();
+    responses.forEach(r => {
       fetch.mockResolvedValueOnce({
-        ok: true,
-        json: jest.fn().mockRejectedValue(new Error('Invalid JSON')),
-        text: jest.fn().mockRejectedValue(new Error('Invalid JSON'))
-      });
-
-      await getFilteredHotels(mockReq, mockRes);
-
-      expect(mockRes.status).toHaveBeenCalledWith(500);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Internal server error'
+        ok: r.ok !== false,
+        status: r.status || 200,
+        json: jest.fn().mockResolvedValue(r.json),
+        text: jest.fn().mockResolvedValue(r.text || '')
       });
     });
+  };
+
+  test('returns 400 if missing required params', async () => {
+    req.query = {};
+    await getFilteredHotels(req, res);
+    expect(res.statusCode).toBe(400);
+    expect(res._getJSONData().error).toMatch(/Missing required parameters/);
   });
 
-  describe('Error Handling', () => {
-    test('should handle fetch errors gracefully', async () => {
-      mockReq.query = {
-        uid: 'dest1',
-        checkin: '2025-08-10',
-        checkout: '2025-08-12'
-      };
-
-      fetch.mockRejectedValueOnce(new Error('Network error'));
-
-      await getFilteredHotels(mockReq, mockRes);
-
-      expect(mockRes.status).toHaveBeenCalledWith(500);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Internal server error'
-      });
+  test('returns data from cache if valid', async () => {
+    const cacheKey = JSON.stringify({
+      destination_id: '123',
+      checkin: '2025-08-15',
+      checkout: '2025-08-20',
+      roomsNum: 1,
+      adultsNum: 1,
+      childrenNum: 0
     });
+    const { cache } = require('../models/hotels');
+    cache.set(cacheKey, { timestamp: Date.now(), data: [{ id: 1, rating: 5, price: 100 }] });
 
-    test('should handle JSON parsing errors in hotel data', async () => {
-      mockReq.query = {
-        uid: 'dest1',
-        checkin: '2025-08-10',
-        checkout: '2025-08-12'
-      };
+    await getFilteredHotels(req, res);
+    const data = res._getJSONData();
+    expect(data.hotels.length).toBe(1);
+    expect(data.hotels[0].price).toBe(100);
+  });
 
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: jest.fn().mockRejectedValue(new Error('Invalid JSON response')),
-        text: jest.fn().mockRejectedValue(new Error('Invalid JSON response'))
-      });
+  test('fetches hotels and prices if cache miss', async () => {
+    setFetchMockSequence(
+      { json: hotelDetails }, // hotelResp
+      { json: { completed: true, hotels: priceDetails.hotels } } // priceResp
+    );
 
-      await getFilteredHotels(mockReq, mockRes);
+    await getFilteredHotels(req, res);
+    const data = res._getJSONData();
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(data.hotels[0]).toHaveProperty('price');
+  });
 
-      expect(mockRes.status).toHaveBeenCalledWith(500);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Internal server error'
-      });
-    });
+  test('retries when prices incomplete', async () => {
+    setFetchMockSequence(
+      { json: hotelDetails },
+      { json: { completed: false } }, // first priceResp incomplete
+      { json: { completed: true, hotels: priceDetails.hotels } } // retryResp
+    );
+
+    await getFilteredHotels(req, res);
+    expect(fetch).toHaveBeenCalledTimes(3); // initial + retry
+    const data = res._getJSONData();
+    expect(data.hotels[0].price).toBeDefined();
+  });
+
+  test('returns 202 if prices not ready after retries', async () => {
+    setFetchMockSequence(
+      { json: hotelDetails },
+      { json: { completed: false } },
+      { json: { completed: false } },
+      { json: { completed: false } }
+    );
+
+    await getFilteredHotels(req, res);
+    expect(res.statusCode).toBe(202);
+  });
+
+  test('filters by starRating', async () => {
+    req.query.starRating = 3;
+    setFetchMockSequence(
+      { json: hotelDetails },
+      { json: { completed: true, hotels: priceDetails.hotels } }
+    );
+    await getFilteredHotels(req, res);
+    expect(res._getJSONData().total).toBe(1);
+  });
+
+  test('filters by guestRating', async () => {
+    req.query.guestRating = 75;
+    setFetchMockSequence(
+      { json: hotelDetails },
+      { json: { completed: true, hotels: priceDetails.hotels } }
+    );
+    await getFilteredHotels(req, res);
+    expect(res._getJSONData().total).toBe(2);
+  });
+
+  test('filters by price range', async () => {
+    req.query.minPrice = 1000;
+    req.query.maxPrice = 2000;
+    setFetchMockSequence(
+      { json: hotelDetails },
+      { json: { completed: true, hotels: priceDetails.hotels } }
+    );
+    await getFilteredHotels(req, res);
+    expect(res._getJSONData().total).toBe(0);
+  });
+
+  test('sorts by price descending', async () => {
+    req.query.sortBy = 'price';
+    setFetchMockSequence(
+      { json: hotelDetails },
+      { json: { completed: true, hotels: priceDetails.hotels } }
+    );
+    await getFilteredHotels(req, res);
+    const { hotels } = res._getJSONData();
+    expect(hotels[0].price).toBeGreaterThanOrEqual(hotels[1].price);
+  });
+
+    test('sorts by guestRating ascending', async () => {
+    req.query.sortBy = 'guestRating';
+    setFetchMockSequence(
+      { json: hotelDetails },
+      { json: { completed: true, hotels: priceDetails.hotels } }
+    );
+    await getFilteredHotels(req, res);
+    const { hotels } = res._getJSONData();
+    expect((hotels[0].trustyou?.score?.overall ?? 0)).toBeGreaterThanOrEqual((hotels[1].trustyou?.score?.overall ?? 0));
+  });
+
+    test('sorts by starRating ascending', async () => {
+    req.query.sortBy = 'rating';
+    setFetchMockSequence(
+      { json: hotelDetails },
+      { json: { completed: true, hotels: priceDetails.hotels } }
+    );
+    await getFilteredHotels(req, res);
+    const { hotels } = res._getJSONData();
+    expect(hotels[0].rating).toBeGreaterThanOrEqual(hotels[1].rating);
+  });
+
+  test('handles Hotel API error', async () => {
+    setFetchMockSequence(
+      { ok: false, status: 500, text: 'Hotel API down' }
+    );
+    await getFilteredHotels(req, res);
+    expect(res.statusCode).toBe(500);
+    expect(res._getJSONData().error).toMatch(/Hotel API error/);
+  });
+
+  test('handles Price API error', async () => {
+    setFetchMockSequence(
+      { json: hotelDetails },
+      { ok: false, status: 500, text: 'Price API down' }
+    );
+    await getFilteredHotels(req, res);
+    expect(res.statusCode).toBe(500);
+    expect(res._getJSONData().error).toMatch(/Price API error/);
+  });
+
+  test('handles unexpected errors', async () => {
+    fetch.mockRejectedValueOnce(new Error('network fail'));
+    await getFilteredHotels(req, res);
+    expect(res.statusCode).toBe(500);
+    expect(res._getJSONData().error).toMatch(/Internal server error/);
   });
 });

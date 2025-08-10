@@ -1,28 +1,16 @@
-import { render, screen, act, fireEvent, waitFor } from '@testing-library/react';
+import React from 'react';
+import { render, screen, act, waitFor } from '@testing-library/react';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { MemoryRouter } from 'react-router-dom';
-import { CheckoutForm, Payment } from '../PaymentStripe';
+import { CheckoutForm } from '../PaymentStripe';
 import userEvent from '@testing-library/user-event';
-
 
 const stripePromise = loadStripe('test_key_123');
 
-beforeEach(() => {
-  jest.clearAllMocks();
-  // Mock fetch for clientSecret
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      json: () => Promise.resolve({ clientSecret: "test_client_secret" }),
-    })
-  );
-});
-
-afterEach(() => {
-  global.fetch.mockClear();
-  jest.resetAllMocks();
-});
-
+// Declare these here to be set per test
+let mockCreatePaymentMethod;
+let mockConfirmCardPayment;
 
 jest.mock("@stripe/react-stripe-js", () => ({
   CardNumberElement: (props) => <input data-testid="card-number" {...props} />,
@@ -30,17 +18,54 @@ jest.mock("@stripe/react-stripe-js", () => ({
   CardCvcElement: (props) => <input data-testid="card-cvc" {...props} />,
   Elements: ({ children }) => <div>{children}</div>,
   useStripe: () => ({
-    createPaymentMethod: jest.fn(),
-    confirmCardPayment: jest.fn(),
+    createPaymentMethod: mockCreatePaymentMethod,
+    confirmCardPayment: mockConfirmCardPayment,
   }),
   useElements: () => ({
-    getElement: jest.fn(() => ({})), // mock getting elements so it passes first check
+    getElement: jest.fn(() => ({})),
   }),
 }));
 
 jest.mock("@stripe/stripe-js", () => ({
   loadStripe: jest.fn(),
 }));
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  // Default mock implementations (can override in tests)
+  mockCreatePaymentMethod = jest.fn(() =>
+    Promise.resolve({
+      error: null,
+      paymentMethod: { id: 'pm_mocked_123' },
+    })
+  );
+  mockConfirmCardPayment = jest.fn(() =>
+    Promise.resolve({
+      error: null,
+      paymentIntent: { status: 'succeeded', id: 'pi_mocked_123' },
+    })
+  );
+
+  // Mock fetch for clientSecret and booking creation
+  global.fetch = jest.fn((url) => {
+    if (url === '/api/payment-stripe/create-payment-intent') {
+      return Promise.resolve({
+        json: () => Promise.resolve({ clientSecret: "test_client_secret" }),
+      });
+    }
+    if (url === '/api/bookings/create') {
+      return Promise.resolve({
+        json: () => Promise.resolve({ success: true }),
+      });
+    }
+    return Promise.reject(new Error('Unknown fetch URL: ' + url));
+  });
+});
+
+afterEach(() => {
+  global.fetch.mockClear();
+  jest.resetAllMocks();
+});
 
 
 test('renders guest details table with correct destination details', async () => {
@@ -54,9 +79,9 @@ test('renders guest details table with correct destination details', async () =>
     );
   });
 
-  expect(await screen.getByText('CityX')).toBeInTheDocument();
-  expect(await screen.getByText('HotelY')).toBeInTheDocument();
-  expect(await screen.getByText('456 Avenue')).toBeInTheDocument();
+  expect(await screen.findByText('CityX')).toBeInTheDocument();
+  expect(await screen.findByText('HotelY')).toBeInTheDocument();
+  expect(await screen.findByText('456 Avenue')).toBeInTheDocument();
 });
 
 test('renders guest details table with correct dates', async () => {
@@ -69,8 +94,8 @@ test('renders guest details table with correct dates', async () => {
       </MemoryRouter>
     );
   });
-  expect(await screen.getByText('2025-12-01')).toBeInTheDocument();
-  expect(await screen.getByText('2025-12-05')).toBeInTheDocument();
+  expect(await screen.findByText('2025-12-01')).toBeInTheDocument();
+  expect(await screen.findByText('2025-12-05')).toBeInTheDocument();
 });
 
 test('renders guest details table with correct guest count', async () => {
@@ -83,8 +108,8 @@ test('renders guest details table with correct guest count', async () => {
       </MemoryRouter>
     );
   });
-  expect(await screen.getByText('3')).toBeInTheDocument();
-  expect(await screen.getByText('2')).toBeInTheDocument();
+  expect(await screen.findByText('3')).toBeInTheDocument();
+  expect(await screen.findByText('2')).toBeInTheDocument();
 });
 
 test('renders guest details table with correct pricing', async () => {
@@ -97,7 +122,7 @@ test('renders guest details table with correct pricing', async () => {
       </MemoryRouter>
     );
   });
-  expect(await screen.getByText('SGD$500.00')).toBeInTheDocument();
+  expect(await screen.findByText('SGD$500.00')).toBeInTheDocument();
 });
 
 
@@ -111,7 +136,6 @@ test('required field empty prevents booking creation', async () => {
       </Elements>
     </MemoryRouter>
   );
-
 
   await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
 
@@ -132,7 +156,7 @@ test('required field empty prevents booking creation', async () => {
 });
 
 test('shows error when required field is empty and logs error', async () => {
-  // Spy on console.error (or console.log)
+  // Spy on console.error and console.log
   const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
   const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
 
@@ -151,7 +175,7 @@ test('shows error when required field is empty and logs error', async () => {
 
   await userEvent.click(screen.getByRole('button', { name: /pay/i }));
 
-  // Wait for submit handler to run
+  // Wait for submit handler to run and error to be logged
   await waitFor(() => {
     expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('is required'));
   });
@@ -161,4 +185,70 @@ test('shows error when required field is empty and logs error', async () => {
   consoleLogSpy.mockRestore();
 });
 
+test('successful payment flow redirects on success', async () => {
+  // Mock window.location.href setter
+  delete window.location;
+  window.location = { href: '' };
 
+  render(
+    <MemoryRouter initialEntries={['/payment-stripe?destination_name=CityX&hotel=HotelY&hotel_addr=456%20Avenue&price=100']}>
+      <Elements stripe={stripePromise}>
+        <CheckoutForm />
+      </Elements>
+    </MemoryRouter>
+  );
+
+  // Fill in form fields
+  await userEvent.type(screen.getByPlaceholderText(/first and last name/i), 'John Doe');
+  await userEvent.type(screen.getByPlaceholderText(/include country code/i), '+6599999999');
+  await userEvent.type(screen.getByPlaceholderText(/someone@example.com/i), 'john@example.com');
+  await userEvent.type(screen.getByPlaceholderText(/billing address/i), '123 Street');
+  await userEvent.type(screen.getByPlaceholderText(/any extra requests/i), 'None');
+
+  // Fill mocked Stripe elements 
+  await userEvent.type(screen.getByTestId('card-number'), '4242424242424242');
+  await userEvent.type(screen.getByTestId('card-expiry'), '1225');
+  await userEvent.type(screen.getByTestId('card-cvc'), '123');
+
+  // Click Pay
+  await userEvent.click(screen.getByRole('button', { name: /pay/i }));
+
+  // Wait for the booking fetch call
+  await waitFor(() => {
+    expect(global.fetch).toHaveBeenCalledWith('/api/bookings/create', expect.any(Object));
+  });
+
+  // Check redirection
+  expect(window.location.href).toBe('/confirmation');
+});
+
+test('shows error when card number is incomplete', async () => {
+  // Override mockConfirmCardPayment to simulate error
+  mockConfirmCardPayment = jest.fn(() =>
+    Promise.resolve({
+      error: { message: 'Your card number is incomplete.' },
+    })
+  );
+
+  render(
+    <MemoryRouter>
+      <Elements stripe={stripePromise}>
+        <CheckoutForm />
+      </Elements>
+    </MemoryRouter>
+  );
+
+  // Fill required fields
+  await userEvent.type(screen.getByPlaceholderText(/first and last name/i), 'John Doe');
+  await userEvent.type(screen.getByPlaceholderText(/someone@example.com/i), 'john@example.com');
+  await userEvent.type(screen.getByPlaceholderText(/billing address/i), '123 Street');
+  await userEvent.type(screen.getByPlaceholderText(/include country code/i), '12345678');
+
+  // Click Pay
+  await userEvent.click(screen.getByRole('button', { name: /pay/i }));
+
+  // Wait for the error message to appear
+  await waitFor(() => {
+    expect(screen.getByText(/your card number is incomplete/i)).toBeInTheDocument();
+  });
+});

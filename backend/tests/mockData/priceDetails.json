@@ -1,0 +1,54 @@
+{
+  "searchCompleted": null,
+  "completed": true,
+  "status": null,
+  "currency": "SGD",
+  "hotels": [
+    {
+      "id": "obxM",
+      "searchRank": 0.93,
+      "price_type": "multi",
+      "free_cancellation": true,
+      "rooms_available": 39992,
+      "max_cash_payment": 5958.35,
+      "coverted_max_cash_payment": 7812.06,
+      "points": 23952,
+      "bonuses": 0,
+      "bonus_programs": [],
+      "bonus_tiers": [],
+      "lowest_price": 5958.35,
+      "price": 7812.06,
+      "converted_price": 7812.06,
+      "lowest_converted_price": 7812.06,
+      "market_rates": [
+        {
+          "supplier": "expedia",
+          "rate": 6915.985110792
+        }
+      ]
+    },
+    {
+      "id": "T9cE",
+      "searchRank": 0.96,
+      "price_type": "multi",
+      "free_cancellation": true,
+      "rooms_available": 25,
+      "max_cash_payment": 321.82,
+      "coverted_max_cash_payment": 421.94,
+      "points": 1413,
+      "bonuses": 0,
+      "bonus_programs": [],
+      "bonus_tiers": [],
+      "lowest_price": 321.82,
+      "price": 421.94,
+      "converted_price": 421.94,
+      "lowest_converted_price": 421.94,
+      "market_rates": [
+        {
+          "supplier": "expedia",
+          "rate": 362.1160453752
+        }
+      ]
+    }    
+  ]
+}

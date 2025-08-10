@@ -3,7 +3,7 @@ import HotelMap from './component/HotelMap';
 
 export default function LocationMapSection({ hotel }) {
   return hotel.latitude && hotel.longitude ? (
-    <section className="location-map">
+    <section className="location-map" aria-label="Hotel location">
       <h2>Location</h2>
       <HotelMap
         latitude={hotel.latitude}

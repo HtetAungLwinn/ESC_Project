@@ -1,4 +1,6 @@
 // Get rooms ids from api
+const baseUrl = process.env.EXTERNAL_API_BASE_URL || 'https://hotelapi.loyalty.dev/api/hotels';
+
 async function getRoomsByHotelId(req, res) {
   const { id } = req.params;
 
@@ -7,7 +9,8 @@ async function getRoomsByHotelId(req, res) {
   }
 
   try {
-    const response = await fetch(`https://hotelapi.loyalty.dev/api/hotels/${id}`);
+    // const response = await fetch(`https://hotelapi.loyalty.dev/api/hotels/${id}`);
+    const response = await fetch(`${baseUrl}/${id}`);
 
     if (!response.ok) {
       return res.status(response.status).json({ error: 'Failed to fetch rooms from external API' });
@@ -33,7 +36,10 @@ async function getBulkRoomPrices(req, res) {
     return res.status(400).json({ error: 'Missing hotel id' });
   }
 
-  const url = `https://hotelapi.loyalty.dev/api/hotels/${id}/price?destination_id=${destination_id}` +
+  // const url = `https://hotelapi.loyalty.dev/api/hotels/${id}/price?destination_id=${destination_id}` +
+  //             `&checkin=${checkin}&checkout=${checkout}&lang=en_US&currency=SGD&country_code=SG` +
+  //             `&guests=${guests}&partner_id=1089&landing_page=wl-acme-earn&product_type=earn`;
+  const url = `${baseUrl}/${id}/price?destination_id=${destination_id}` +
               `&checkin=${checkin}&checkout=${checkout}&lang=en_US&currency=SGD&country_code=SG` +
               `&guests=${guests}&partner_id=1089&landing_page=wl-acme-earn&product_type=earn`;
 
