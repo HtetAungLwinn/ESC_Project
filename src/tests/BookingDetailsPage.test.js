@@ -16,23 +16,68 @@ jest.mock('../DeleteAccount', () => ({
   handleDeleteAccount: jest.fn(() => jest.fn()) // returns a function for onClick
 }));
 
+
+
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import BookingDetailsPage from '../BookingDetailsPage';
 import bookingDetails from '../../backend/tests/mockData/bookingDetails.json';
 import '@testing-library/jest-dom';
 
+
+
+// Mock localStorage.getItem
 beforeEach(() => {
-  
-  Storage.prototype.getItem = jest.fn((key) => {
+  jest.spyOn(window.localStorage.__proto__, 'getItem').mockImplementation((key) => {
     if (key === 'uid') return 'user_A1';
     return null;
   });
+
+  // Mock window.confirm to always return true by default
+  jest.spyOn(window, 'confirm').mockImplementation(() => true);
+
+  // Mock window.alert to be a jest.fn()
+  jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+  // Clear fetch mocks before each test
+  global.fetch = jest.fn();
 });
 
 afterEach(() => {
+  jest.restoreAllMocks();
   jest.resetAllMocks();
 });
+
+const mockBookings = [
+  {
+    bid: 1,
+    hotel_name: 'Test Hotel',
+    stay_info: {
+      room_type: 'Suite',
+      adults: 2,
+      children: 0,
+    },
+    hotel_addr: '123 Test St',
+    price: 200,
+    start_date: '2025-08-10',
+    end_date: '2025-08-12',
+    message_to_hotel: 'No smoking room',
+  },
+  {
+    bid: 2,
+    hotel_name: 'Another Hotel',
+    stay_info: {
+      room_type: 'Standard',
+      adults: 1,
+      children: 1,
+    },
+    hotel_addr: '456 Another Ave',
+    price: 150,
+    start_date: '2025-09-01',
+    end_date: '2025-09-03',
+    message_to_hotel: 'Late check-in',
+  },
+];
 
 test('displays loading message', async () => {
   global.fetch = jest.fn(() => new Promise(() => {})); // never resolves
@@ -170,3 +215,104 @@ test('shows "No bookings found..." if backend returns null object', async () => 
   expect(noBookingsMessage).toBeInTheDocument();
 });
 
+test('renders bookings and deletes one on button click', async () => {
+  // First fetch call returns bookings (GET)
+  global.fetch.mockImplementationOnce(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(mockBookings),
+    })
+  );
+
+  // Second fetch call is for DELETE, returns success
+  global.fetch.mockImplementationOnce(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ success: true, message: 'Booking deleted successfully' }),
+    })
+  );
+
+  render(<BookingDetailsPage setLoggedIn={jest.fn()} />);
+
+  // Wait for bookings to render
+  expect(await screen.findByText('Test Hotel')).toBeInTheDocument();
+  expect(screen.getByText('Another Hotel')).toBeInTheDocument();
+
+  // Click delete button for first booking
+  const deleteButtons = screen.getAllByText('Delete Booking');
+  fireEvent.click(deleteButtons[0]);
+
+  // Wait for alert confirmation
+  await waitFor(() => {
+    expect(window.alert).toHaveBeenCalledWith('Booking deleted successfully!');
+  });
+
+  // The first booking should be removed from the DOM
+  expect(screen.queryByText('Test Hotel')).not.toBeInTheDocument();
+
+  // The second booking should still be present
+  expect(screen.getByText('Another Hotel')).toBeInTheDocument();
+});
+
+test('does not delete booking if user cancels confirm', async () => {
+  // Mock confirm to return false (cancel)
+  window.confirm.mockImplementationOnce(() => false);
+
+  // Mock fetch GET call returns bookings
+  global.fetch.mockImplementationOnce(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(mockBookings),
+    })
+  );
+
+  render(<BookingDetailsPage setLoggedIn={jest.fn()} />);
+
+  expect(await screen.findByText('Test Hotel')).toBeInTheDocument();
+
+  // Click delete button for first booking
+  const deleteButtons = screen.getAllByText('Delete Booking');
+  fireEvent.click(deleteButtons[0]);
+
+  // Alert should NOT be called
+  expect(window.alert).not.toHaveBeenCalled();
+
+  // Booking should still be there
+  expect(screen.getByText('Test Hotel')).toBeInTheDocument();
+});
+
+test('shows alert on delete failure', async () => {
+  window.confirm.mockImplementationOnce(() => true);
+
+  // Mock fetch GET call returns bookings
+  global.fetch.mockImplementationOnce(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(mockBookings),
+    })
+  );
+
+  // Mock fetch DELETE call fails
+  global.fetch.mockImplementationOnce(() =>
+    Promise.resolve({
+      ok: false,
+      json: () => Promise.resolve({ error: 'Failed to delete booking' }),
+    })
+  );
+
+  render(<BookingDetailsPage setLoggedIn={jest.fn()} />);
+
+  expect(await screen.findByText('Test Hotel')).toBeInTheDocument();
+
+  // Click delete button for first booking
+  const deleteButtons = screen.getAllByText('Delete Booking');
+  fireEvent.click(deleteButtons[0]);
+
+  // Wait for failure alert
+  await waitFor(() => {
+    expect(window.alert).toHaveBeenCalledWith('Failed to delete booking');
+  });
+
+  // Booking should still be present
+  expect(screen.getByText('Test Hotel')).toBeInTheDocument();
+});

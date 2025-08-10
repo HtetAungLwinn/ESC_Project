@@ -44,12 +44,37 @@ export default function BookingDetailsPage({ setLoggedIn }){
       }
     };
 
-
     fetchBookings();
+    
   }, [userId]);
 
   
+  const handleDeleteBooking = async (bid) => {
+    if (!window.confirm("Are you sure you want to delete this booking?")) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/bookings/delete`, { 
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bid }) 
+      });
   
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to delete booking');
+      }
+  
+      // Remove the deleted booking from state
+      setBookings(prev => prev.filter(b => b.bid !== bid));
+      alert("Booking deleted successfully!");
+      navigate('/')
+    } catch (err) {
+      console.error("Error deleting booking:", err);
+      alert("Failed to delete booking");
+    }
+  };
 
   return (
     <div style={{ position: 'relative' }}>
@@ -66,7 +91,7 @@ export default function BookingDetailsPage({ setLoggedIn }){
       {!loading && !error && Array.isArray(bookings) && bookings.length > 0 && bookings.map((booking) => {
         return (
           <div
-            key={booking.hotel_name}
+            key={booking.bid}
             style={{
               border: '1px solid #ccc',
               padding: '1rem',
@@ -84,6 +109,19 @@ export default function BookingDetailsPage({ setLoggedIn }){
               Children: {booking.stay_info.children} <br />
               Message to hotel: {booking.message_to_hotel}
             </p>
+            <button
+            style={{
+              background: '#e74c3c',
+              color: 'white',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+            onClick={() => handleDeleteBooking(booking.bid)}
+            >
+            Delete Booking
+            </button>
           </div>
         );
       })}
