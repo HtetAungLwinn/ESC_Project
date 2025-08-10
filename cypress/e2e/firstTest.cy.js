@@ -1,21 +1,35 @@
 import 'cypress-real-events/support';
+import '../support/commands.js'
+
+const STRIPE_IFRAME_PREFIX = '__privateStripeFrame';
+
+const CARD_DETAILS = {
+  cardNumber: '4000058260000005',
+  cardExpiry: '0535',
+  cardCvc: '123',
+};
+
+// Get the Stripe iframe's document body for interaction
+const getStripeIFrameDocument = () => {
+  return cy.checkElementExists(`iframe[name^="${STRIPE_IFRAME_PREFIX}"]`).iframeCustom();
+};
 
 describe('Hotel Booking E2E', () => {
   // Helper function to handle Stripe iframe fields
-function fillStripeElement(field, value) {
-  // Get the specific Stripe Element iframe
-  return cy
-    .get(`iframe[title="${field}"]`, { timeout: 10000 })
-    .should('be.visible')
-    .then($iframe => {
-      const $body = $iframe.contents().find('body');
-      // Wrap the body and type the value
-      cy.wrap($body)
-        .find('input')
-        .should('exist')
-        .type(value, { delay: 50 });
-    });
-}
+// function fillStripeElement(field, value) {
+//   // Get the specific Stripe Element iframe
+//   return cy
+//     .get(`iframe[title="${field}"]`)
+//     .should('be.visible')
+//     .then($iframe => {
+//       const $body = $iframe.contents().find('body');
+//       // Wrap the body and type the value
+//       cy.wrap($body)
+//         .find('input')
+//         .should('exist')
+//         .type(value, { delay: 50 });
+//     });
+// }
 
 
   it('should search hotels and view hotel details', () => {
@@ -44,12 +58,14 @@ function fillStripeElement(field, value) {
     cy.get('.react-datepicker__day--012').first().click(); // 12th of the month
 
     // 6. Click Search
-    cy.get('button.search-btn').click();
+    cy.get('button.search-btn', { delay: 200 }).click();
 
     // 7. Wait for results page and check for hotel cards
     cy.url().should('include', '/results');
     cy.contains('Hotels in Singapore').should('be.visible');
-    cy.get('button').contains(/select/i).first().click(); // Click first hotel "Select" button
+    cy.get('button', { delay: 200 }).contains(/select/i).first().click(); // Click first hotel "Select" button
+
+    cy.wait(1000);
 
     // 8. Should navigate to hotel details page
     cy.url().should('include', '/room');
@@ -58,9 +74,9 @@ function fillStripeElement(field, value) {
 
     // 9. Scroll to Room Options section
     cy.contains('Room Options').scrollIntoView();
-
+    
     // 10. Click "More Rooms" button if present
-    cy.get('button.see-more-rooms').should('be.visible').click();
+    cy.get('button.see-more-rooms', { delay: 400 }).should('be.visible').click();
 
     // 11. Select the first room in the expanded list
     cy.get('.room-card__btn').first().click();
@@ -96,7 +112,9 @@ function fillStripeElement(field, value) {
 
     cy.url().should('include', '/results');
     cy.contains('Hotels in Singapore').should('be.visible');
-    cy.get('button').contains(/select/i).first().click(); // Click first hotel "Select" button
+    cy.get('button', { delay: 200 }).contains(/select/i).first().click(); // Click first hotel "Select" button
+
+    cy.wait(1000); // Wait for the page to load
 
     cy.url().should('include', '/room');
     cy.contains(/overview/i).should('be.visible');
@@ -104,6 +122,7 @@ function fillStripeElement(field, value) {
 
     cy.contains('Room Options').scrollIntoView();
 
+    cy.wait(1000);
     cy.get('button.see-more-rooms', { delay: 200 }).should('be.visible').click();
 
     // Select the first room in the expanded list
@@ -120,64 +139,27 @@ function fillStripeElement(field, value) {
     // Fill card number
     cy.wait(1000); // Wait for Stripe elements to load
 
-    // Fill card number
-    fillStripeElement('Card Number', '4242424242424242', { delay: 200 });
+    // cy.fillStripeCard('4242 4242 4242 4242', '1234', '123'); 
 
-    // Fill expiry
-    fillStripeElement('Expiry Date', '1234', { delay: 200 });
+    getStripeIFrameDocument()
+      .find('input[data-elements-stable-field-name="cardNumber"]')  // Locate card number field
+      .type(CARD_DETAILS.cardNumber);
 
-    // Fill CVC
-    fillStripeElement('CVC', '123', { delay: 200 });
+    getStripeIFrameDocument()
+      .find('input[data-elements-stable-field-name="cardExpiry"]')  // Locate expiry date field
+      .type(CARD_DETAILS.cardExpiry);
 
+    getStripeIFrameDocument()
+      .find('input[data-elements-stable-field-name="cardCvc"]')  // Locate CVC field
+      .type(CARD_DETAILS.cardCvc);
 
-    // 13. Fill in Stripe card fields using data-cy and iframe
-    // // Card Number
-    // cy.get('[data-cy="card-number-element"] iframe')
-    //   .first()
-    //   .then($iframe => {
-    //     cy.wrap($iframe.contents().find('input[name="cardnumber"]'))
-    //       .realType('4242424242424242', { delay: 20 });
-    //   });
+    // Click the Pay button and wait for processing
+    cy.get('button[type="submit"]')
+      .should('be.visible')
+      .click();
 
-    // // Expiry Date
-    // cy.get('[data-cy="card-expiry-element"] iframe')
-    //   .first()
-    //   .then($iframe => {
-    //     cy.wrap($iframe.contents().find('input[name="exp-date"]'))
-    //       .realType('1234', { delay: 20 });
-    //   });
-
-    // // CVC
-    // cy.get('[data-cy="card-cvc-element"] iframe')
-    //   .first()
-    //   .then($iframe => {
-    //     cy.wrap($iframe.contents().find('input[name="cvc"]'))
-    //       .realType('123', { delay: 20 });
-    //   });
-
-
-    // Cypress.Commands.add('getStripeElement', (fieldName) => {
-    //   if (Cypress.config('chromeWebSecurity')) {
-    //     throw new Error('To get stripe element `chromeWebSecurity` must be disabled');
-    //   }
-
-    //   const selector = `input[data-elements-stable-field-name="${fieldName}"]`;
-
-    //   return cy
-    //     .get('iframe')
-    //     .its('0.contentDocument.body').should('not.be.empty')
-    //     .then(cy.wrap)
-    //     .find(selector);
-    // });
-
-    
-    // Cypress.Commands.add('getByTestId', (testid) => {
-    //   return cy.get(`[data-testid=${testid}]`)
-    // });
-
-    // cy.getByTestId('card-number').find('.StripeElement').should('exist');
-    // cy.getByTestId('card-expiry').find('.StripeElement').should('exist');
-    // cy.getByTestId('card-cvc').find('.StripeElement').should('exist');
+    // Add a wait for payment processing
+    cy.wait(2000);
 
     // 14. Should show booking confirmation
     cy.contains('Booking Confirmed', { timeout: 20000 }).should('be.visible');
@@ -186,6 +168,8 @@ function fillStripeElement(field, value) {
     cy.get('.header').within(() => {
       cy.contains('Booking Details').click();
     });
+
+    cy.contains('Your Bookings', { timeout: 20000 }).should('be.visible');
 
   });
 });
