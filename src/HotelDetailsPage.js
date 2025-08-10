@@ -267,7 +267,7 @@ export default function HotelDetailsPage() {
               .filter(([, v]) => v)
               .map(([key]) => (
                 <div key={key} className="amenity-item">
-                  {formatAmenityName(key)}
+                  {key}
                 </div>
               ))
             }
@@ -295,19 +295,4 @@ export default function HotelDetailsPage() {
 
     </div>
   );
-}
-function formatAmenityName(key) {
-  const acronyms = ['TV', 'AC', 'WiFi', 'Wi-Fi'];
-  acronyms.forEach(acronym => {
-    key = key.replace(new RegExp(acronym, 'gi'), `__${acronym}__`);
-  });
-  let words = key.replace(/([a-z])([A-Z])/g, '$1 $2').split(/[\s_]+/);
-  return words
-    .map(word => {
-      if (word.startsWith('__') && word.endsWith('__')) {
-        return word.replace(/__/g, '');
-      }
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-    })
-    .join(' ');
 }
