@@ -3,7 +3,7 @@ const db = require('./database')
 async function createBooking(req, res){
     const {
         dest_id,
-        stay_info, //stores json file of format start_date, end_date, nights, adults, children, room_type
+        stay_info, //stores json file of format nights, adults, children, room_type
         price,
         payment_info, // stores payment_id and payee_id
         message_to_hotel,

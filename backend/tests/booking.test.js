@@ -1,4 +1,4 @@
-const { createBooking, getAllBookings } = require('../models/booking.js');
+const { createBooking, getAllBookings, deleteBooking } = require('../models/booking.js');
 const booking = require('../models/booking.js');
 const httpMocks = require('node-mocks-http');
 const path = require('path');
@@ -250,8 +250,7 @@ describe('deleteBooking', () => {
   });
 
   test('should return 400 if booking ID is missing', async () => {
-    const { deleteBooking } = require('../models/booking.js');
-    const req = httpMocks.createRequest({ params: {} });
+    const req = httpMocks.createRequest({ method: 'DELETE', body: {} }); // no bid in body
     const res = httpMocks.createResponse();
 
     await deleteBooking(req, res);
@@ -261,12 +260,11 @@ describe('deleteBooking', () => {
   });
 
   test('should return 200 if booking is deleted successfully', async () => {
-    const { deleteBooking } = require('../models/booking.js');
     db.query.mockResolvedValue([{ affectedRows: 1 }]);
 
     const req = httpMocks.createRequest({
       method: 'DELETE',
-      params: { bid: 5 }
+      body: { bid: 5 }, // pass bid in body
     });
     const res = httpMocks.createResponse();
 
@@ -275,17 +273,16 @@ describe('deleteBooking', () => {
     expect(res.statusCode).toBe(200);
     expect(res._getJSONData()).toEqual({
       success: true,
-      message: 'Booking deleted successfully'
+      message: 'Booking deleted successfully',
     });
   });
 
   test('should return 404 if booking not found', async () => {
-    const { deleteBooking } = require('../models/booking.js');
     db.query.mockResolvedValue([{ affectedRows: 0 }]);
 
     const req = httpMocks.createRequest({
       method: 'DELETE',
-      params: { bid: 5 }
+      body: { bid: 5 }, // bid present but no rows deleted
     });
     const res = httpMocks.createResponse();
 
@@ -296,14 +293,13 @@ describe('deleteBooking', () => {
   });
 
   test('should return 500 if DB query fails', async () => {
-    const { deleteBooking } = require('../models/booking.js');
     db.query.mockImplementation(() => {
       throw new Error('DB error');
     });
 
     const req = httpMocks.createRequest({
       method: 'DELETE',
-      params: { bid: 5 }
+      body: { bid: 5 }, // bid present to reach DB call
     });
     const res = httpMocks.createResponse();
 
