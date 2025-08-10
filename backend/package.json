@@ -19,6 +19,7 @@
     "stripe": "^18.3.0"
   },
   "devDependencies": {
-    "jest": "^30.0.5"
+    "jest": "^30.0.5",
+    "supertest": "^7.1.4"
   }
 }

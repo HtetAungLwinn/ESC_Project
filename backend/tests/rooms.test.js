@@ -636,7 +636,7 @@ describe('getBulkRoomPrices', () => {
     expect(res._getJSONData()).toEqual(roomDetails);
   });
 
-  test('checks does room roomNormlizedDescription exist', async () => {
+  test('checks does room roomNormalizedDescription exist', async () => {
     fetch.mockResolvedValue({
       ok: true,
       status: 200,

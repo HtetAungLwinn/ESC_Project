@@ -18,6 +18,7 @@ const paymentRoutes = require('./routes/paymentMock');
 const paymentStripeRoutes = require('./routes/paymentStripe');
 const roomsRoutes = require('./routes/rooms');
 const bookingsRoutes = require('./routes/bookings');
+const deleteAccountRoutes = require('./routes/deleteAccount');
 
 app.use('/api/signup', signupRoutes.router);
 app.use('/api/destinations', destinationRoutes);
@@ -26,6 +27,8 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/payment-stripe', paymentStripeRoutes);
 app.use('/api/rooms', roomsRoutes)
 app.use('/api/bookings', bookingsRoutes);
+
+app.use('/api/deleteAccount', deleteAccountRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
