@@ -14,20 +14,6 @@ const getStripeIFrameDocument = () => {
   return cy.checkElementExists(`iframe[name^="${STRIPE_IFRAME_PREFIX}"]`).iframeCustom();
 };
 
-beforeEach(() => {
-  // Clear cookies and localStorage before each test
-  cy.clearCookies();
-  cy.clearLocalStorage();
-  Cypress.session.clearAllSavedSessions();
-});
-
-afterEach(() => {
-  // Cleanup after each test
-  cy.clearCookies();
-  cy.clearLocalStorage();
-  Cypress.session.clearAllSavedSessions();
-});
-
 describe('Hotel Booking E2E', () => {
   it('should book hotel successfully', () => {
     // 1. Visit homepage
@@ -169,13 +155,62 @@ describe('Hotel Booking E2E', () => {
     cy.contains('Your Bookings', { timeout: 20000 }).should('be.visible');
 
   });
+});
 
-  after(() => {
-    // Final cleanup after all tests in this describe block
-    cy.log('Test completed, cleaning up...');
-    cy.clearCookies();
-    cy.clearLocalStorage();
-    Cypress.session.clearAllSavedSessions();
-    cy.log('Cleanup completed');
+describe('Booking Cancellation E2E', () => {
+  it('should cancel all existing bookings', () => {
+    // 1. Visit homepage and login
+    cy.visit('http://localhost:3000');
+    cy.contains('Login').click();
+    
+    // 2. Login with test credentials
+    cy.get('input#email').type('chia.zhong.yi.zy@gmail.com');
+    cy.get('input#password').type('testtest');
+    cy.get('button[type="submit"]').click();
+
+    // 3. Navigate to Booking Details
+    cy.get('.header').within(() => {
+      cy.contains('Booking Details').click();
+    });
+
+    // 4. Verify we're on the bookings page
+    cy.contains('Your Bookings', { timeout: 10000 }).should('be.visible');
+
+    cy.wait(1000); // Wait for bookings to load
+
+    // 5. Delete all bookings if they exist
+    cy.get('body').then(($body) => {
+      const deleteBooking = () => {
+        if ($body.find('button:contains("Delete Booking")').length > 0) {
+          // Click delete button
+          cy.get('button').contains('Delete Booking').first().click();
+          
+          // Handle confirmation dialog
+          cy.on('window:confirm', () => true);
+          
+          // Wait for deletion and page refresh
+          cy.wait(1000);
+          
+          // Refresh page to update booking list
+          cy.get('.header').within(() => {
+            cy.contains('Booking Details').click();
+          });
+
+          cy.wait(1000); // Wait for bookings to reload
+          
+          // Check if more bookings exist and continue deleting
+          cy.get('body').then(($updatedBody) => {
+            if ($updatedBody.find('button:contains("Delete Booking")').length > 0) {
+              deleteBooking();
+            }
+          });
+        }
+      };
+
+      deleteBooking();
+    });
+
+    // 6. Verify no bookings remain
+    cy.contains('No bookings found').should('be.visible');
   });
 });
