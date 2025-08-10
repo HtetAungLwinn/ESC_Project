@@ -15,23 +15,6 @@ const getStripeIFrameDocument = () => {
 };
 
 describe('Hotel Booking E2E', () => {
-  // Helper function to handle Stripe iframe fields
-// function fillStripeElement(field, value) {
-//   // Get the specific Stripe Element iframe
-//   return cy
-//     .get(`iframe[title="${field}"]`)
-//     .should('be.visible')
-//     .then($iframe => {
-//       const $body = $iframe.contents().find('body');
-//       // Wrap the body and type the value
-//       cy.wrap($body)
-//         .find('input')
-//         .should('exist')
-//         .type(value, { delay: 50 });
-//     });
-// }
-
-
   it('should search hotels and view hotel details', () => {
     // 1. Visit homepage
     cy.visit('http://localhost:3000');
@@ -139,8 +122,6 @@ describe('Hotel Booking E2E', () => {
     // Fill card number
     cy.wait(1000); // Wait for Stripe elements to load
 
-    // cy.fillStripeCard('4242 4242 4242 4242', '1234', '123'); 
-
     getStripeIFrameDocument()
       .find('input[data-elements-stable-field-name="cardNumber"]')  // Locate card number field
       .type(CARD_DETAILS.cardNumber);
@@ -169,6 +150,7 @@ describe('Hotel Booking E2E', () => {
       cy.contains('Booking Details').click();
     });
 
+    // confirm page 
     cy.contains('Your Bookings', { timeout: 20000 }).should('be.visible');
 
   });
