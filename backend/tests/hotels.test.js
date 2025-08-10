@@ -56,7 +56,7 @@ describe('getFilteredHotels Controller', () => {
       adultsNum: 1,
       childrenNum: 0
     });
-    const { cache } = require('../models/hotels'); // if exported for testing
+    const { cache } = require('../models/hotels');
     cache.set(cacheKey, { timestamp: Date.now(), data: [{ id: 1, rating: 5, price: 100 }] });
 
     await getFilteredHotels(req, res);
@@ -142,6 +142,28 @@ describe('getFilteredHotels Controller', () => {
     await getFilteredHotels(req, res);
     const { hotels } = res._getJSONData();
     expect(hotels[0].price).toBeGreaterThanOrEqual(hotels[1].price);
+  });
+
+    test('sorts by guestRating ascending', async () => {
+    req.query.sortBy = 'guestRating';
+    setFetchMockSequence(
+      { json: hotelDetails },
+      { json: { completed: true, hotels: priceDetails.hotels } }
+    );
+    await getFilteredHotels(req, res);
+    const { hotels } = res._getJSONData();
+    expect((hotels[0].trustyou?.score?.overall ?? 0)).toBeGreaterThanOrEqual((hotels[1].trustyou?.score?.overall ?? 0));
+  });
+
+    test('sorts by starRating ascending', async () => {
+    req.query.sortBy = 'rating';
+    setFetchMockSequence(
+      { json: hotelDetails },
+      { json: { completed: true, hotels: priceDetails.hotels } }
+    );
+    await getFilteredHotels(req, res);
+    const { hotels } = res._getJSONData();
+    expect(hotels[0].rating).toBeGreaterThanOrEqual(hotels[1].rating);
   });
 
   test('handles Hotel API error', async () => {
