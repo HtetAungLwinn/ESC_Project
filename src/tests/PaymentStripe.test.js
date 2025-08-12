@@ -252,3 +252,153 @@ test('shows error when card number is incomplete', async () => {
     expect(screen.getByText(/your card number is incomplete/i)).toBeInTheDocument();
   });
 });
+
+test('required field with only whitespace is treated as empty', async () => {
+  global.fetch.mockClear();
+
+  render(
+    <MemoryRouter>
+      <Elements stripe={stripePromise}>
+        <CheckoutForm />
+      </Elements>
+    </MemoryRouter>
+  );
+
+  await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
+
+  // Fill one field with whitespace only
+  await userEvent.type(screen.getByPlaceholderText(/first and last name/i), '   ');
+  await userEvent.click(screen.getByRole('button', { name: /pay/i }));
+
+  // Booking API should not be called
+  const bookingCalls = global.fetch.mock.calls.filter(call => call[0] === '/api/bookings/create');
+  expect(bookingCalls.length).toBe(0);
+});
+
+test('payment method creation error sets correct error message', async () => {
+  mockCreatePaymentMethod = jest.fn(() =>
+    Promise.resolve({
+      error: { message: 'Test payment method error' },
+    })
+  );
+
+  render(
+    <MemoryRouter>
+      <Elements stripe={stripePromise}>
+        <CheckoutForm />
+      </Elements>
+    </MemoryRouter>
+  );
+
+  // Fill all fields
+  await userEvent.type(screen.getByPlaceholderText(/first and last name/i), 'John Doe');
+  await userEvent.type(screen.getByPlaceholderText(/include country code/i), '+6512345678');
+  await userEvent.type(screen.getByPlaceholderText(/someone@example.com/i), 'john@example.com');
+  await userEvent.type(screen.getByPlaceholderText(/billing address/i), '123 Street');
+
+  await userEvent.click(screen.getByRole('button', { name: /pay/i }));
+
+  expect(await screen.findByText(/test payment method error/i)).toBeInTheDocument();
+});
+
+test('loading state is true during payment attempt and false after', async () => {
+  let resolveConfirm;
+  mockConfirmCardPayment = jest.fn(
+    () => new Promise(res => { resolveConfirm = res; })
+  );
+
+  render(
+    <MemoryRouter>
+      <Elements stripe={stripePromise}>
+        <CheckoutForm />
+      </Elements>
+    </MemoryRouter>
+  );
+
+  // Fill required fields
+  await userEvent.type(screen.getByPlaceholderText(/first and last name/i), 'John Doe');
+  await userEvent.type(screen.getByPlaceholderText(/include country code/i), '+6512345678');
+  await userEvent.type(screen.getByPlaceholderText(/someone@example.com/i), 'john@example.com');
+  await userEvent.type(screen.getByPlaceholderText(/billing address/i), '123 Street');
+
+  const payButton = screen.getByRole('button', { name: /pay/i });
+
+  // Click and wait for UI to update
+  await userEvent.click(payButton);
+
+  // Wait for button to be disabled and show Loading...
+  await waitFor(() => {
+    expect(payButton).toBeDisabled();
+    expect(payButton).toHaveTextContent(/loading/i);
+  });
+
+  // Resolve the confirmCardPayment promise
+  await act(async () => {
+    resolveConfirm({ error: null, paymentIntent: { status: 'succeeded' } });
+  });
+
+  // Wait for button to be enabled and show Pay again
+  await waitFor(() => {
+    expect(payButton).not.toBeDisabled();
+    expect(payButton).toHaveTextContent(/^pay$/i);
+  });
+});
+
+
+test('success message is set when payment succeeds', async () => {
+  mockConfirmCardPayment = jest.fn(() =>
+    Promise.resolve({ error: null, paymentIntent: { status: 'succeeded' } })
+  );
+
+  // Prevent actual redirect
+  delete window.location;
+  window.location = { href: '' };
+
+  render(
+    <MemoryRouter>
+      <Elements stripe={stripePromise}>
+        <CheckoutForm />
+      </Elements>
+    </MemoryRouter>
+  );
+
+  await userEvent.type(screen.getByPlaceholderText(/first and last name/i), 'John Doe');
+  await userEvent.type(screen.getByPlaceholderText(/include country code/i), '+6512345678');
+  await userEvent.type(screen.getByPlaceholderText(/someone@example.com/i), 'john@example.com');
+  await userEvent.type(screen.getByPlaceholderText(/billing address/i), '123 Street');
+
+  await userEvent.click(screen.getByRole('button', { name: /pay/i }));
+
+  // Wait for message to appear before redirect attempt
+  expect(await screen.findByText(/payment successful!/i)).toBeInTheDocument();
+
+  // Check redirect happened as well (optional)
+  expect(window.location.href).toBe('/confirmation');
+});
+
+
+test('does not call booking API if createPaymentMethod fails', async () => {
+  mockCreatePaymentMethod = jest.fn(() =>
+    Promise.resolve({ error: { message: 'Fail create PM' } })
+  );
+
+  render(
+    <MemoryRouter>
+      <Elements stripe={stripePromise}>
+        <CheckoutForm />
+      </Elements>
+    </MemoryRouter>
+  );
+
+  await userEvent.type(screen.getByPlaceholderText(/first and last name/i), 'John Doe');
+  await userEvent.type(screen.getByPlaceholderText(/include country code/i), '+6512345678');
+  await userEvent.type(screen.getByPlaceholderText(/someone@example.com/i), 'john@example.com');
+  await userEvent.type(screen.getByPlaceholderText(/billing address/i), '123 Street');
+
+  await userEvent.click(screen.getByRole('button', { name: /pay/i }));
+
+  await waitFor(() => {
+    const bookingCalls = global.fetch.mock.calls.filter(call => call[0] === '/api/bookings/create');
+    expect(bookingCalls.length).toBe(0);
+  });
+});

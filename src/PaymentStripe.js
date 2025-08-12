@@ -59,7 +59,7 @@ export function CheckoutForm() {
     fetch('/api/payment-stripe/create-payment-intent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: 1000 }) // SGD $10.00  todo - replace with actual amount
+      body: JSON.stringify({ amount: 1000 })
     })
       .then(res => res.json())
       .then(data => {
@@ -201,6 +201,7 @@ export function CheckoutForm() {
       </div>
       <h2>Payment Details</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
+      {message && <p style={{ color: 'green' }}>{message}</p>}
       <form onSubmit={handleSubmit} className='payment-form'>
         <div className='form-left'>
           <div>
@@ -275,7 +276,9 @@ export function CheckoutForm() {
           </label>
         </div>
 
-        <button type="submit">Pay</button>
+        <button type="submit" disabled={loading}>
+        {loading ? 'Loading...' : 'Pay'}
+        </button>
       </form>
     </div>
   );
