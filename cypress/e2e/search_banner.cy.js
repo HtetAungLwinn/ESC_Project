@@ -23,8 +23,8 @@ describe("SearchBanner full E2E test", () => {
     cy.contains(".suggestions-list li", "Singapore, Singapore").click();
 
     // Select check-in date (using the date picker inputs)
-    cy.get('input[placeholder="Check‑in"]').clear().type("2025-08-15").blur();
-    cy.get('input[placeholder="Check‑out"]').clear().type("2025-08-18").blur();
+    cy.get('input[placeholder="Check‑in"]').clear().type("2025-08-22").blur();
+    cy.get('input[placeholder="Check‑out"]').clear().type("2025-08-29").blur();
 
     // Open Rooms & Guests dropdown
     cy.get(".rg-toggle").click();
@@ -47,13 +47,11 @@ describe("SearchBanner full E2E test", () => {
     // Confirm URL includes /results and correct query params
     cy.url().should("include", "/results");
     cy.url().should("include", "destination=Singapore");
-    cy.url().should("include", "checkin=2025-08-15");
-    cy.url().should("include", "checkout=2025-08-18");
+    cy.url().should("include", "checkin=2025-08-22");
+    cy.url().should("include", "checkout=2025-08-29");
     cy.url().should("include", "rooms=2");
     cy.url().should("include", "adults=2");
     cy.url().should("include", "children=1");
 
-    // Optionally, assert that the results page content loaded (if you have an element to check)
-    // cy.contains("h1", "Hotels in Singapore").should("exist");
   });
 });
