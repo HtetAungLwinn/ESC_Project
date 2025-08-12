@@ -24,27 +24,64 @@ describe('Signup + Login (frontend ↔ backend ↔ DB)', () => {
     };
   
     it('SU-01 + LG-01: sign up then login (assert redirect + session)', () => {
+      // Intercept Firebase REST login & user lookup
+      cy.intercept('POST', 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword*', (req) => {
+        req.reply({
+          statusCode: 200,
+          body: {
+            localId: 'test-uid',
+            email,
+            emailVerified: true,
+            idToken: 'fake-id-token',
+            refreshToken: 'fake-refresh-token',
+            expiresIn: '3600',
+          },
+        });
+      }).as('firebaseSignIn');
+
+      cy.intercept('POST', 'https://identitytoolkit.googleapis.com/v1/accounts:lookup*', (req) => {
+        req.reply({
+          statusCode: 200,
+          body: {
+            users: [{
+              localId: 'test-uid',
+              emailVerified: true,
+              email,
+            }],
+          },
+        });
+      }).as('firebaseUserLookup');
+
+      // Intercept backend API call that happens on first login (after email verified)
       cy.intercept('POST', '/api/signup').as('postSignup');
-  
-      // --- Signup (happy path) ---
+
+      // Signup
       cy.visit('/signup');
       fillSignup();
       cy.get('form').submit();
-  
+
       cy.contains('Signup successful', { timeout: 10000 }).should('be.visible');
       cy.url().should('include', '/login');
-  
-      // --- Login (happy path) ---
+
+      // Login
       cy.get('#email').type(email);
       cy.get('#password').type(password);
       cy.get('form').submit();
-  
-      cy.wait('@postSignup', { timeout: 15000 }).then(({ response }) => {
-        expect([200, 409]).to.include(response?.statusCode);
+
+      // Wait for Firebase login and user lookup
+      cy.wait('@firebaseSignIn', { timeout: 15000 });
+      cy.wait('@firebaseUserLookup', { timeout: 15000 });
+
+      // Wait for backend /api/signup call triggered on login after email verification
+      cy.wait('@postSignup', { timeout: 15000 }).its('response.statusCode').should(status => {
+        expect([200, 409]).to.include(status);
       });
-  
+
+      // Assert redirect to homepage
       cy.location('pathname', { timeout: 10000 }).should('eq', '/');
-      cy.window().then((win) => {
+
+      // Assert localStorage uid set
+      cy.window().then(win => {
         const uid = win.localStorage.getItem('uid');
         expect(uid).to.be.a('string').and.to.have.length.greaterThan(0);
       });
