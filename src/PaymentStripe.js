@@ -83,6 +83,7 @@ export function CheckoutForm() {
     }
 
     setLoading(true);
+    setError('');  // clear previous errors
 
     const requiredFields = [
       { label: "Name on card", value: name },
@@ -95,6 +96,7 @@ export function CheckoutForm() {
       if (!field.value.trim()) {
         setError(`${field.label} is required.`);
         console.log(`${field.label} is required.`);
+        setLoading(false);
         return;
       }
     }
@@ -107,6 +109,7 @@ export function CheckoutForm() {
     if (pmError) {
       setError(pmError.message || "Payment method creation failed.");
       console.log(pmError.message);
+      setLoading(false);
       return;
     }
 
@@ -119,6 +122,7 @@ export function CheckoutForm() {
     if (result.error) {
       setError(result.error.message || 'Payment failed.');
       console.log(result.error.message);
+      setLoading(false);
     } else if (result.paymentIntent.status === 'succeeded') {
       fetch('/api/bookings/create', {
         method: 'POST',
@@ -150,6 +154,7 @@ export function CheckoutForm() {
           message_to_hotel: specialRequests || null
         }),
       });
+      setLoading(false);
       setMessage('Payment successful!');
       window.location.href = '/confirmation';
     }
