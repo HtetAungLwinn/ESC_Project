@@ -393,7 +393,7 @@ export default function Results() {
 
           <div style={{ display: "flex", flexDirection: "column", width: "75px" }}>
             <button
-              className="search-btn"
+              className="filter-btn"
               style={{ alignSelf: "flex-end", marginLeft: "1rem" }}
               onClick={() => {
                 const min = parseFloat(filterInputs.minPrice);
@@ -434,6 +434,7 @@ export default function Results() {
           ) : (
             hotelsToShow.map((hotel) => (
               <div
+                className = "hotel-card"
                 key={hotel.id}
                 style={{
                   border: "1px solid #ddd",
@@ -497,12 +498,12 @@ export default function Results() {
                 }
                 < div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                   <div>
-                    <h3 style={{ fontSize: "1.1rem", margin: "0 0 0.2rem" }}>{hotel.name}</h3>
+                    <h3 className="hotel-name" style={{ fontSize: "1.1rem", margin: "0 0 0.2rem" }}>{hotel.name}</h3>
                     <p style={{ margin: 0, color: "#777" }}>{destination}</p>
-                    <p style={{ margin: "0.3rem 0", fontWeight: "bold", color: "#d66a6a" }}>
+                    <p className="price-card" style={{ margin: "0.3rem 0", fontWeight: "bold", color: "#d66a6a" }}>
                       ${hotel.price.toLocaleString()}
                     </p>
-                    <p style={{ margin: "0.2rem 0", fontSize: "0.9rem", color: "#555" }}>
+                    <p className="rating-card" style={{ margin: "0.2rem 0", fontSize: "0.9rem", color: "#555" }}>
                       ⭐ Star Rating: {hotel.rating ?? "N/A"} <br />
                       👤 Guest Rating: {hotel.guestRating ?? "N/A"}
                     </p>
