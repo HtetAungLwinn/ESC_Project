@@ -100,10 +100,34 @@ async function getAllBookings(req,res) {
   
 }
 
+async function deleteBooking(req, res) {
+  try {
+    const { bid } = req.body;
 
+    console.log(bid);
+
+    if (!bid) {
+      return res.status(400).json({ error: 'Missing booking ID' });
+    }
+
+    // Attempt to delete the booking
+    const [result] = await db.query('DELETE FROM bookings WHERE bid = ?', [bid]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    return res.status(200).json({ success: true, message: 'Booking deleted successfully' });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to delete booking' });
+  }
+}
 
 module.exports = {
   createBooking,
   getBookingByID,
-  getAllBookings
+  getAllBookings,
+  deleteBooking
 };

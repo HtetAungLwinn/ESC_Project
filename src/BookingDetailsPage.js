@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from './firebase';
-import { EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { handleDeleteAccount } from './DeleteAccount';
 
 
 export default function BookingDetailsPage({ setLoggedIn }){
@@ -17,72 +16,71 @@ export default function BookingDetailsPage({ setLoggedIn }){
     const fetchBookings = async () => {
       try {
         const res = await fetch(`/api/bookings?uid=${userId}`);
+      
+        if (!res.ok) {
+          // get error message from server
+          const errorData = await res.json();
+          throw new Error(errorData.error || 'Failed to fetch bookings');
+        }
+      
         const bookingsData = await res.json();
-          //setBookings(bookingsData);
-          // Safely handle null, undefined, or wrong types
-          if (Array.isArray(bookingsData)) {
-            setBookings(bookingsData);
-          } else if (bookingsData === null || bookingsData === undefined) {
-            console.warn("Bookings data is null or undefined");
-            setBookings([]); // Fallback to empty array
-          } else {
-            console.error("Unexpected bookings format:", data);
-            setBookings([]); // Fallback to avoid crashing the app
-          }
-        } catch (err) {
+      
+        if (Array.isArray(bookingsData)) {
+          setBookings(bookingsData);
+        } else {
+          console.error("Unexpected bookings format:", bookingsData);
+          setBookings([]);
+        }
+      } catch (err) {
+        if (err.message.includes("No bookings found")) {
+          // Backend says no bookings, show empty list
+          setBookings([]);
+        } else {
           console.error("Error fetching bookings:", err);
           setError(true);
-        } finally {
-          setLoading(false);
         }
-      };
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      fetchBookings();
-    }, [userId]);
+    fetchBookings();
+    
+  }, [userId]);
 
-  const handleDeleteAccount = async () => {
-    if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) return;
-    const uid = localStorage.getItem('uid');
-    const user = auth.currentUser;
+  
+  const handleDeleteBooking = async (bid) => {
+    if (!window.confirm("Are you sure you want to delete this booking?")) {
+      return;
+    }
 
     try {
-      const email = user.email;
-      const password = prompt("Please re-enter your password to confirm account deletion:");
-
-      if (!password) return;
-
-      const credential = EmailAuthProvider.credential(email, password);
-      await reauthenticateWithCredential(user, credential);
-
-      // 1. Call backend to delete user data
-      const res = await fetch(`http://localhost:5000/api/deleteAccount`, {
+      const res = await fetch(`/api/bookings/delete`, { 
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid })
+        body: JSON.stringify({ bid }) 
       });
-
-      const result = await res.json();
-      if (!result.success) throw new Error(result.error || 'Backend delete failed');
-
-      // 2. Delete user from Firebase Auth
-      await user.delete();
-
-      // 3. Log out and redirect
-      localStorage.removeItem('uid');
-      localStorage.removeItem('user');
-      setLoggedIn(false);
-      navigate('/');
+  
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to delete booking');
+      }
+  
+      // Remove the deleted booking from state
+      setBookings(prev => prev.filter(b => b.bid !== bid));
+      alert("Booking deleted successfully!");
+      navigate('/')
     } catch (err) {
-      alert('Failed to delete account: ' + err.message);
+      console.error("Error deleting booking:", err);
+      alert("Failed to delete booking");
     }
   };
-  
 
   return (
     <div style={{ position: 'relative' }}>
       <button
         style={{ position: 'absolute', top: 0, right: 0, margin: '1rem', padding: '0.5rem 1rem', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'}}
-        onClick={handleDeleteAccount}
+        onClick={() => handleDeleteAccount({setLoggedIn, navigate})}
       >
         Delete Account
       </button>
@@ -92,7 +90,14 @@ export default function BookingDetailsPage({ setLoggedIn }){
       {!loading && !error && bookings.length === 0 && <p>No bookings found...</p>}
       {!loading && !error && Array.isArray(bookings) && bookings.length > 0 && bookings.map((booking) => {
         return (
-          <div key={booking.hotel_name} style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem' }}>
+          <div
+            key={booking.bid}
+            style={{
+              border: '1px solid #ccc',
+              padding: '1rem',
+              marginBottom: '1rem'
+            }}
+          >
             <h3>{booking.hotel_name}</h3>
             <p>
               Room: {booking.stay_info.room_type}<br />
@@ -104,6 +109,19 @@ export default function BookingDetailsPage({ setLoggedIn }){
               Children: {booking.stay_info.children} <br />
               Message to hotel: {booking.message_to_hotel}
             </p>
+            <button
+            style={{
+              background: '#e74c3c',
+              color: 'white',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+            onClick={() => handleDeleteBooking(booking.bid)}
+            >
+            Delete Booking
+            </button>
           </div>
         );
       })}

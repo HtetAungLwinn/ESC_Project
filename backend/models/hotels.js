@@ -173,4 +173,4 @@ async function getFilteredHotels(req, res) {
   }
 }
 
-module.exports = { getFilteredHotels };
+module.exports = { getFilteredHotels, cache };
