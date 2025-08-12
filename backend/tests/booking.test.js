@@ -266,7 +266,7 @@ describe('deleteBooking', () => {
 
     const req = httpMocks.createRequest({
       method: 'DELETE',
-      params: { bid: 5 }
+      body: { bid: 5 }
     });
     const res = httpMocks.createResponse();
 
@@ -285,7 +285,7 @@ describe('deleteBooking', () => {
 
     const req = httpMocks.createRequest({
       method: 'DELETE',
-      params: { bid: 5 }
+      body: { bid: 5 }
     });
     const res = httpMocks.createResponse();
 
@@ -303,7 +303,7 @@ describe('deleteBooking', () => {
 
     const req = httpMocks.createRequest({
       method: 'DELETE',
-      params: { bid: 5 }
+      body: { bid: 5 }
     });
     const res = httpMocks.createResponse();
 
