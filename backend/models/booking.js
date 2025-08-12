@@ -102,7 +102,7 @@ async function getAllBookings(req,res) {
 
 async function deleteBooking(req, res) {
   try {
-    const { bid } = req.body;
+    const { bid } = req.params;
 
     console.log(bid);
 
