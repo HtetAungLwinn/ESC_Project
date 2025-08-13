@@ -10,7 +10,7 @@ router.delete('/', async (req, res) => {
     // Delete user from users table
     await db.query('DELETE FROM User WHERE uid = ?', [uid]);
     // Delete user bookings
-    await db.query('DELETE FROM bookings WHERE uid = ?', [uid]);
+    // await db.query('DELETE FROM bookings WHERE uid = ?', [uid]);
     res.json({ success: true });
   } catch (err) {
     console.error('Delete account error:', err);

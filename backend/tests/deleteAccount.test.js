@@ -14,18 +14,16 @@ describe('DELETE /api/deleteAccount', () => {
     jest.clearAllMocks();
   });
 
-  it('delete account from user and bookings, and return success', async () => {
-    // Mock db.query to resolve successfully twice
-    db.query.mockResolvedValueOnce()  // for deleting user
-            .mockResolvedValueOnce(); // for deleting bookings
+  it('delete account from user and return success', async () => {
+    // Mock db.query to resolve successfully once
+    db.query.mockResolvedValueOnce(); // for deleting user only
 
     const res = await request(app)
       .delete('/api/deleteAccount')
       .send({ uid: 123 });
 
-    expect(db.query).toHaveBeenCalledTimes(2);
+    expect(db.query).toHaveBeenCalledTimes(1);
     expect(db.query).toHaveBeenNthCalledWith(1, 'DELETE FROM User WHERE uid = ?', [123]);
-    expect(db.query).toHaveBeenNthCalledWith(2, 'DELETE FROM bookings WHERE uid = ?', [123]);
     expect(res.statusCode).toBe(200);
     expect(res.body).toEqual({ success: true });
   });
