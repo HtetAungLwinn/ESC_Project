@@ -37,7 +37,9 @@ describe('Hotel Booking E2E', () => {
     cy.contains('Travel Website').should('be.visible');
 
     // 3. Fill in destination and select suggestion
-    cy.get('input[placeholder="Where are you going?"]').as('destinationInput').type('Singapore');
+    cy.get('input[placeholder="Where are you going?"]')
+      .as('destinationInput')
+      .type('Singapore, Sing', { delay: 100 });
     cy.get('.suggestions-list li').first().click();
 
     // 4. Pick check-in and check-out dates using react-datepicker

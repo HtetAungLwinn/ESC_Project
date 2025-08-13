@@ -24,7 +24,9 @@ describe('Hotel Booking E2E', () => {
     cy.contains('Travel Website').should('be.visible');
 
     // 3. Fill in destination and select suggestion
-    cy.get('input[placeholder="Where are you going?"]').as('destinationInput').type('Singapore');
+    cy.get('input[placeholder="Where are you going?"]')
+      .as('destinationInput')
+      .type('Singapore, Sing', { delay: 100 });
     cy.get('.suggestions-list li').first().click();
 
     // 4. Pick check-in and check-out dates using react-datepicker
@@ -76,7 +78,9 @@ describe('Hotel Booking E2E', () => {
     cy.get('button[type="submit"]').click();
 
     // repeat steps 3 to 11
-    cy.get('input[placeholder="Where are you going?"]').as('destinationInput').type('Singapore');
+    cy.get('input[placeholder="Where are you going?"]')
+      .as('destinationInput')
+      .type('Singapore, Sing', { delay: 100 });
     cy.get('.suggestions-list li').first().click();
 
     // Open check-in picker
@@ -167,7 +171,9 @@ describe('Payment Error', () => {
     cy.contains('Travel Website').should('be.visible');
 
     // 3. Fill in destination and select suggestion
-    cy.get('input[placeholder="Where are you going?"]').as('destinationInput').type('Singapore');
+    cy.get('input[placeholder="Where are you going?"]')
+      .as('destinationInput')
+      .type('Singapore, Sing', { delay: 100 });
     cy.get('.suggestions-list li').first().click();
 
     // 4. Pick check-in and check-out dates using react-datepicker
@@ -219,7 +225,9 @@ describe('Payment Error', () => {
     cy.get('button[type="submit"]').click();
 
     // repeat steps 3 to 11
-    cy.get('input[placeholder="Where are you going?"]').as('destinationInput').type('Singapore');
+    cy.get('input[placeholder="Where are you going?"]')
+      .as('destinationInput')
+      .type('Singapore, Sing', { delay: 100 });
     cy.get('.suggestions-list li').first().click();
 
     // Open check-in picker
