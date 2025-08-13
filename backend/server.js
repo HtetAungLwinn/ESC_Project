@@ -45,7 +45,10 @@ app.use('/api/bookings', bookingsRoutes);
 
 app.use('/api/deleteAccount', deleteAccountRoutes);
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`Server running on port ${port}`);
+// });
+
+module.exports = app;
+
 
