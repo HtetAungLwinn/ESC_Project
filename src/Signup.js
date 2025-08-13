@@ -81,7 +81,7 @@ export default function Signup() {
       setForm((prev) => ({ ...prev, password: "", confirmPassword: "" }));
       setTimeout(() => {
         navigate("/login", { state: location.state });
-      }, 1500); // Give user time to read success message
+      }, 4000); // Give user time to read success message
     } catch (error) {
       setErrorMessage(error.message);
     }
