@@ -141,14 +141,27 @@ export default function SearchBanner() {
 
 
   const handleSearch = () => {
-    if (!destination.trim()) return;
+    let dest = destination.trim();
+    if (!dest) return;
+    // If destination is not an exact match, try to auto-complete
+    const exactMatch = allDestinations.find(
+      d => d.toLowerCase() === dest.toLowerCase()
+    );
+    if (!exactMatch) {
+      const hits = fuse.search(dest).slice(0, 1); // take top suggestion
+      if (hits.length > 0) {
+        dest = hits[0].item; // auto-complete with suggestion
+        setDestination(dest); // update input field
+      }
+    }
+
     const { startDate } = dateRange;
     if (startDate && startDate < minCheckinDate) {
       alert(`Check‑in must be on or after ${minCheckinDate.toLocaleDateString("en-CA")}`);
       return;
     }
 
-    fetch(`/api/destinations/uid?term=${encodeURIComponent(destination)}`)
+    fetch(`/api/destinations/uid?term=${encodeURIComponent(dest)}`)
       .then(res => res.json())
       .then(data => {
         const uid    = data.uid;
@@ -161,7 +174,7 @@ export default function SearchBanner() {
           : "";
 
         navigate(
-          `/results?destination=${encodeURIComponent(destination)}`+
+          `/results?destination=${encodeURIComponent(dest)}`+
           `&uid=${encodeURIComponent(uid)}`+
           `&checkin=${checkin}`+
           `&checkout=${checkout}`+
